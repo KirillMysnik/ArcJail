@@ -1,15 +1,8 @@
-from traceback import format_exc
-
-from filters.players import PlayerIter
-from listeners import OnClientActive, OnClientDisconnect, OnLevelInit
 from paths import CFG_PATH
 from players.entity import Player
 from stringtables.downloads import Downloadables
 
 from .info import info
-
-from .classes.base_player_manager import BasePlayerManager
-from .classes.callback import CallbackDecorator
 
 
 DOWNLOADLIST = CFG_PATH / info.basename / "downloadlists" / "main.txt"
@@ -28,8 +21,6 @@ def load_downloadables(filepath):
     return downloadables
 
 downloadables_global = load_downloadables(DOWNLOADLIST)
-
-player_manager = BasePlayerManager(lambda player: player)
 
 
 class InternalEventManager(dict):
@@ -73,76 +64,30 @@ internal_event_manager = InternalEventManager()
 
 
 class InternalEvent:
-    def __init__(self, event_name, event_manager=internal_event_manager):
+    def __init__(self, event_name):
         self.event_name = event_name
-        self.event_manager = event_manager
 
     def __call__(self, handler):
         self.register(handler)
 
     def register(self, handler):
-        self.event_manager.register_event_handler(self.event_name, handler)
+        internal_event_manager.register_event_handler(self.event_name, handler)
 
     def unregister(self, handler):
-        self.event_manager.register_event_handler(self.event_name, handler)
+        internal_event_manager.unregister_event_handler(
+            self.event_name, handler)
 
     @staticmethod
-    def fire(self, event_name, event_var):
-        self.event_manager.fire(event_name, event_var)
-
-
-plugin_load_callbacks = []
-plugin_unload_callbacks = []
-
-
-class OnPluginLoad(CallbackDecorator):
-    def register(self):
-        plugin_load_callbacks.append(self)
-
-    def unregister(self):
-        plugin_load_callbacks.remove(self)
-
-
-class OnPluginUnload(CallbackDecorator):
-    def register(self):
-        plugin_unload_callbacks.append(self)
-
-    def unregister(self):
-        plugin_unload_callbacks.remove(self)
+    def fire(event_name, event_var):
+        internal_event_manager.fire(event_name, event_var)
 
 
 def load():
-    for player in PlayerIter():
-        player_manager.create(player)
-
-    for callback in plugin_load_callbacks:
-        callback()
+    InternalEvent.fire('load', {})
 
 
 def unload():
-    for callback in plugin_unload_callbacks:
-        callback()
-
-    for player in list(player_manager.values()):
-        player_manager.delete(player)
-
-
-@OnClientActive
-def listener_on_client_active(index):
-    player = Player(index)
-    player_manager.create(player)
-
-
-@OnClientDisconnect
-def on_client_disconnect(index):
-    player = Player(index)
-    player_manager.delete(player)
-
-
-@OnLevelInit
-def listener_on_level_init(map_name):
-    for player in list(player_manager.keys()):
-        player_manager.delete(player)
+    InternalEvent.fire('unload', {})
 
 
 from . import modules

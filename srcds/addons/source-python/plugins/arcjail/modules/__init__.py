@@ -1,5 +1,9 @@
 import os
 
+from config.manager import ConfigManager
+
+from ..info import info
+
 
 def parse_packages(dir_):
     packages = []
@@ -28,8 +32,25 @@ def parse_modules(dir_):
     return modules
 
 
+configs = []
+
+
+def build_module_config(path):
+    config_file = info.basename + '/' + info.basename + '_' + path
+    config_manager = ConfigManager(
+        config_file, cvar_prefix='arcjail_{}'.format(path))
+
+    configs.append(config_manager)
+    return config_manager
+
+
 current_dir = os.path.dirname(__file__)
 __all__ = parse_packages(current_dir) + parse_modules(current_dir)
 
 
 from . import *
+
+
+for config_manager in configs:
+    config_manager.write()
+    config_manager.execute()

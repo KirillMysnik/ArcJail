@@ -1,0 +1,13 @@
+sound/arcjail/chicken01.mp3
+sound/arcjail/chicken02.mp3
+sound/arcjail/chicken03.mp3
+sound/arcjail/chicken04.mp3
+sound/arcjail/chicken05.mp3
+sound/arcjail/chicken06.mp3
+sound/arcjail/chicken07.mp3
+sound/arcjail/chicken08.mp3
+sound/arcjail/chicken09.mp3
+sound/arcjail/chicken10.mp3
+sound/arcjail/chicken11.mp3
+sound/arcjail/chicken12.mp3
+sound/arcjail/chicken13.mp3

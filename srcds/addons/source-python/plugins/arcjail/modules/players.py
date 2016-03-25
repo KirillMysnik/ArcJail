@@ -1,27 +1,48 @@
 from events import Event
 from filters.players import PlayerIter
 from listeners import OnClientActive, OnClientDisconnect, OnLevelInit
+from messages import SayText2
 from players.entity import Player
 
 from ..arcjail import InternalEvent
 
 from ..classes.base_player_manager import BasePlayerManager
 
+from ..resource.strings import COLOR_SCHEME, strings_common
+
+
 
 class MainPlayerManager(BasePlayerManager):
     def create(self, player):
         main_player = super().create(player)
-        InternalEvent.fire('main_player_created', {
-            'main_player': main_player,
-        })
+        InternalEvent.fire('main_player_created', main_player=main_player)
 
     def delete(self, player):
         main_player = super().delete(player)
-        InternalEvent.fire('main_player_deleted', {
-            'main_player': main_player,
-        })
+        InternalEvent.fire('main_player_deleted', main_player=main_player)
 
 main_player_manager = MainPlayerManager(lambda player: player)
+
+
+def tell(players, message, **tokens):
+    """Send a SayText2 message to a list of Admin instances."""
+    if isinstance(players, Player):
+        players = (players, )
+
+    player_indexes = [player.player.index for player in players]
+
+    tokens.update(COLOR_SCHEME)
+
+    message = message.tokenize(**tokens)
+    message = strings_common['chat_base'].tokenize(
+        message=message, **COLOR_SCHEME)
+
+    SayText2(message=message).send(*player_indexes)
+
+
+def broadcast(message, **tokens):
+    """Send a SayText2 message to all registered users."""
+    tell(list(main_player_manager.values()), message, **tokens)
 
 
 @InternalEvent('load')
@@ -40,10 +61,11 @@ def on_unload(event_var):
 def on_player_spawn(game_event):
     userid = game_event.get_int('userid')
     if userid in main_player_manager:
-        InternalEvent.fire('player_respawn', {
-            'player': main_player_manager[userid],
-            'game_event': game_event,
-        })
+        InternalEvent.fire(
+            'player_respawn',
+            player=main_player_manager[userid],
+            game_event=game_event,
+        )
 
 
 @OnClientActive

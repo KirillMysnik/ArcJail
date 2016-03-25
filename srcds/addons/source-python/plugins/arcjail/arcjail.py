@@ -1,17 +1,13 @@
-from paths import CFG_PATH
-from players.entity import Player
 from stringtables.downloads import Downloadables
 
-from .info import info
+from .resource.paths import DOWNLOADLISTS_PATH
 
 
-DOWNLOADLIST = CFG_PATH / info.basename / "downloadlists" / "main.txt"
-
-
-def load_downloadables(filepath):
+def load_downloadables(file_name):
+    file_path = DOWNLOADLISTS_PATH / file_name
     downloadables = Downloadables()
 
-    with open(filepath) as f:
+    with open(file_path) as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -19,8 +15,6 @@ def load_downloadables(filepath):
             downloadables.add(line)
 
     return downloadables
-
-downloadables_global = load_downloadables(DOWNLOADLIST)
 
 
 class InternalEventManager(dict):
@@ -78,16 +72,16 @@ class InternalEvent:
             self.event_name, handler)
 
     @staticmethod
-    def fire(event_name, event_var):
+    def fire(event_name, **event_var):
         internal_event_manager.fire(event_name, event_var)
 
 
 def load():
-    InternalEvent.fire('load', {})
+    InternalEvent.fire('load')
 
 
 def unload():
-    InternalEvent.fire('unload', {})
+    InternalEvent.fire('unload')
 
 
 from . import modules

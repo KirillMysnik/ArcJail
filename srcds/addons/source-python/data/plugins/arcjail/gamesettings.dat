@@ -1,0 +1,27 @@
+[vars]
+ALLOW_LR::								bool:		1:				Allow Last Request?
+PLAYERS_DEAD_PERCENTAGE::               int:        -1:             Percent of players dead to end the game. Leave -1 for server default.
+ENABLE_NOBLOCK::						int:		-1:				Enable no-block?
+MIN_PLAYERS::							int:		0:				Minimum amount of living prisoners for this game to start
+MAX_PLAYERS::							int:		-1:				Maximum amount of living prisoners for this game to start, leave -1 to let server count spawnpoints instead
+TIMEOUT_BETWEEN_GAMES::					int:		0:				(NOT SUPPORTED) Amount of seconds server must wait after this game ends before starting game again, 0 - no limit
+MAX_SCORE::								int:		0:				Max amount of goals needed to win score-based game
+PUSHSCALE_OVERRIDE::                    int:        0:
+PUSHSCALE::								float:		1.0:			phys_pushscale value
+TIMESCALE_OVERRIDE::                    int:        0:
+TIMESCALE::								float:		1.0:			phys_timescale value
+GRAVITY_OVERRIDE::                      int:        0:
+GRAVITY::								int:		800:			sv_gravity value
+RESTORE_HEALTH_ON_FF::					bool:		1:				Restore health if player attacks his teammate?
+INITIAL_HEALTH::						int:		100:			Initial amount of health for each player
+ARENA_HORIZONTAL_FORCE_BASE::			float:		192:			Base value for horizontal force calculation
+ARENA_VERTICAL_FORCE::					float:		256:			Vertical force to apply to a victim
+ARENA_FORCE_FALLOFF::					int:		2:				Type of Force(Damage) multiplier falloff (Const = 1/damage_base)
+ARENA_DAMAGE_BASE::						float:		7.0:			Damage base for force multiplier falloff - constant. Force = F(damage * 1/damage_base), where F = x, sqrt(x) or cuberoot(x).
+ENABLE_EQUIPMENT::                      bool:       1:              Give players items when the game starts? This will also prevent them from picking up and dropping weapons.
+ARENA_EQUIPMENT::						tuple:		weapon_knife:	List of entities to give to prisoners when game starts, separated by comma (e.g. weapon_knife,weapon_glock)
+ARENA_MIN_DAMAGE_TO_HURT::				int:		0:				Min damage to hurt
+FALL_DAMAGE_PROTECTION_TIMEOUT::		float:		0.0:			Number of seconds to protect winners from fall damage for
+ALLOW_REBELLING::						int:		-1:				Allow rebelling?
+ALLOW_SELFDAMAGE::						int:		-1:				Allow self-damage/world damage? This damage will count towards game health, not towards health against CT team.
+[/vars]

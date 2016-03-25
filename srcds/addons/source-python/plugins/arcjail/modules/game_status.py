@@ -26,7 +26,7 @@ def set_status(status):
 
     global _status
     if _status == GameStatus.NOT_STARTED and status == GameStatus.FREE:
-        InternalEvent.fire('arcjail_game_started', {})
+        InternalEvent.fire('arcjail_game_started')
 
     _status = status
 

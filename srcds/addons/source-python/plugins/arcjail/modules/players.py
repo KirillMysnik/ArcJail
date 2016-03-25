@@ -50,6 +50,8 @@ def on_load(event_var):
     for player in PlayerIter():
         main_player_manager.create(player)
 
+    InternalEvent.fire('main_players_loaded')
+
 
 @InternalEvent('unload')
 def on_unload(event_var):

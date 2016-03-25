@@ -1,15 +1,23 @@
 from json import load as json_load
 from warnings import warn
 
+from commands.server import ServerCommand
 from engines.server import global_vars
+from events import Event
 
-from ..classes.geometry import Point, Vector, Plane, ConvexArea
+from mathlib import QAngle, Vector as Vector_MathLib
+
+from ..arcjail import InternalEvent
+
+from ..classes.geometry import Point, Vector, ConvexArea
 from ..classes.meta_parser import MetaParser
 from ..classes.string_values import value_from_string
 
 from ..resource.paths import ARCJAIL_DATA_PATH, MAPDATA_PATH
 
 from .ent_fire import new_output_connection
+
+from .players import main_player_manager
 
 
 ORIGIN_OFFSET_Z = 32
@@ -351,3 +359,173 @@ def reload_map_info():
                 MapData.jails.append(jail_name)
 
     # TODO: Add map_strings
+
+
+def reload_map_scripts():
+    # TODO
+    pass
+
+
+def is_point_in_area(point, area):
+    for structure in area.structures:
+        if point in structure:
+            return True
+    return False
+
+
+def is_player_in_area(player, area_name):
+    area_name = area_name.lower()
+    if area_name not in MapData.areas:
+        return False
+
+    player_point = Point(tuple(player.origin)) + Vector(0, 0, ORIGIN_OFFSET_Z)
+    return is_point_in_area(player_point, MapData.areas[area_name])
+
+
+def get_player_areas(player):
+    rs = []
+    player_point = Point(tuple(player.origin)) + Vector(0, 0, ORIGIN_OFFSET_Z)
+    for area_name, area in MapData.areas.items():
+        if is_point_in_area(player_point, area):
+            rs.append(area_name)
+    return tuple(rs)
+
+
+def get_players_in_area(area_name):
+    area_name = area_name.lower()
+    if area_name not in MapData.areas:
+        return []
+
+    rs = []
+    for player in main_player_manager.values():
+        player_point = (Point(tuple(player.origin)) +
+                        Vector(0, 0, ORIGIN_OFFSET_Z))
+
+        if is_point_in_area(player_point, MapData.areas[area_name]):
+            rs.append(player)
+
+    return rs
+
+
+def teleport_player(player, spawnpoint_name):
+    spawnpoint = MapData.spawnpoints[spawnpoint_name]
+    player.origin = Vector_MathLib(*spawnpoint.origin)
+    player.view_angle = QAngle(*spawnpoint.angles)
+
+
+def get_map_var(var_name, default=None):
+    if var_name in MapData.settings:
+        for value in MapData.settings[var_name]:
+            return value
+
+    return default
+
+
+
+def get_map_var_list(var_name):
+    return tuple(MapData.settings.get(var_name, ()))
+
+
+
+def get_map_connections(output_name):
+    return tuple(MapData.connections.get(output_name, ()))
+
+
+def register_push_handler(slot_id, push_id, handler):
+    if slot_id not in _push_handlers:
+        _push_handlers[slot_id] = {}
+
+    if push_id not in _push_handlers[slot_id]:
+        _push_handlers[slot_id][push_id] = []
+
+    if handler in _push_handlers[slot_id][push_id]:
+        raise ValueError("Cannot register same handler to '{0}' "
+                         "push twice".format(push_id))
+
+    _push_handlers[slot_id][push_id].append(handler)
+
+
+def unregister_push_handler(slot_id, push_id, handler):
+    if slot_id not in _push_handlers:
+        raise KeyError("Unknown slot id: '{0}'".format(slot_id))
+
+    if push_id not in _push_handlers[slot_id]:
+        raise KeyError("Unknown push id: '{0}'".format(push_id))
+
+    if handler not in _push_handlers[slot_id][push_id]:
+        raise ValueError("Handler '{0}' is not registered to handle "
+                         "{1}.{2} push".format(handler, slot_id, push_id))
+
+    _push_handlers[slot_id][push_id].remove(handler)
+
+    if not _push_handlers[slot_id][push_id]:
+        del _push_handlers[slot_id][push_id]
+
+    if not _push_handlers[slot_id]:
+        del _push_handlers[slot_id]
+
+
+def get_games(module):
+    return tuple(filter(lambda game: game.module == module,
+                        MapData.games.values()))
+
+
+def get_lrs(module):
+   return tuple(filter(lambda game: game.module == module,
+                       MapData.lrs.values()))
+
+
+def get_map_status():
+    return _map_status
+
+
+@Event('server_spawn')
+def on_server_spawn(game_event):
+    reload_map_info()
+    reload_map_scripts()
+
+    for connection in get_map_connections('OnJailMapStart'):
+        connection.fire()
+
+    InternalEvent.fire('map_data_ready')
+
+
+@InternalEvent('load')
+def on_load(arc_event):
+    reload_game_settings()
+    reload_map_info()
+    reload_map_scripts()
+
+    InternalEvent.fire('map_data_ready')
+
+
+@InternalEvent('jail_game_started')
+def on_jail_game_started(arc_event):
+    for connection_string in get_map_var_list('OnJailRoundStart'):
+        connection = new_output_connection(connection_string)
+        connection.fire()
+        connection.destroy()
+
+
+@ServerCommand
+def srv_push(command):
+    if not args:
+        return
+
+    try:
+        slot_id, push_id, *args = args
+    except ValueError:
+        return
+
+    if slot_id not in _push_handlers:
+        return
+
+    if push_id not in _push_handlers[slot_id]:
+        return
+
+    for handler in _push_handlers[slot_id][push_id]:
+        try:
+            handler(args)
+        except:
+            log("Exception during handling {0}.{1} "
+                "push:\n{2}".format(slot_id, push_id, format_exc()))

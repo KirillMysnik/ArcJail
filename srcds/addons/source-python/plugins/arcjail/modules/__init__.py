@@ -1,6 +1,6 @@
 import os
 
-from config.manager import ConfigManager
+from controlled_cvars import ControlledConfigManager
 
 from ..info import info
 
@@ -37,8 +37,8 @@ configs = []
 
 def build_module_config(path):
     config_file = info.basename + '/' + info.basename + '_' + path
-    config_manager = ConfigManager(
-        config_file, cvar_prefix='arcjail_{}'.format(path))
+    config_manager = ControlledConfigManager(
+        config_file, cvar_prefix='arcjail_{}_'.format(path))
 
     configs.append(config_manager)
     return config_manager

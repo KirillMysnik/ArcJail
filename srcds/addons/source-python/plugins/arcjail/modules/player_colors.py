@@ -8,14 +8,10 @@ DEFAULT_COLOR = Color(255, 255, 255)
 
 
 class PlayerColorRequest:
-    def __init__(self, id_, priority, rgba):
+    def __init__(self, id_, priority, color):
         self.id = id_
         self.priority = priority
-        self.rgba = rgba
-
-    def get_color(self):
-        return Color(*self.rgba)
-
+        self.color = color
 
 requests = {}
 
@@ -34,7 +30,7 @@ def on_player_death_real(game_event):
 
 @InternalEvent('main_player_deleted')
 def on_main_player_deleted(event_var):
-    userid = event_var['player'].userid
+    userid = event_var['main_player'].userid
     if userid in requests:
         del requests[userid]
 
@@ -48,7 +44,7 @@ def on_player_respawn(event_var):
 
 
 def _update_player(player):
-    if player.isdead:
+    if player.dead:
         return
 
     if player.userid not in requests:
@@ -61,12 +57,12 @@ def _update_player(player):
             request_max = request
 
     if request_max:
-        player.color = request_max.get_color()
+        player.color = request_max.color
     else:
         player.color = DEFAULT_COLOR
 
 
-def make_color_request(player, priority, id_, rgba):
+def make_color_request(player, priority, id_, color):
     if player.userid not in requests:
         requests[player.userid] = []
 
@@ -75,7 +71,7 @@ def make_color_request(player, priority, id_, rgba):
             requests[player.userid].remove(request)
             break
 
-    requests[player.userid].append(PlayerColorRequest(id_, priority, rgba))
+    requests[player.userid].append(PlayerColorRequest(id_, priority, color))
     _update_player(player)
 
 

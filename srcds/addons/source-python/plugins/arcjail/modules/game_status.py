@@ -26,7 +26,7 @@ def set_status(status):
 
     global _status
     if _status == GameStatus.NOT_STARTED and status == GameStatus.FREE:
-        InternalEvent.fire('arcjail_game_started')
+        InternalEvent.fire('jail_game_status_started')
 
     _status = status
 
@@ -35,6 +35,8 @@ def set_status(status):
 def on_round_start(game_event):
     global _status
     _status = GameStatus.NOT_STARTED
+
+    InternalEvent.fire('jail_game_status_reset')
 
 
 @InternalEvent('load')

@@ -1,6 +1,9 @@
 from commands.say import SayCommand
 from events import Event
 
+from controlled_cvars import InvalidValue
+from controlled_cvars.handlers import bool_handler
+
 from ..arcjail import InternalEvent
 
 from ..resource.strings import build_module_strings
@@ -20,20 +23,33 @@ DEFAULT_GAME_HP_AMOUNT = 100
 
 
 strings_module = build_module_strings('leaders')
+config_manager = build_module_config('leaders')
 
-config_manager = build_module_config('rebels')
-cvars = {
-    'enabled': config_manager.cvar(
-        name="enabled",
-        default=1,
-        description="Enable/Disable leadership features",
-    ),
-    'leader_hp': config_manager.cvar(
-        name="leader_hp",
-        default=115,
-        description="Maximum amount of health a leader can have",
-    ),
-}
+config_manager.controlled_cvar(
+    bool_handler,
+    name="enabled",
+    default=1,
+    description="Enable/Disable leadership features",
+)
+
+
+def _leader_hp_handler(cvar):
+    try:
+        hp = int(cvar.get_string())
+    except ValueError:
+        raise InvalidValue
+
+    if hp <= 0:
+        raise InvalidValue
+
+    return hp
+
+config_manager.controlled_cvar(
+    _leader_hp_handler,
+    name="leader_hp",
+    default=115,
+    description="Maximum amount of health a leader can have",
+)
 
 
 _round_end = False
@@ -50,7 +66,7 @@ def _give_leadership(player):
     if player.userid in _hp_bonuses:
         return
 
-    upgrade_health(player, cvars['leader_hp'].get_int())
+    upgrade_health(player, config_manager['leader_hp'])
     _hp_bonuses.add(player.userid)
 
 
@@ -61,10 +77,10 @@ def _drop_leadership():
 
     InternalEvent.fire('jail_leadership_dropped', player=player)
 
-    if player.isdead:
+    if player.dead:
         return
 
-    if DEFAULT_GAME_HP_AMOUNT < player.health <= cvars['leader_hp'].get_int():
+    if DEFAULT_GAME_HP_AMOUNT < player.health <= config_manager['leader_hp']:
         player.health = DEFAULT_GAME_HP_AMOUNT
 
 
@@ -78,13 +94,13 @@ def iter_leaders():
 
 
 def get_leadership_denial_reason(player):
-    if not cvars['enabled'].get_bool():
+    if not config_manager['enabled']:
         return strings_module['fail_disabled']
 
     if _leader is not None:
-        return strings_module['fail_leader_alredy_set']
+        return strings_module['fail_leader_already_set']
 
-    if player.isdead:
+    if player.dead:
         return strings_module['fail_dead']
 
     if player.team != GUARDS_TEAM:
@@ -105,7 +121,7 @@ def on_player_death_real(game_event):
 
 @InternalEvent('main_player_deleted')
 def on_main_player_deleted(event_var):
-    if event_var['player'] == _leader:
+    if event_var['main_player'] == _leader:
         broadcast(strings_module['leader_disconnected'].tokenize(
             player=_leader.name))
 
@@ -177,7 +193,7 @@ def jailmenu_refuse_leadership_handler_active(player):
 
 new_available_option(
     'leadership',
-    '$leaders jailmenu_entry_obtain',
+    strings_module['jailmenu_entry_obtain'],
     jailmenu_obtain_leadership,
     jailmenu_obtain_leadership_handler_active,
     jailmenu_obtain_leadership_handler_active,
@@ -186,7 +202,7 @@ new_available_option(
 
 new_available_option(
     'leadership',
-    '$leaders jailmenu_entry_refuse',
+    strings_module['jailmenu_entry_refuse'],
     jailmenu_refuse_leadership,
     jailmenu_refuse_leadership_handler_active,
     jailmenu_refuse_leadership_handler_active,

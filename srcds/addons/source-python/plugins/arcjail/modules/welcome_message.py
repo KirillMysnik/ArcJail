@@ -1,5 +1,6 @@
-from engines.sound import Sound, SOUND_FROM_WORLD
 from listeners.tick import Delay
+
+from controlled_cvars.handlers import bool_handler, sound_handler
 
 from ..arcjail import InternalEvent, load_downloadables
 
@@ -12,27 +13,26 @@ SPAWN_ANNOUNCE_DELAY = 2.0
 
 
 config_manager = build_module_config('welcome_message')
-cvars = {
-    'enabled': config_manager.cvar(
-        name="enabled",
-        default=1,
-        description="Enable/Disable welcome messages",
-    ),
-    'sound': config_manager.cvar(
-        name="sound",
-        default="arcjail/welcome.mp3",
-        description="Welcome sound",
-    ),
-}
+config_manager.controlled_cvar(
+    bool_handler,
+    name="enabled",
+    default=1,
+    description="Enable/Disable welcome messages",
+)
+config_manager.controlled_cvar(
+    sound_handler,
+    name="sound",
+    default="arcjail/welcome.mp3",
+    description="Welcome sound",
+)
 
 _announced_uids = {}
-_welcome_sound = None
 _downloads = load_downloadables('welcome-sounds.res')
 
 
 def announce(player):
-    if _welcome_sound is not None:
-        _welcome_sound.play(player.index)
+    if config_manager['sound'] is not None:
+        config_manager['sound'].play(player.index)
 
 
 @InternalEvent('player_respawn')
@@ -52,7 +52,7 @@ def on_main_players_loaded(event_var):
 
 @InternalEvent('main_player_deleted')
 def on_main_player_deleted(event_var):
-    player = event_var['player']
+    player = event_var['main_player']
     if player.userid in _announced_uids:
         if (_announced_uids[player.userid] is not None and
                 _announced_uids[player.userid].running):
@@ -60,5 +60,3 @@ def on_main_player_deleted(event_var):
             _announced_uids[player.userid].cancel()
 
         del _announced_uids[player.userid]
-
-

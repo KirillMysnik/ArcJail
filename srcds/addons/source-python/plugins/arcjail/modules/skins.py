@@ -3,6 +3,8 @@ from warnings import warn
 from engines.precache import Model
 from events import Event
 
+from controlled_cvars.handlers import bool_handler, string_handler
+
 from ..arcjail import InternalEvent, load_downloadables
 
 from ..resource.paths import ARCJAIL_CFG_PATH
@@ -28,28 +30,32 @@ with open(ARCJAIL_CFG_PATH / "other" / "skins-precache.res") as f:
 
 
 config_manager = build_module_config('rebels')
-cvars = {
-    'enable_prisoner_model': config_manager.cvar(
-        name="enable_prisoner_model",
-        default=1,
-        description="Enable/Disable custom prisoner model",
-    ),
-    'prisoner_model': config_manager.cvar(
-        name="prisoner_model",
-        default="models/player/arcjail/regular/regular.mdl",
-        description="Prisoner model",
-    ),
-    'enable_guard_model': config_manager.cvar(
-        name="enable_guard_model",
-        default=0,
-        description="Enable/Disable custom guard model",
-    ),
-    'guard_model': config_manager.cvar(
-        name="guard_model",
-        default="",
-        description="Enable/Disable custom prisoner model",
-    ),
-}
+
+
+config_manager.controlled_cvar(
+    bool_handler,
+    name="enable_prisoner_model",
+    default=1,
+    description="Enable/Disable custom prisoner model",
+)
+config_manager.controlled_cvar(
+    string_handler,
+    name="prisoner_model",
+    default="models/player/arcjail/regular/regular.mdl",
+    description="Prisoner model",
+)
+config_manager.controlled_cvar(
+    bool_handler,
+    name="enable_guard_model",
+    default=0,
+    description="Enable/Disable custom guard model",
+)
+config_manager.controlled_cvar(
+    string_handler,
+    name="guard_model",
+    default="",
+    description="Guard model",
+)
 
 
 class UnprecachedModel(Warning):
@@ -66,7 +72,7 @@ _requests = {}
 
 
 def _update_player(player):
-    if player.isdead:
+    if player.dead:
         return
 
     if player.userid not in _requests:
@@ -124,21 +130,21 @@ def on_player_respawn(event_var):
         _requests[player.userid].clear()
 
     if player.team == PRISONERS_TEAM:
-        if cvars['enable_prisoner_model'].get_bool():
+        if config_manager['enable_prisoner_model']:
             make_model_request(
                 player,
                 DEFAULT_SKIN_PRIORITY,
                 'default-skin',
-                cvars['prisoner_model'].get_string(),
+                config_manager['prisoner_model'],
             )
 
     elif player.team == GUARDS_TEAM:
-        if cvars['enable_guard_model'].get_bool():
+        if config_manager['enable_guard_model']:
             make_model_request(
                 player,
                 DEFAULT_SKIN_PRIORITY,
                 'default-skin',
-                cvars['guard_model'].get_string(),
+                config_manager['guard_model'],
             )
 
     _update_player(player)
@@ -146,7 +152,7 @@ def on_player_respawn(event_var):
 
 @InternalEvent('main_player_deleted')
 def on_main_player_deleted(event_var):
-    player = event_var['player']
+    player = event_var['main_player']
     if player.userid in _requests:
         del _requests[player.userid]
 

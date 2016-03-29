@@ -1,4 +1,5 @@
 from json import load as json_load
+from traceback import format_exc
 from warnings import warn
 
 from commands.server import ServerCommand
@@ -507,13 +508,13 @@ def on_jail_game_started(arc_event):
         connection.destroy()
 
 
-@ServerCommand
+@ServerCommand('push')
 def srv_push(command):
-    if not args:
+    if len(command) == 1:
         return
 
     try:
-        slot_id, push_id, *args = args
+        _, slot_id, push_id, *args = command
     except ValueError:
         return
 
@@ -527,5 +528,5 @@ def srv_push(command):
         try:
             handler(args)
         except:
-            log("Exception during handling {0}.{1} "
-                "push:\n{2}".format(slot_id, push_id, format_exc()))
+            warn(Warning("Exception during handling {0}.{1} "
+                "push:\n{2}".format(slot_id, push_id, format_exc())))

@@ -10,9 +10,10 @@ from ..info import info
 # Map color variables in translation files to actual Color instances
 COLOR_SCHEME = {
     'color_tag': Color(242, 242, 242),
-    'color_highlight': Color(255, 191, 0),
+    'color_highlight': Color(255, 137, 0),
     'color_default': Color(242, 242, 242),
     'color_error': Color(255, 54, 54),
+    'color_warning': Color(255, 54, 54),
 }
 
 

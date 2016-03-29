@@ -3,6 +3,7 @@ from filters.players import PlayerIter
 from listeners import OnClientActive, OnClientDisconnect, OnLevelInit
 from messages import SayText2
 from players.entity import Player
+from players.teams import teams_by_name
 
 from ..arcjail import InternalEvent
 
@@ -29,7 +30,7 @@ def tell(players, message, **tokens):
     if isinstance(players, Player):
         players = (players, )
 
-    player_indexes = [player.player.index for player in players]
+    player_indexes = [player.index for player in players]
 
     tokens.update(COLOR_SCHEME)
 
@@ -61,11 +62,11 @@ def on_unload(event_var):
 
 @Event('player_spawn')
 def on_player_spawn(game_event):
-    userid = game_event.get_int('userid')
-    if userid in main_player_manager:
+    player = main_player_manager[game_event.get_int('userid')]
+    if player.team != teams_by_name['un']:
         InternalEvent.fire(
             'player_respawn',
-            player=main_player_manager[userid],
+            player=player,
             game_event=game_event,
         )
 

@@ -1,5 +1,7 @@
 from stringtables.downloads import Downloadables
 
+import arc_death_tools
+
 from .resource.paths import DOWNLOADLISTS_PATH
 
 
@@ -48,7 +50,7 @@ class InternalEventManager(dict):
 
         if exceptions:
             print("{} exceptions were raised during "
-                  "handling of '{}' event".format(event_name))
+                  "handling of '{}' event".format(len(exceptions), event_name))
 
             print("Raising the first one...")
 

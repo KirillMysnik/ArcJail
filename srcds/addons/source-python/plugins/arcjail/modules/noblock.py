@@ -3,7 +3,7 @@ from events import Event
 from filters.players import PlayerIter
 from listeners.tick import Delay
 
-from controlled_cvars import bool_handler, float_handler
+from controlled_cvars.handlers import bool_handler, float_handler
 
 from ..resource.strings import build_module_strings
 

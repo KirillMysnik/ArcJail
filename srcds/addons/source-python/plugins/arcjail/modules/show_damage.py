@@ -1,7 +1,7 @@
 from listeners.tick import Delay
 from messages import TextMsg
 
-from controlled_cvars import sound_nullable_handler, string_handler
+from controlled_cvars.handlers import sound_nullable_handler, string_handler
 
 from ..arcjail import InternalEvent
 

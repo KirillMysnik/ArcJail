@@ -113,7 +113,7 @@ def get_leadership_denial_reason(player):
 @Event('player_death_real')
 def on_player_death_real(game_event):
     player = main_player_manager[game_event.get_int('userid')]
-    if player == _leader:
+    if _leader is not None and player == _leader:
         broadcast(strings_module['leader_died'].tokenize(player=player.name))
 
         _drop_leadership()
@@ -121,7 +121,7 @@ def on_player_death_real(game_event):
 
 @InternalEvent('main_player_deleted')
 def on_main_player_deleted(event_var):
-    if event_var['main_player'] == _leader:
+    if _leader is not None and event_var['main_player'] == _leader:
         broadcast(strings_module['leader_disconnected'].tokenize(
             player=_leader.name))
 

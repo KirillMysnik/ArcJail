@@ -25,7 +25,7 @@ config_manager = build_module_config('team_balancer')
 
 config_manager.controlled_cvar(
     bool_handler,
-    name="enabled",
+    "enabled",
     default=1,
     description="Enable/Disable team balancing",
 )
@@ -139,7 +139,7 @@ def lock_teams():
     _locked += 1
 
 
-def unload_teams():
+def unlock_teams():
     global _locked
     _locked = max(0, _locked - 1)
 

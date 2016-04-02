@@ -172,9 +172,9 @@ def chat_on_leaders(command, index, team_only):
             player=_leader.name))
 
 
-#####################
-# JAIL MENU ENTRIES #
-#####################
+# =============================================================================
+# >> JAIL MENU ENTRIES
+# =============================================================================
 def jailmenu_obtain_leadership(player):
     chat_on_lead(None, player.index, False)
 

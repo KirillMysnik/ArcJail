@@ -143,9 +143,9 @@ def on_unload(event_var):
     _popups.clear()
 
 
-#####################
-# JAIL MENU ENTRIES #
-#####################
+# =============================================================================
+# >> JAIL MENU ENTRIES
+# =============================================================================
 def jailmenu_respawn(player):
     send_leader_popup(player)
 

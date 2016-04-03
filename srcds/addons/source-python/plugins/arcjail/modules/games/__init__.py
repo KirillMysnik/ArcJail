@@ -28,6 +28,8 @@ from ..players import main_player_manager, tell
 from .. import build_module_config, parse_modules
 
 
+MIN_PLAYERS_IN_GAME = 2
+
 strings_module = build_module_strings('games/common')
 config_manager = build_module_config('games/common')
 

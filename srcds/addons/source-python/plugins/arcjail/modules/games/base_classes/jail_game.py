@@ -2,12 +2,11 @@ from ...players import broadcast, main_player_manager
 
 from ...rebels import get_rebels
 
-from .. import config_manager, game_event_handler, stage, strings_module
+from .. import (
+    config_manager, game_event_handler, MIN_PLAYERS_IN_GAME, stage,
+    strings_module)
 
 from .base_game import BaseGame
-
-
-MIN_PLAYERS_IN_GAME = 2
 
 
 class JailGame(BaseGame):

@@ -85,7 +85,7 @@ def _drop_leadership():
 
 
 def is_leader(player):
-    return _leader == player
+    return _leader is not None and _leader == player
 
 
 def iter_leaders():
@@ -146,7 +146,7 @@ def on_round_end(game_event):
 @SayCommand('!lead')
 def chat_on_lead(command, index, team_only):
     player = main_player_manager.get_by_index(index)
-    if _leader and _leader.userid == player.userid:
+    if _leader is not None and _leader == player:
         _drop_leadership()
         broadcast(strings_module['leader_drop'].tokenize(player=player.name))
 
@@ -188,7 +188,7 @@ def jailmenu_obtain_leadership_handler_active(player):
 
 
 def jailmenu_refuse_leadership_handler_active(player):
-    return _leader == player
+    return _leader is not None and _leader == player
 
 
 new_available_option(

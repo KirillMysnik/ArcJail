@@ -69,7 +69,7 @@ def get_noblock_denial_reason(player):
     if not config_manager['enabled']:
         return strings_module['fail_disabled']
 
-    if player.isdead:
+    if player.dead:
         return strings_module['fail_dead']
 
     if _locked and player.team == PRISONERS_TEAM:
@@ -117,9 +117,9 @@ def say_noblock(command, index, team_only):
 
     if config_manager['default']:
         set_force_off(player)
-        tell(player, '$noblock solid_enabled',
-             time=config_manager['chat_command_duration'])
+        tell(player, strings_module['solid enabled'].tokenize(
+            time=config_manager['chat_command_duration']))
     else:
         set_force_on(player)
-        tell(player, '$noblock solid_disabled',
-             time=config_manager['chat_command_duration'])
+        tell(player, strings_module['solid disabled'].tokenize(
+            time=config_manager['chat_command_duration']))

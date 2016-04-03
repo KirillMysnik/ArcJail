@@ -2,6 +2,11 @@ from events import Event
 
 from ..arcjail import InternalEvent
 
+from ..resource.strings import build_module_strings
+
+
+strings_module = build_module_strings('game_status')
+
 
 class GameStatus:
     FREE = 1

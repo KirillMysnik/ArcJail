@@ -38,7 +38,7 @@ configs = []
 def build_module_config(path):
     config_file = info.basename + '/' + info.basename + '_' + path
     config_manager = ControlledConfigManager(
-        config_file, cvar_prefix='arcjail_{}_'.format(path))
+        config_file, cvar_prefix='arcjail_{}_'.format(path.replace('/', '_')))
 
     configs.append(config_manager)
     return config_manager

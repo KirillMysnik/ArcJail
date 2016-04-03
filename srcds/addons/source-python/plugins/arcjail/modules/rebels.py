@@ -200,6 +200,10 @@ def iter_rebels():
     return iter(_rebels)
 
 
+def get_rebels():
+    return tuple(_rebels)
+
+
 def register_rebel_filter(filter_):
     """ Register new rebel filter. """
     if filter_ in _filters:

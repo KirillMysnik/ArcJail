@@ -243,6 +243,8 @@ def on_player_respawn(event_var):
 
 
 delay = None
+
+
 @InternalEvent('load')
 def on_load(event_var):
     def callback():

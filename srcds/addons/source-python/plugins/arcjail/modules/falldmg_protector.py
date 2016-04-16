@@ -1,3 +1,4 @@
+from events import Event
 from listeners.tick import Delay
 from messages import Shake
 
@@ -65,8 +66,7 @@ class FallProtectedPlayer:
                 "Player {} is not protected yet".format(self.player.userid)
             )
 
-        if self._delay is not None and self._delay.running:
-            self._delay.cancel()
+        self.cancel_delay()
 
         self.p_player.delete_counter(self._counter)
         self.p_player.unset_protected()
@@ -76,6 +76,10 @@ class FallProtectedPlayer:
     @property
     def protected(self):
         return self._counter is not None
+
+    def cancel_delay(self):
+        if self._delay is not None and self._delay.running:
+            self._delay.cancel()
 
 
 fall_protected_player_manager = BasePlayerManager(FallProtectedPlayer)
@@ -92,6 +96,17 @@ def on_main_player_deleted(event_var):
     player = event_var['main_player']
     fall_protected_player_manager.delete(player)
 
+
+@Event('player_death_real')
+def on_player_death_real(game_event):
+    p_player = fall_protected_player_manager[game_event.get_int('userid')]
+    p_player.cancel_delay()
+
+
+@Event('round_start')
+def on_round_start(game_event):
+    for p_player in fall_protected_player_manager.values():
+        p_player.cancel_delay()
 
 
 def protect(player, map_data):

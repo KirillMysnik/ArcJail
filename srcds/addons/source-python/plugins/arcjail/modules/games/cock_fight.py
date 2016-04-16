@@ -35,7 +35,7 @@ config_manager.controlled_cvar(
     int_handler,
     "percentage",
     default=50,
-    description="Alive plaeyrs percentage when the game ends"
+    description="Alive players percentage when the game ends"
 )
 config_manager.controlled_cvar(
     bool_handler,
@@ -141,8 +141,12 @@ class CockFight(PrepareTime, JailGame):
 
     @game_event_handler('cockfight-player-jump', 'player_jump')
     def event_cockfight_player_jump(self, game_event):
-        if config_manager['sounds']:
-            player = main_player_manager[game_event.get_int('userid')]
+        if not config_manager['sounds']:
+            return
+
+        player = main_player_manager[game_event.get_int('userid')]
+
+        if player in self.players:
             sound_name = choice(sounds)
             sound = Sound(sound_name, player.index)
             sound.play()

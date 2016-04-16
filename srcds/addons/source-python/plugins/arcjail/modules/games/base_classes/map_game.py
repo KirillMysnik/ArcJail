@@ -137,7 +137,7 @@ class MapGame(PrepareTime, JailGame):
         if player not in self._players:
             return True
 
-        weapon_classname = edict_from_index(weapon_index).get_class_name()
+        weapon_classname = edict_from_index(weapon_index).classname
         return weapon_classname in self.map_data['ARENA_EQUIPMENT']
 
     @stage('basegame-entry')

@@ -45,6 +45,10 @@ class PrepareTime(BaseGame):
     @stage('prepare-prepare')
     def stage_prepare_prepare(self):
         if self._settings.get('prepare', True):
+            indexes = list(player.index for player in self._players)
+            if self.leader.index not in indexes:
+                indexes.append(self.leader.index)
+
             def callback():
                 self.undo_stages('prepare-start')
                 self.set_stage_group('prepare-continue')
@@ -53,12 +57,10 @@ class PrepareTime(BaseGame):
                 config_manager['prepare_timeout'], callback)
 
             def countdown(ticks_left):
-                TextMsg(str(ticks_left)).send(
-                    *[player.index for player in self._players])
+                TextMsg(str(ticks_left)).send(*indexes)
 
                 if config_manager['countdown_sound'] is not None:
-                    config_manager['countdown_sound'].play(
-                        *[player.index for player in self._players])
+                    config_manager['countdown_sound'].play(*indexes)
 
                 self._prepare_countdown = Delay(1.0, countdown, ticks_left - 1)
 
@@ -67,8 +69,7 @@ class PrepareTime(BaseGame):
             broadcast(strings_module['stage_prepare'])
 
             if config_manager['prepare_sound'] is not None:
-                config_manager['prepare_sound'].play(
-                    *[player.index for player in self._players])
+                config_manager['prepare_sound'].play(*indexes)
 
             self.set_stage_group('prepare-start')
 
@@ -174,4 +175,8 @@ class PrepareTime(BaseGame):
     @stage('abort-prepare-interrupted')
     def stage_abort_prepare_interrupted(self):
         broadcast(strings_module['abort_prepare_interrupted'])
+
+        if config_manager['prepare_sound'] is not None:
+            config_manager['prepare_sound'].stop()
+
         self.set_stage_group('destroy')

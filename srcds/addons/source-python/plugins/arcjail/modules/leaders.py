@@ -8,6 +8,8 @@ from ..arcjail import InternalEvent
 
 from ..resource.strings import build_module_strings
 
+from .admin import section
+
 from .jail_menu import new_available_option
 
 from .max_health import upgrade_health
@@ -207,3 +209,48 @@ new_available_option(
     jailmenu_refuse_leadership_handler_active,
     jailmenu_refuse_leadership_handler_active,
 )
+
+
+# =============================================================================
+# >> ARCADMIN ENTRIES
+# =============================================================================
+if section is not None:
+    from arcadmin.classes.menu import PlayerBasedCommand, Section
+
+    class GiveLeadershipCommand(PlayerBasedCommand):
+        base_filter = 'alive'
+        include_equal_priorities = True
+        include_self = True
+        allow_multiple_choices = False
+
+        @staticmethod
+        def player_name(player):
+            if is_leader(player):
+                return strings_module['arcadmin name_prefix'].tokenize(
+                    base=player.name)
+            return player.name
+
+        @staticmethod
+        def player_select_callback(admin, players):
+            player = players.pop()
+
+            if _leader is not None:
+                _drop_leadership()
+
+            if is_leader(player):
+                admin.announce(strings_module['arcadmin dropped'].tokenize(
+                    leader=player.name))
+
+            else:
+                _give_leadership(player)
+                admin.announce(strings_module['arcadmin given'].tokenize(
+                    leader=player.name))
+
+    leaders_section = section.add_child(
+        Section, strings_module['arcadmin section'])
+
+    leaders_section.add_child(
+        GiveLeadershipCommand,
+        strings_module['arcadmin option give_leadership'],
+        'jail.leaders.give', 'give'
+    )

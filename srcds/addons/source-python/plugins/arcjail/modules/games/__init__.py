@@ -1,9 +1,12 @@
 import os
+from traceback import format_exc
+from warnings import warn
 
 from commands.say import SayCommand
 from events import Event
 from filters.players import PlayerIter
 from menus import PagedMenu, PagedOption
+from players.helpers import get_client_language
 
 from controlled_cvars.handlers import (
     bool_handler, color_handler, float_handler, int_handler,
@@ -12,7 +15,11 @@ from controlled_cvars.handlers import (
 
 from ...arcjail import InternalEvent, load_downloadables
 
-from ...resource.strings import build_module_strings
+from ...resource.paths import ARCJAIL_LOG_PATH
+
+from ...resource.strings import build_module_strings, COLOR_SCHEME
+
+from ..admin import section
 
 from ..effects import set_player_sprite
 
@@ -171,6 +178,10 @@ config_manager.controlled_cvar(
 )
 
 
+class DestructionFailure(Warning):
+    pass
+
+
 class GameLauncher:
     def __init__(self, game_class):
         self.caption = game_class.caption
@@ -194,9 +205,9 @@ class GameLauncher:
 _popups = {}
 _game_instances = []
 _available_game_classes = []
-_sounds = {}
 _downloadables_sounds = load_downloadables('games-base-sounds.res')
 _downloadables_sprites = load_downloadables('games-base-sprites.res')
+_saved_game_status = None
 
 
 def _launch_game(launcher, leader_player, players, **kwargs):
@@ -255,8 +266,13 @@ def remove_available_game(game_class):
 
 
 def set_instance(game):
+    global _saved_game_status
+    if _saved_game_status is None:
+        _saved_game_status = get_status()
+
     if game is None:
-        set_status(GameStatus.FREE)
+        set_status(_saved_game_status)
+        _saved_game_status = None
         _game_instances.clear()
 
     else:
@@ -348,10 +364,18 @@ def send_popup(player):
 
 
 def reset():
+    global _saved_game_status
+    _saved_game_status = None
+
     game = get_instance()
     if game is not None:
         try:
             game.set_stage_group('destroy')
+        except Exception as e:
+            warn(DestructionFailure(
+                "Couldn't properly destroy the game. "
+                "Exception: {}. Traceback:\n{}".format(e, format_exc())
+            ))
         finally:
             set_instance(None)
 
@@ -394,6 +418,87 @@ new_available_option(
     jailmenu_games,
     handler_active=jailmenu_games_handler_active,
 )
+
+
+# =============================================================================
+# >> ARCADMIN ENTRIES
+# =============================================================================
+if section is not None:
+    from arcadmin.classes.menu import Command, Section
+
+    class PrintAvailableGames(Command):
+        @staticmethod
+        def select_callback(admin):
+            lines = []
+            players = get_players_to_play()
+            language = get_client_language(admin.player.index)
+
+            def translated(caption):
+                if isinstance(caption, str):
+                    return caption
+
+                return caption.tokenize(**COLOR_SCHEME).get_string(language)
+
+            for i, game_class in enumerate(_available_game_classes, start=1):
+                lines.append(
+                    "{}. *** GAME CLASS: {} (caption: {}) ***".format(
+                        i,
+                        game_class.__name__,
+                        translated(game_class.caption),
+                    )
+                )
+
+                lines.append("Available launchers for the "
+                             "current number of alive "
+                             "prisoners ({}):".format(len(players)))
+
+                for j, game_launcher in enumerate(
+                    game_class.get_available_launchers(
+                        admin.player, players
+                    ),
+                    start=1
+                ):
+
+                    lines.append("{}.{}. {}".format(
+                        i, j, translated(game_launcher.caption)))
+
+                    denial_reason = game_launcher.get_launch_denial_reason(
+                        admin.player, players)
+
+                    if denial_reason is not None:
+                        denial_reason = translated(denial_reason)
+
+                    lines.append("Launch denial reason: {}".format(
+                        denial_reason
+                    ))
+
+                lines.append("")
+
+            try:
+                with open(ARCJAIL_LOG_PATH / "available-games.txt", "w") as f:
+                    f.write("\n".join(lines))
+
+                tell(
+                    admin.player,
+                    strings_module[
+                        'arcadmin dump_available_games saved'
+                    ].tokenize(
+                        file=ARCJAIL_LOG_PATH / "available-games.txt"
+                    )
+                )
+
+            except OSError:
+                tell(admin.player,
+                     strings_module['arcadmin dump_available_games failed'])
+
+    games_section = section.add_child(
+        Section, strings_module['arcadmin section'])
+
+    games_section.add_child(
+        PrintAvailableGames,
+        strings_module['arcadmin option dump_available_games'],
+        'jail.games.debug', 'available-games-list'
+    )
 
 
 # =============================================================================

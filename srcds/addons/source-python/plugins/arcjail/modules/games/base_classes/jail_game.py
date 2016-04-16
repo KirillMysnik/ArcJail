@@ -63,8 +63,8 @@ class JailGame(BaseGame):
             if player in self._players:
                 self._players.remove(player)
 
-            if len(self._players) < MIN_PLAYERS_IN_GAME:
-                self.set_stage_group('abort-not-enough-players')
+                if len(self._players) < MIN_PLAYERS_IN_GAME:
+                    self.set_stage_group('abort-not-enough-players')
 
     @game_event_handler('jailgame-player-disconnect', 'player_disconnect')
     def event_jailgame_player_disconnect(self, game_event):
@@ -76,8 +76,8 @@ class JailGame(BaseGame):
             if player in self._players:
                 self._players.remove(player)
 
-            if len(self._players) < MIN_PLAYERS_IN_GAME:
-                self.set_stage_group('abort-not-enough-players')
+                if len(self._players) < MIN_PLAYERS_IN_GAME:
+                    self.set_stage_group('abort-not-enough-players')
 
     @classmethod
     def get_available_launchers(cls, leader_player, players):

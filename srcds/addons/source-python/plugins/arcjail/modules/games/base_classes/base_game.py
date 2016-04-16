@@ -49,6 +49,9 @@ class BaseGame(metaclass=GameMeta):
         for game_event_handler_ in self._events.values():
             game_event_handler_.game_instance = self
 
+        for game_internal_event_handler_ in self._internal_events.values():
+            game_internal_event_handler_.game_instance = self
+
     @property
     def players(self):
         return tuple(self._players)
@@ -166,7 +169,7 @@ class BaseGame(metaclass=GameMeta):
 
     @stage('start-notify')
     def stage_start_notify(self):
-        InternalEvent.fire('arcjail_games_game_started', instance=self)
+        InternalEvent.fire('jail_games_game_started', instance=self)
         broadcast(strings_module['game_started'].tokenize(game=self.caption))
 
     @stage('basegame-entry')

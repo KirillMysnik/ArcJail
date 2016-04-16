@@ -11,19 +11,20 @@ from .. import build_module_config
 from .base_classes.map_game_team_based import MapGameTeamBased
 from .base_classes.player_preserving import PlayerPreserving
 
-from . import add_available_game, push, stage, strings_module as strings_common
+from . import (add_available_game, config_manager as config_manager_common,
+               push, stage, strings_module as strings_common)
 
 
 strings_module = build_module_strings('games/scoregames')
 config_manager = build_module_config('games/scoregames')
 
-config_manager.cvar(
+config_manager.controlled_cvar(
     bool_handler,
     "enabled",
     default=1,
     description="Enable/Disable Score Games"
 )
-config_manager.cvar(
+config_manager.controlled_cvar(
     int_handler,
     "win_score",
     default=5,
@@ -55,10 +56,10 @@ class ScoreGameBase(MapGameTeamBased):
     @stage('scoregame-new-score2')
     def stage_scoregame_new_score2(self):
         broadcast(strings_module['new_score2'].tokenize(
-            color1=config_manager['team1_color'],
+            color1=config_manager_common['team1_color'],
             team1=strings_common['team1'],
             score1=self.score['team1'],
-            color2=config_manager['team2_color'],
+            color2=config_manager_common['team2_color'],
             team2=strings_common['team2'],
             score2=self.score['team2']
         ))
@@ -68,13 +69,13 @@ class ScoreGameBase(MapGameTeamBased):
     @stage('scoregame-new-score3')
     def stage_scoregame_new_score3(self):
         broadcast(strings_module['new_score2'].tokenize(
-            color1=config_manager['team1_color'],
+            color1=config_manager_common['team1_color'],
             team1=strings_common['team1'],
             score1=self.score['team1'],
-            color2=config_manager['team2_color'],
+            color2=config_manager_common['team2_color'],
             team2=strings_common['team2'],
             score2=self.score['team2'],
-            color3=config_manager['team3_color'],
+            color3=config_manager_common['team3_color'],
             team3=strings_common['team3'],
             score3=self.score['team3']
         ))
@@ -84,16 +85,16 @@ class ScoreGameBase(MapGameTeamBased):
     @stage('scoregame-new-score4')
     def stage_scoregame_new_score4(self):
         broadcast(strings_module['new_score2'].tokenize(
-            color1=config_manager['team1_color'],
+            color1=config_manager_common['team1_color'],
             team1=strings_common['team1'],
             score1=self.score['team1'],
-            color2=config_manager['team2_color'],
+            color2=config_manager_common['team2_color'],
             team2=strings_common['team2'],
             score2=self.score['team2'],
-            color3=config_manager['team3_color'],
+            color3=config_manager_common['team3_color'],
             team3=strings_common['team3'],
             score3=self.score['team3'],
-            color4=config_manager['team4_color'],
+            color4=config_manager_common['team4_color'],
             team4=strings_common['team4'],
             score4=self.score['team4'],
         ))

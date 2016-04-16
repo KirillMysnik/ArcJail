@@ -13,6 +13,8 @@ from ..arcjail import InternalEvent
 
 from ..resource.strings import build_module_strings
 
+from .admin import section
+
 from .player_colors import cancel_color_request, make_color_request
 
 from .players import broadcast, main_player_manager
@@ -187,6 +189,7 @@ def unset_rebel(player):
     """ Unset given player as a rebel (with all checks). """
     if is_rebel(player):
         _unset_rebel(player)
+
 
 def reset_rebels():
     """ Reset rebels list. """
@@ -399,3 +402,42 @@ def cmd_on_drop(command, index):
     Delay(0, confirm_weapon_drop)
 
     return True
+
+
+# =============================================================================
+# >> ARCADMIN ENTRIES
+# =============================================================================
+if section is not None:
+    from arcadmin.classes.menu import PlayerBasedCommand, Section
+
+    class ToggleRebelCommand(PlayerBasedCommand):
+        base_filter = ('jail_prisoner', 'alive')
+        include_equal_priorities = False
+
+        @staticmethod
+        def player_name(player):
+            if is_rebel(player):
+                return strings_module['arcadmin name_prefix'].tokenize(
+                    base=player.name)
+            return player.name
+
+        @staticmethod
+        def player_select_callback(admin, players):
+            for player in players:
+                if is_rebel(player):
+                    unset_rebel(player)
+                    admin.announce(strings_module['arcadmin unset'].tokenize(
+                        rebel=player.name))
+
+                else:
+                    set_rebel(player)
+                    admin.announce(strings_module['arcadmin set'].tokenize(
+                        rebel=player.name))
+
+    rebels_section = section.add_child(
+        Section, strings_module['arcadmin section'])
+
+    rebels_section.add_child(
+        ToggleRebelCommand, strings_module['arcadmin option toggle_rebel'],
+        'jail.rebels.toggle', 'toggle'
+    )

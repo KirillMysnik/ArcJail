@@ -1,3 +1,5 @@
+from core import echo_console
+
 from commands.client import ClientCommand
 from entities.entity import Entity
 from entities.helpers import edict_from_index
@@ -103,7 +105,7 @@ class SavedPlayer:
 
     def max_ammo(self, weapon_classnames):
         for index in self.player.weapon_indexes():
-            weapon_classname = edict_from_index(index).get_class_name()
+            weapon_classname = edict_from_index(index).classname
             if weapon_classname not in weapon_classnames:
                 continue
 

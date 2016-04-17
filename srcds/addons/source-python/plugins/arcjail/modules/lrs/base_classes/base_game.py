@@ -51,9 +51,5 @@ class BaseGame(BaseGame):
 
     @stage('start-notify')
     def stage_start_notify(self):
-        InternalEvent.fire('jail_lrs_game_started', instance=self)
-        broadcast(strings_module['game_started'].tokenize(
-            player1=self.prisoner.name,
-            player2=self.guard.name,
-            game=self.caption
-        ))
+        # Obsolete, as set-start-status does this for us
+        pass

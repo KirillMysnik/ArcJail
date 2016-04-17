@@ -204,6 +204,7 @@ def check_bump_weapons():
 
     elif not weapon_pickup_filters and bump_weapon_function is not None:
         bump_weapon_function.remove_pre_hook(pre_bump_weapon)
+        bump_weapon_function = None
 
 
 def register_weapon_pickup_filter(callback):

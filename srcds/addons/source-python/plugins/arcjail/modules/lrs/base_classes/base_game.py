@@ -1,13 +1,13 @@
-from ....arcjail import InternalEvent
-
 from ...games.base_classes.base_game import BaseGame
 
-from ...players import broadcast
-
-from .. import GameLauncher, stage, strings_module
+from .. import GameLauncher, remove_instance, stage
 
 
 class BaseGame(BaseGame):
+    settings = {}
+    caption = None
+    module = None
+
     class GameLauncher(GameLauncher):
         def launch(self, players, **kwargs):
             return self.game_class(players, **kwargs)
@@ -32,6 +32,12 @@ class BaseGame(BaseGame):
 
         for game_internal_event_handler_ in self._internal_events.values():
             game_internal_event_handler_.game_instance = self
+
+    @stage('destroy')
+    def stage_destroy(self):
+        self.undo_stages()
+        self._lock_stage_queue = True
+        remove_instance(self)
 
     @property
     def guard(self):

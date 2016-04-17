@@ -45,8 +45,11 @@ class CombatGame(PrepareTime):
     def __init__(self, players, **kwargs):
         super().__init__(players, **kwargs)
 
-        lrs = get_lrs(self.module)
-        self.map_data = lrs[0] if lrs else None
+        self.map_data = None
+        if self._settings.get('using_map_data', True):
+            lrs = get_lrs(self.module)
+            if lrs:
+                self.map_data = lrs[0]
 
         self._flawless = {
             self.prisoner.userid: True,
@@ -153,9 +156,12 @@ class CombatGame(PrepareTime):
 
             return True
 
-        def death_callback_for_prisoner():
+        def hook_death_for_prisoner(counter, game_event):
             saved_player = saved_player_manager[self.prisoner.userid]
             saved_player.strip()
+            return True
+
+        def death_callback_for_prisoner():
             self.on_death(self.prisoner)
 
         def hook_hurt_for_guard(counter, game_event):
@@ -168,13 +174,17 @@ class CombatGame(PrepareTime):
 
             return True
 
-        def death_callback_for_guard():
+        def hook_death_for_guard(counter, game_event):
             saved_player = saved_player_manager[self.guard.userid]
             saved_player.strip()
+            return True
+
+        def death_callback_for_guard():
             self.on_death(self.guard)
 
-        for hook_hurt, death_callback, player in zip(
+        for hook_hurt, hook_death, death_callback, player in zip(
                 (hook_hurt_for_prisoner, hook_hurt_for_guard),
+                (hook_death_for_prisoner, hook_death_for_guard),
                 (death_callback_for_prisoner, death_callback_for_guard),
                 self._players
         ):
@@ -186,13 +196,14 @@ class CombatGame(PrepareTime):
 
             counter.health = self._settings.get('health', 100)
             counter.hook_hurt = hook_hurt
+            counter.hook_death = hook_death
             counter.death_callback = death_callback
 
             p_player.set_protected()
 
     @stage('undo-equip-damage-hooks')
     def stage_undo_survival_equip_damage_hooks(self):
-        for player in self._players:
+        for player in self._players_all:
             p_player = protected_player_manager[player.userid]
             p_player.delete_counter(self._counters[player.userid])
             p_player.unset_protected()

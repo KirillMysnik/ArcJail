@@ -10,7 +10,8 @@ from menus import PagedMenu, PagedOption
 
 from controlled_cvars import InvalidValue
 from controlled_cvars.handlers import (
-    bool_handler, float_handler, int_handler, sound_nullable_handler)
+    bool_handler, float_handler, int_handler, sound_nullable_handler,
+    string_handler)
 
 from ...arcjail import InternalEvent, load_downloadables
 
@@ -144,6 +145,13 @@ config_manager.controlled_cvar(
                 "leave empty to disable",
 )
 config_manager.controlled_cvar(
+    string_handler,
+    "flawless_material",
+    default="overlays/arcjail/flawless",
+    description="Path to a FLAWLESS! material (VMT-file) without VMT "
+                "extension, leave empty to disable",
+)
+config_manager.controlled_cvar(
     sound_nullable_handler,
     "availability_sound",
     default="arcjail/lr3.mp3",
@@ -156,6 +164,45 @@ config_manager.controlled_cvar(
     default="arcjail/fight.mp3",
     description="Sound to play when Last Request of a combat type starts, "
                 "leave empty to disable",
+)
+config_manager.controlled_cvar(
+    sound_nullable_handler,
+    "prepare_sound",
+    default="",
+    description="Prepare sound",
+)
+config_manager.controlled_cvar(
+    sound_nullable_handler,
+    "countdown_sound",
+    default="arcjail/beep2.mp3",
+    description="Countdown sound",
+)
+config_manager.controlled_cvar(
+    string_handler,
+    "countdown_3_material",
+    default="overlays/arcjail/3",
+    description="Path to a '3' material (VMT-file) without VMT "
+                "extension, leave empty to disable",
+)
+config_manager.controlled_cvar(
+    string_handler,
+    "countdown_2_material",
+    default="overlays/arcjail/2",
+    description="Path to a '2' material (VMT-file) without VMT "
+                "extension, leave empty to disable",
+)
+config_manager.controlled_cvar(
+    string_handler,
+    "countdown_1_material",
+    default="overlays/arcjail/1",
+    description="Path to a '1' material (VMT-file) without VMT "
+                "extension, leave empty to disable",
+)
+config_manager.controlled_cvar(
+    float_handler,
+    "prepare_timeout",
+    default=3.0,
+    description="Preparation timeout for games that require it",
 )
 
 
@@ -172,7 +219,7 @@ class LastRequestGameStatus:
 class GameLauncher:
     def __init__(self, game_class):
         self.caption = game_class.caption
-        self.game_class = game_class.caption
+        self.game_class = game_class
 
     def __eq__(self, other):
         return self.game_class == other.game_class
@@ -185,6 +232,33 @@ class GameLauncher:
             return strings_module['fail game_unavailable']
 
         return None
+
+
+class Setting:
+    def __init__(self, key, caption, *options):
+        if key == 'defaults':
+            raise ValueError("Can't use 'defaults' keyword as setting name")
+
+        if not options:
+            raise ValueError("Emtpy options list, won't be able "
+                             "to pick default value")
+
+        self.key = key
+        self.caption = caption
+        self.options = options
+
+
+class HiddenSetting:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+
+class SettingOption:
+    def __init__(self, value, caption, default=False):
+        self.value = value
+        self.caption = caption
+        self.default = default
 
 
 _rebel_delays = {}
@@ -331,7 +405,232 @@ def get_available_launchers():
     return tuple (rs)
 
 
-def send_popup(player):
+def send_rebel_popup(player, launcher, guard, settings):
+    reason = get_lr_denial_reason(player)
+    if reason is not None:
+        tell(player, reason)
+        return
+
+    reason = launcher.get_launch_denial_reason()
+    if reason is not None:
+        tell(player, reason)
+        return
+
+    if get_player_game_instance(guard) is not None:
+        tell(player, strings_module['fail busy_partner'])
+        return
+
+    if guard.userid in _popups:
+        _popups[guard.userid].close()
+
+    if is_rebel(player):
+        def auto_action():
+            del _rebel_delays[player.userid]
+
+            if config_manager['ask_guard_auto_action']:
+                reason = get_lr_denial_reason(player)
+                if reason is not None:
+                    tell(player, reason)
+                    return
+
+                reason = launcher.get_launch_denial_reason()
+                if reason is not None:
+                    tell(player, reason)
+                    return
+
+                if get_player_game_instance(guard) is not None:
+                    tell(player, strings_module['fail busy_partner'])
+                    return
+
+                _launch_game(launcher, (player, guard), **settings)
+
+            else:
+                tell(player, strings_module['fail decline'])
+
+        _rebel_delays[player.userid] = Delay(
+            config_manager['ask_guard_timeout'], auto_action)
+
+        def select_callback_rebel(popup, player_index, option):
+            if player.userid in _rebel_delays:
+                if _rebel_delays[player.userid].running:
+                    _rebel_delays[player.userid].cancel()
+
+                del _rebel_delays[player.userid]
+
+            if option.value:
+                reason = get_lr_denial_reason(player)
+                if reason is not None:
+                    tell(player, reason)
+                    return
+
+                reason = launcher.get_launch_denial_reason()
+                if reason is not None:
+                    tell(player, reason)
+                    return
+
+                if get_player_game_instance(guard) is not None:
+                    tell(player, strings_module['fail busy_partner'])
+                    return
+
+                _launch_game(launcher, (player, guard), **settings)
+
+            else:
+                tell(player, strings_module['fail decline'])
+
+        popup = _popups[guard.userid] = PagedMenu(
+            select_callback=select_callback_rebel,
+            title=strings_module['let_him_play']
+        )
+
+        popup.append(PagedOption(
+            text=strings_module['let_him_play yes'],
+            value=True,
+            highlight=True,
+            selectable=True
+        ))
+        popup.append(PagedOption(
+            text=strings_module['let_him_play no'],
+            value=False,
+            highlight=True,
+            selectable=True
+        ))
+
+        popup.send(guard.index)
+
+        tell(player, strings_module['rebel_asking_guard'])
+
+    else:
+        _launch_game(launcher, (player, guard), **settings)
+
+
+def send_settings_popup(player, launcher, guard, settings=None):
+    if settings is None:
+        settings = {}
+
+        for setting in launcher.game_class.settings:
+            if isinstance(setting, HiddenSetting):
+                settings[setting.key] = setting.value
+
+    reason = get_lr_denial_reason(player)
+    if reason is not None:
+        tell(player, reason)
+        return
+
+    reason = launcher.get_launch_denial_reason()
+    if reason is not None:
+        tell(player, reason)
+        return
+
+    if get_player_game_instance(guard) is not None:
+        tell(player, strings_module['fail busy_partner'])
+        return
+
+    if settings.get('defaults', False):
+        for setting in launcher.game_class.settings:
+            if isinstance(setting, HiddenSetting):
+                continue
+
+            for setting_option in setting.options:
+                if setting_option.default:
+                    break
+
+            settings[setting.key] = setting_option.value
+
+        send_rebel_popup(player, launcher, guard, settings)
+        return
+
+    if player.userid in _popups:
+        _popups[player.userid].close()
+
+    def select_callback(popup, player_index, option):
+        settings.update(option.value)
+        send_settings_popup(player, launcher, guard, settings)
+
+    visible_settings_count = 0
+    for setting in launcher.game_class.settings:
+        if not isinstance(setting, HiddenSetting):
+            visible_settings_count += 1
+
+    if visible_settings_count > 0 and 'defaults' not in settings:
+        popup = _popups[player.userid] = PagedMenu(
+            select_callback=select_callback,
+            title=strings_module['popup title choose_defaults'],
+        )
+
+        popup.append(PagedOption(
+            text=strings_module['popup title choose_defaults yes'],
+            value={'defaults': True},
+        ))
+
+        popup.append(PagedOption(
+            text=strings_module['popup title choose_defaults no'],
+            value={'defaults': False},
+        ))
+
+        popup.send(player.index)
+        return
+
+    for setting in launcher.game_class.settings:
+        if setting.key not in settings:
+            break
+
+    else:
+        send_rebel_popup(player, launcher, guard, settings)
+        return
+
+    popup = _popups[player.userid] = PagedMenu(
+        select_callback=select_callback,
+        title=setting.caption,
+    )
+
+    for setting_option in setting.options:
+        popup.append(PagedOption(
+            text=setting_option.caption,
+            value={setting.key: setting_option.value}
+        ))
+
+    popup.send(player.index)
+
+
+def send_player_popup(player, launcher):
+    reason = get_lr_denial_reason(player)
+    if reason is not None:
+        tell(player, reason)
+        return
+
+    reason = launcher.get_launch_denial_reason()
+    if reason is not None:
+        tell(player, reason)
+        return
+
+    if player.userid in _popups:
+        _popups[player.userid].close()
+
+    def select_callback_player(popup, player_index, option):
+        send_settings_popup(player, launcher, option.value)
+
+    popup = _popups[player.userid] = PagedMenu(
+        select_callback=select_callback_player,
+        title=strings_module['popup title choose_player'],
+    )
+
+    spare_players = set(PlayerIter(['jail_guard', 'alive']))
+
+    for game_instance in _game_instances:
+        spare_players.difference_update(game_instance.players)
+
+    for player_ in spare_players:
+        popup.append(PagedOption(
+            text=player_.name,
+            value=player_,
+            highlight=True,
+            selectable=True
+        ))
+
+    popup.send(player.index)
+
+
+def send_game_popup(player):
     reason = get_lr_denial_reason(player)
     if reason:
         tell(player, reason)
@@ -345,137 +644,7 @@ def send_popup(player):
         _popups[player.userid].close()
 
     def select_callback_game(popup, player_index, option):
-        reason = get_lr_denial_reason(player)
-        if reason is not None:
-            tell(player, reason)
-            return
-
-        launcher = option.value
-        reason = launcher.get_launch_denial_reason()
-        if reason is not None:
-            tell(player, reason)
-            return
-
-        if player.userid in _popups:
-            _popups[player.userid].close()
-
-        def select_callback_player(popup, player_index, option):
-            reason = get_lr_denial_reason(player)
-            if reason is not None:
-                tell(player, reason)
-                return
-
-            reason = launcher.get_launch_denial_reason()
-            if reason is not None:
-                tell(player, reason)
-                return
-
-            guard = option.value
-            if get_player_game_instance(guard) is not None:
-                tell(player, strings_module['fail busy_partner'])
-                return
-
-            if is_rebel(player):
-                if guard.userid in _popups:
-                    _popups[guard.userid].close()
-
-                def auto_action():
-                    del _rebel_delays[player.userid]
-
-                    if config_manager['ask_guard_auto_action']:
-                        reason = get_lr_denial_reason(player)
-                        if reason is not None:
-                            tell(player, reason)
-                            return
-
-                        reason = launcher.get_launch_denial_reason()
-                        if reason is not None:
-                            tell(player, reason)
-                            return
-
-                        if get_player_game_instance(guard) is not None:
-                            tell(player, strings_module['fail busy_partner'])
-                            return
-
-                        _launch_game(launcher, (player, guard))
-
-                    else:
-                        tell(player, strings_module['fail decline'])
-
-                _rebel_delays[player.userid] = Delay(
-                    config_manager['ask_guard_timeout'], auto_action)
-
-                def select_callback_rebel(popup, player_index, option):
-                    if player.userid in _rebel_delays:
-                        if _rebel_delays[player.userid].running:
-                            _rebel_delays[player.userid].cancel()
-
-                        del _rebel_delays[player.userid]
-
-                    if option.value:
-                        reason = get_lr_denial_reason(player)
-                        if reason is not None:
-                            tell(player, reason)
-                            return
-
-                        reason = launcher.get_launch_denial_reason()
-                        if reason is not None:
-                            tell(player, reason)
-                            return
-
-                        if get_player_game_instance(guard) is not None:
-                            tell(player, strings_module['fail busy_partner'])
-                            return
-
-                        _launch_game(launcher, (player, guard))
-
-                    else:
-                        tell(player, strings_module['fail decline'])
-
-                popup = _popups[guard.userid] = PagedMenu(
-                    select_callback=select_callback_rebel,
-                    title=strings_module['let_him_play']
-                )
-
-                popup.append(PagedOption(
-                    text=strings_module['let_him_play yes'],
-                    value=True,
-                    highlight=True,
-                    selectable=True
-                ))
-                popup.append(PagedOption(
-                    text=strings_module['let_him_play no'],
-                    value=False,
-                    highlight=True,
-                    selectable=True
-                ))
-
-                popup.send(guard.index)
-
-                tell(player, strings_module['rebel_asking_guard'])
-
-            else:
-                _launch_game(launcher, (player, guard))
-
-        popup = _popups[player.userid] = PagedMenu(
-            select_callback=select_callback_player,
-            title=strings_module['popup title choose_player'],
-        )
-
-        spare_players = set(PlayerIter(['#jail_guard', '#alive']))
-
-        for game_instance in _game_instances:
-            spare_players.difference_update(game_instance.players)
-
-        for player_ in spare_players:
-            popup.append(PagedOption(
-                text=player_.name,
-                value=player_,
-                highlight=True,
-                selectable=True
-            ))
-
-        popup.send(player.index)
+        send_player_popup(player, option.value)
 
     popup = _popups[player.userid] = PagedMenu(
         select_callback=select_callback_game,
@@ -599,7 +768,7 @@ def on_unload(event_var):
 @SayCommand('!lr')
 def say_games(command, index, team_only):
     player = main_player_manager.get_by_index(index)
-    send_popup(player)
+    send_game_popup(player)
 
 
 # =============================================================================

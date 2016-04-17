@@ -84,44 +84,49 @@ class ProtectedPlayer:
 
         def _hurt(self, game_event):
             player = self.owner.player
-            if self.hook_hurt(self, game_event):
-                self.health -= game_event.get_int('dmg_health')
-                if self.health <= 0:
-                    if (self.hook_death(self, game_event) and
-                            not self.owner.dead):
+            if not self.hook_hurt(self, game_event):
+                return
 
-                        self.owner._show_health(hide=True)
-                        self.owner.dead = True
+            self.health -= game_event.get_int('dmg_health')
+            if self.health <= 0:
+                if (self.hook_death(self, game_event) and
+                        not self.owner.dead):
 
-                        player.health = 0
+                    self.owner._show_health(hide=True)
+                    self.owner.dead = True
 
-                        aid = game_event.get_int('attacker')
-                        if aid:
-                            attacker = main_player_manager[aid]
+                    player.health = 0
 
-                            for weapon in EntityIter("weapon_{0}".format(
-                                    game_event.get_string('item'))):
+                    aid = game_event.get_int('attacker')
+                    if aid != 0:
+                        attacker = main_player_manager[aid]
 
-                                if weapon.owner == -1:
-                                    continue
-                                if (index_from_inthandle(weapon.owner) ==
-                                        attacker.index):
+                        for weapon in EntityIter("weapon_{0}".format(
+                                game_event.get_string('item'))):
 
-                                    weapon_index = weapon.index
-                                    break
-                            else:
-                                weapon_index = None
+                            if weapon.owner == -1:
+                                continue
+                            if (index_from_inthandle(weapon.owner) ==
+                                    attacker.index):
 
-                            player.take_damage(
-                                FINISHING_DAMAGE,
-                                attacker_index=attacker.index,
-                                weapon_index=weapon_index
-                            )
+                                weapon_index = weapon.index
+                                break
+                        else:
+                            weapon_index = None
 
-                            self.death_callback()
+                        player.take_damage(
+                            FINISHING_DAMAGE,
+                            attacker_index=attacker.index,
+                            weapon_index=weapon_index
+                        )
 
-                else:
-                    self.owner._show_health()
+                    else:
+                        player.take_damage(FINISHING_DAMAGE)
+
+                    self.death_callback()
+
+            else:
+                self.owner._show_health()
 
         def delete(self):
             self.owner.delete_counter(self)

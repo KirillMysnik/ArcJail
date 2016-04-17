@@ -188,7 +188,7 @@ class PrepareTime(JailGame):
 
     @stage('abort-prepare-interrupted')
     def stage_abort_prepare_interrupted(self):
-        broadcast(strings_module['abort_prepare_interrupted'])
+        broadcast(strings_module['abort prepare_interrupted'])
 
         if config_manager['prepare_sound'] is not None:
             config_manager['prepare_sound'].stop()

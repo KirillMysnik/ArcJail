@@ -128,11 +128,11 @@ class ScoreGameBase(MapGameTeamBased):
             'scoregame-new-score{}'.format(self.num_teams))
 
 
-class Game_ScoreGame_Standard(ScoreGameBase, PlayerPreserving):
+class ScoreGameStandard(ScoreGameBase, PlayerPreserving):
     caption = strings_module['title standard']
     module = 'scoregame_standard'
 
-add_available_game(Game_ScoreGame_Standard)
+add_available_game(ScoreGameStandard)
 
 
 class ScoreGameNoPropKill(ScoreGameBase, PlayerPreserving):

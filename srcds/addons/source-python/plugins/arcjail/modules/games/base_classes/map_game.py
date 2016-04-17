@@ -62,6 +62,7 @@ class MapGame(PrepareTime, JailGame):
             "mapgame-entry",
         ],
     }
+
     class GameLauncher(GameLauncher):
         def __init__(self, game_class, map_data):
             self.caption = map_data.caption or game_class.caption

@@ -24,6 +24,7 @@ class JailGame(BaseGame):
         'abort': ["abort", ],
         'abort-player-out': ["abort-player-out", ],
         'win': ["win", ],
+        'draw': ["draw", ],
     }
 
     def __init__(self, players, **kwargs):
@@ -74,8 +75,7 @@ class JailGame(BaseGame):
         if winner is None or loser is None:
             return
 
-        InternalEvent.fire('jail_lr_won', player=winner)
-        InternalEvent.fire('jail_lr_lost', player=loser)
+        InternalEvent.fire('jail_lr_won', winner=winner, loser=loser)
 
         if config_manager['victory_sound'] is not None:
             config_manager['victory_sound'].play(winner.index)
@@ -83,6 +83,19 @@ class JailGame(BaseGame):
         broadcast(strings_module['common_victory'].tokenize(
             winner=winner.name,
             loser=loser.name,
+            game=self.caption,
+        ))
+
+        self.set_stage_group('destroy')
+
+    @stage('draw')
+    def stage_draw(self):
+        InternalEvent.fire(
+            'jail_lr_draw', prisoner=self.prisoner, guard=self.guard)
+
+        broadcast(strings_module['common_draw'].tokenize(
+            winner=self.prisoner.name,
+            loser=self.guard.name,
             game=self.caption,
         ))
 

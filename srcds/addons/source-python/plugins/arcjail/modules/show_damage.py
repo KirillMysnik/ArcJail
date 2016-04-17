@@ -9,6 +9,8 @@ from ..classes.base_player_manager import BasePlayerManager
 
 from ..resource.strings import build_module_strings
 
+from .overlays import show_overlay
+
 from . import build_module_config
 
 TEXT_VISIBLE_TIMEOUT = 2
@@ -39,14 +41,10 @@ class ShowDamagePlayer:
         self.player = player
         self._current_damage = 0
         self._reset_text_delay = None
-        self._reset_marker_delay = None
 
     def _reset_text(self):
         self._current_damage = 0
         EMPTY_CENTER_MESSAGE.send(self.player.index)
-
-    def _reset_marker(self):
-        self.player.client_command('r_screenoverlay off')
 
     def show_damage(self, amount):
         self._current_damage += amount
@@ -61,8 +59,11 @@ class ShowDamagePlayer:
 
         # Show hit marker
         if config_manager['hit_marker_material'] != "":
-            self.player.client_command(
-                'r_screenoverlay {}'.format(config_manager['hit_sound']))
+            show_overlay(
+                self.player,
+                config_manager['hit_marker_material'],
+                MARKER_VISIBLE_TIMEOUT
+            )
 
         # Cancel delays if any
         if (self._reset_text_delay is not None and
@@ -70,15 +71,8 @@ class ShowDamagePlayer:
 
             self._reset_text_delay.cancel()
 
-        if (self._reset_marker_delay is not None and
-                self._reset_marker_delay.running):
-
-            self._reset_marker_delay.cancel()
-
         # Relaunch delays
         self._reset_text_delay = Delay(TEXT_VISIBLE_TIMEOUT, self._reset_text)
-        self._reset_marker_delay = Delay(
-            MARKER_VISIBLE_TIMEOUT, self._reset_marker)
 
 
 show_damage_player_manager = BasePlayerManager(ShowDamagePlayer)

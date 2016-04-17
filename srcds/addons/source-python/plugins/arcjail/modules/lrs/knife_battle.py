@@ -1,6 +1,8 @@
 from ...resource.strings import build_module_strings
 
-from . import add_available_game, HiddenSetting, Setting, SettingOption
+from . import (
+    add_available_game, HiddenSetting, Setting, SettingOption,
+    strings_module as strings_common)
 
 from .base_classes.combat_game import CombatGame
 
@@ -16,7 +18,12 @@ class KnifeBattle(CombatGame):
                 SettingOption(35, strings_module['setting 35hp']),
                 SettingOption(100, strings_module['setting 100hp'], True),
                 ),
-        HiddenSetting('weapons', ('weapon_knife', ))
+        Setting('using_map_data', strings_common['settings map_data'],
+                SettingOption(
+                    True, strings_common['setting map_data yes'], True),
+                SettingOption(False, strings_common['setting map_data no']),
+                ),
+        HiddenSetting('weapons', ('weapon_knife', )),
     ]
 
 

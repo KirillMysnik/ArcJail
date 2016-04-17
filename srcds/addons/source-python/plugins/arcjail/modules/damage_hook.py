@@ -80,6 +80,7 @@ class ProtectedPlayer:
 
             self.hook_hurt = lambda health_counter, game_event: True
             self.hook_death = lambda health_counter, game_event: True
+            self.death_callback = lambda: None
 
         def _hurt(self, game_event):
             player = self.owner.player
@@ -116,6 +117,8 @@ class ProtectedPlayer:
                                 attacker_index=attacker.index,
                                 weapon_index=weapon_index
                             )
+
+                            self.death_callback()
 
                 else:
                     self.owner._show_health()

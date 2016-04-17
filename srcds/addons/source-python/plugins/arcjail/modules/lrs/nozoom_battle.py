@@ -16,7 +16,7 @@ strings_module = build_module_strings('lrs/nozoom_battle')
 
 class NozoomBattle(CombatGame):
     caption = strings_module['title']
-    module = "knife_battle"
+    module = "nozoom_battle"
     settings = [
         Setting('health', strings_module['settings hp'],
                 SettingOption(1, strings_module['setting 1hp']),

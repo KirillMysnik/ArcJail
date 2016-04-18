@@ -3,8 +3,7 @@ from ...resource.strings import build_module_strings
 from ..damage_hook import get_hook, protected_player_manager
 
 from ..games.scoregames import config_manager as config_manager_games
-
-from ..overlays import show_overlay
+from ..games import play_flawless_effects
 
 from ..players import broadcast
 
@@ -15,6 +14,7 @@ from . import (
 
 
 strings_module = build_module_strings('lrs/scoregames')
+
 
 class ScoreGameBase(MapGameTeamBased):
     stage_groups = {
@@ -59,14 +59,7 @@ class ScoreGameBase(MapGameTeamBased):
         self._results['loser'] = loser
 
         if self.score[loser.userid] == 0:
-            if config_manager_common['flawless_sound'] is not None:
-                indexes = [player_.index for player_ in self._players]
-                config_manager_common['flawless_sound'].play(*indexes)
-
-            if config_manager_common['flawless_material'] != "":
-                for player in self._players:
-                    show_overlay(
-                        player, config_manager_common['flawless_material'], 3)
+            play_flawless_effects(self._players)
 
         self.set_stage_group('win')
 
@@ -84,14 +77,7 @@ class ScoreGameBase(MapGameTeamBased):
         self._results['loser'] = loser
 
         if self.score[loser.userid] == 0:
-            if config_manager_common['flawless_sound'] is not None:
-                indexes = [player_.index for player_ in self._players]
-                config_manager_common['flawless_sound'].play(*indexes)
-
-            if config_manager_common['flawless_material'] != "":
-                for player in self._players:
-                    show_overlay(
-                        player, config_manager_common['flawless_material'], 3)
+            play_flawless_effects(self._players)
 
         self.set_stage_group('win')
 

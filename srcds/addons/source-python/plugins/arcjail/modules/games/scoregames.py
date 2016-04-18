@@ -11,8 +11,9 @@ from .. import build_module_config
 from .base_classes.map_game_team_based import MapGameTeamBased
 from .base_classes.player_preserving import PlayerPreserving
 
-from . import (add_available_game, config_manager as config_manager_common,
-               push, stage, strings_module as strings_common)
+from . import (
+    add_available_game, config_manager as config_manager_common,
+    play_flawless_effects, push, stage, strings_module as strings_common)
 
 
 strings_module = build_module_strings('games/scoregames')
@@ -104,9 +105,15 @@ class ScoreGameBase(MapGameTeamBased):
     @stage('scoregame-check-team-scores')
     def stage_scoregame_check_team_scores(self):
         if self.score['team1'] == self.win_score:
+            if self.score['team2'] == 0:
+                play_flawless_effects(self._players)
+
             self.set_stage_group('game-end-win-team1')
 
         elif self.score['team2'] == self.win_score:
+            if self.score['team1'] == 0:
+                play_flawless_effects(self._players)
+
             self.set_stage_group('game-end-win-team2')
 
         elif self.score['team3'] == self.win_score:

@@ -141,5 +141,124 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
             self._rebel_filter = rebel_filter
             register_rebel_filter(rebel_filter)
 
-
 add_available_game(SurvivalKnockoutPlayerBased)
+
+
+class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
+    caption = strings_module['title teambased_standard']
+    module = 'survival_knockout_teambased'
+
+    @stage('survival-equip-damage-hooks')
+    def stage_survival_equip_damage_hooks(self):
+        if self.map_data['RESTORE_HEALTH_ON_FF']:
+            def hook_p(counter, game_event):
+                victim_uid = game_event.get_int('userid')
+                attacker_uid = game_event.get_int('attacker')
+
+                if attacker_uid in (0, victim_uid):
+                    return False
+
+                attacker = main_player_manager[attacker_uid]
+                victim = main_player_manager[victim_uid]
+
+                try:
+                    attacker_team = self.get_player_team(attacker)
+                    victim_team = self.get_player_team(victim)
+                except IndexError:
+                    return False
+
+                if attacker_team == victim_team:
+                    return False
+
+                damage = game_event.get_int('dmg_health')
+                show_damage(attacker, damage)
+                push_by_damage_amount(
+                    victim, attacker, damage, self.map_data)
+
+                return False
+
+        else:
+            def hook_p(counter, game_event):
+                victim_uid = game_event.get_int('userid')
+                attacker_uid = game_event.get_int('attacker')
+
+                if attacker_uid in (0, victim_uid):
+                    return False
+
+                attacker = main_player_manager[attacker_uid]
+                victim = main_player_manager[victim_uid]
+
+                if (attacker not in self._players or
+                        victim not in self._players):
+
+                    return False
+
+                damage = game_event.get_int('dmg_health')
+                show_damage(attacker, damage)
+                push_by_damage_amount(
+                    victim, attacker, damage, self.map_data)
+
+                return False
+
+        def hook_w_min_damage(counter, game_event):
+            if game_event.get_int('attacker') != 0:
+                return False
+
+            min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
+            current_damage = game_event.get_int('dmg_health')
+            return current_damage >= min_damage
+
+        for player in main_player_manager.values():
+            if player.dead:
+                continue
+
+            def hook_on_death(counter, game_event, player=player):
+                saved_player = saved_player_manager[player.userid]
+                saved_player.strip()
+                self.on_death(player)
+                return True
+
+            p_player = protected_player_manager[player.userid]
+            self._counters[player.userid] = []
+            if player in self._players:
+                counter1 = p_player.new_counter(
+                    display=strings_damage_hook['health against_guards'])
+
+                counter1.hook_hurt = get_hook('G')
+                counter1.hook_death = hook_on_death
+
+                counter2 = p_player.new_counter()
+                counter2.hook_hurt = hook_p
+
+                counter3 = p_player.new_counter()
+                counter3.hook_hurt = hook_w_min_damage
+                counter3.hook_death = hook_on_death
+                counter3.health = self.map_data['INITIAL_HEALTH']
+
+                self._counters[player.userid].append(counter1)
+                self._counters[player.userid].append(counter2)
+                self._counters[player.userid].append(counter3)
+
+            elif player.team == GUARDS_TEAM:
+                counter = p_player.new_counter()
+                if self.map_data['ALLOW_REBELLING']:
+                    counter.hook_hurt = get_hook('SWP')
+                    counter.display = strings_damage_hook[
+                        'health against_prisoners']
+
+                else:
+                    counter.hook_hurt = get_hook('SW')
+                    counter.display = strings_damage_hook['health general']
+
+                self._counters[player.userid].append(counter)
+
+            p_player.set_protected()
+
+        if not self.map_data['ALLOW_REBELLING']:
+            def rebel_filter(player):
+                return player not in self._players_all
+
+            self._rebel_filter = rebel_filter
+            register_rebel_filter(rebel_filter)
+
+add_available_game(SurvivalKnockoutTeamBased)

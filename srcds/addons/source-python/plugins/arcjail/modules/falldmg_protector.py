@@ -35,7 +35,7 @@ class FallProtectedPlayer:
         self._counter = self.p_player.new_counter(
             health=0, display=strings_module['health falldmg_protection'])
 
-        def sub_hook(counter, game_event):
+        def sub_hook(counter, info):
             self.p_player.delete_counter(counter)
             self.p_player.unset_protected()
 

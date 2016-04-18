@@ -1,8 +1,10 @@
 from warnings import warn
 
 from cvars import ConVar
+
 from ..damage_hook import (
-    get_hook, protected_player_manager, strings_module as strings_damage_hook)
+    get_hook, is_world, protected_player_manager,
+    strings_module as strings_damage_hook)
 
 from ..equipment_switcher import saved_player_manager
 
@@ -69,11 +71,10 @@ def build_survival_base(*parent_classes):
 
         @stage('survival-equip-damage-hooks')
         def stage_survival_equip_damage_hooks(self):
-            def hook_hurt_for_prisoner(counter, game_event):
+            def hook_hurt_for_prisoner(counter, info):
                 min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
-                current_damage = game_event.get_int('dmg_health')
 
-                if current_damage >= min_damage:
+                if info.damage >= min_damage:
                     self._flawless[self.prisoner.userid] = False
                     return True
 
@@ -87,11 +88,10 @@ def build_survival_base(*parent_classes):
             def death_callback_for_prisoner():
                 self.on_death(self.prisoner)
 
-            def hook_hurt_for_guard(counter, game_event):
+            def hook_hurt_for_guard(counter, info):
                 min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
-                current_damage = game_event.get_int('dmg_health')
 
-                if current_damage >= min_damage:
+                if info.damage >= min_damage:
                     self._flawless[self.guard.userid] = False
                     return True
 
@@ -232,43 +232,42 @@ def build_survival_friendlyfire_base(*parent_classes):
 
                         return True
 
-                    def hook_min_damage(counter, game_event, player=player):
+                    def hook_min_damage(counter, info, player=player):
                         min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
-                        current_damage = game_event.get_int('dmg_health')
 
-                        if current_damage >= min_damage:
+                        if info.damage >= min_damage:
                             self._flawless[player.userid] = False
                             return True
 
                         return False
 
-                    def hook_game_p(counter, game_event, player=player):
-                        attacker_uid = game_event.get_int('attacker')
-                        if attacker_uid in (0, player.userid):
+                    def hook_game_p(counter, info, player=player):
+                        if (info.attacker == player.index or
+                                is_world(info.attacker)):
+
                             return False
 
-                        attacker = main_player_manager[attacker_uid]
+                        attacker = main_player_manager.get_by_index(
+                            info.attacker)
 
                         if attacker in self._players:
-                            show_damage(
-                                attacker, game_event.get_int('dmg_health'))
-
-                            return hook_min_damage(counter, game_event)
+                            show_damage(attacker, info.damage)
+                            return hook_min_damage(counter, info)
 
                         return False
 
-                    def hook_sw_game_p(counter, game_event, player=player):
-                        attacker_uid = game_event.get_int('attacker')
-                        if attacker_uid in (0, player.userid):
-                            return hook_min_damage(counter, game_event)
+                    def hook_sw_game_p(counter, info, player=player):
+                        if (info.attacker == player.index or
+                                is_world(info.attacker)):
 
-                        attacker = main_player_manager[attacker_uid]
+                            return hook_min_damage(counter, info)
+
+                        attacker = main_player_manager.get_by_index(
+                            info.attacker)
 
                         if attacker in self._players:
-                            show_damage(
-                                attacker, game_event.get_int('dmg_health'))
-
-                            return hook_min_damage(counter, game_event)
+                            show_damage(attacker, info.damage)
+                            return hook_min_damage(counter, info)
 
                         return False
 
@@ -287,12 +286,15 @@ def build_survival_friendlyfire_base(*parent_classes):
                     p_player.set_protected()
 
                 elif player.team == GUARDS_TEAM:
-                    def hook_sw_nongame_p(counter, game_event, player=player):
-                        attacker_uid = game_event.get_int('attacker')
-                        if attacker_uid in (0, player.userid):
+                    def hook_sw_nongame_p(counter, info, player=player):
+                        if (info.attacker == player.index or
+                                is_world(info.attacker)):
+
                             return True
 
-                        attacker = main_player_manager[attacker_uid]
+                        attacker = main_player_manager.get_by_index(
+                            info.attacker)
+
                         if attacker in self._players:
                             return False
 

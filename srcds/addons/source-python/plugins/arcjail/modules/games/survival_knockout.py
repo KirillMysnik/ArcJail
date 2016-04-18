@@ -3,7 +3,8 @@ from mathlib import Vector
 from ...resource.strings import build_module_strings
 
 from ..damage_hook import (
-    get_hook, protected_player_manager, strings_module as strings_damage_hook)
+    get_hook, is_world, protected_player_manager,
+    strings_module as strings_damage_hook)
 
 from ..equipment_switcher import saved_player_manager
 
@@ -60,39 +61,34 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
     @stage('survival-equip-damage-hooks')
     def stage_survival_equip_damage_hooks(self):
         def hook_on_death(counter, game_event):
-            player = main_player_manager[game_event.get_int('userid')]
-            if player in self._players:
-                saved_player = saved_player_manager[player.userid]
-                saved_player.strip()
-                self.on_death(player)
+            player = counter.owner.player
+            saved_player = saved_player_manager[player.userid]
+            saved_player.strip()
+            self.on_death(player)
 
             return True
 
-        def hook_p(counter, game_event):
-            victim_uid = game_event.get_int('userid')
-            attacker_uid = game_event.get_int('attacker')
+        def hook_p(counter, info):
+            victim = counter.owner.player
 
-            if attacker_uid in (0, victim_uid):
+            if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager[attacker_uid]
-            victim = main_player_manager[victim_uid]
+            attacker = main_player_manager.get_by_index(info.attacker)
 
             if attacker in self._players:
-                damage = game_event.get_int('dmg_health')
-                show_damage(attacker, damage)
+                show_damage(attacker, info.damage)
                 push_by_damage_amount(
-                    victim, attacker, damage, self.map_data)
+                    victim, attacker, info.damage, self.map_data)
 
             return False
 
-        def hook_w_min_damage(counter, game_event):
-            if game_event.get_int('attacker') != 0:
+        def hook_w_min_damage(counter, info):
+            if not is_world(info.attacker):
                 return False
 
             min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
-            current_damage = game_event.get_int('dmg_health')
-            return current_damage >= min_damage
+            return info.damage >= min_damage
 
         for player in main_player_manager.values():
             if player.dead:
@@ -151,15 +147,13 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
     @stage('survival-equip-damage-hooks')
     def stage_survival_equip_damage_hooks(self):
         if self.map_data['RESTORE_HEALTH_ON_FF']:
-            def hook_p(counter, game_event):
-                victim_uid = game_event.get_int('userid')
-                attacker_uid = game_event.get_int('attacker')
+            def hook_p(counter, info):
+                victim = counter.owner.player
 
-                if attacker_uid in (0, victim_uid):
+                if info.attacker == victim.index or is_world(info.attacker):
                     return False
 
-                attacker = main_player_manager[attacker_uid]
-                victim = main_player_manager[victim_uid]
+                attacker = main_player_manager.get_by_index(info.attacker)
 
                 try:
                     attacker_team = self.get_player_team(attacker)
@@ -170,57 +164,50 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                 if attacker_team == victim_team:
                     return False
 
-                damage = game_event.get_int('dmg_health')
-                show_damage(attacker, damage)
+                show_damage(attacker, info.damage)
                 push_by_damage_amount(
-                    victim, attacker, damage, self.map_data)
+                    victim, attacker, info.damage, self.map_data)
 
                 return False
 
         else:
-            def hook_p(counter, game_event):
-                victim_uid = game_event.get_int('userid')
-                attacker_uid = game_event.get_int('attacker')
+            def hook_p(counter, info):
+                victim = counter.owner.player
 
-                if attacker_uid in (0, victim_uid):
+                if info.attacker == victim.index or is_world(info.attacker):
                     return False
 
-                attacker = main_player_manager[attacker_uid]
-                victim = main_player_manager[victim_uid]
+                attacker = main_player_manager.get_by_index(info.attacker)
 
-                if (attacker not in self._players or
-                        victim not in self._players):
-
+                if attacker not in self._players:
                     return False
 
-                damage = game_event.get_int('dmg_health')
-                show_damage(attacker, damage)
+                show_damage(attacker, info.damage)
                 push_by_damage_amount(
-                    victim, attacker, damage, self.map_data)
+                    victim, attacker, info.damage, self.map_data)
 
                 return False
 
-        def hook_w_min_damage(counter, game_event):
-            if game_event.get_int('attacker') != 0:
+        def hook_w_min_damage(counter, info):
+            if not is_world(info.attacker):
                 return False
 
             min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
-            current_damage = game_event.get_int('dmg_health')
-            return current_damage >= min_damage
+            return info.damage >= min_damage
 
         for player in main_player_manager.values():
             if player.dead:
                 continue
 
-            def hook_on_death(counter, game_event, player=player):
-                saved_player = saved_player_manager[player.userid]
-                saved_player.strip()
-                self.on_death(player)
-                return True
-
             p_player = protected_player_manager[player.userid]
             self._counters[player.userid] = []
             if player in self._players:
+                def hook_on_death(counter, game_event, player=player):
+                    saved_player = saved_player_manager[player.userid]
+                    saved_player.strip()
+                    self.on_death(player)
+                    return True
+
                 counter1 = p_player.new_counter(
                     display=strings_damage_hook['health against_guards'])
 

@@ -146,13 +146,13 @@ class CombatGame(PrepareTime):
 
     @stage('equip-damage-hooks')
     def stage_equip_damage_hooks(self):
-        def hook_hurt_for_prisoner(counter, game_event):
-            if game_event.get_int('attacker') != self.guard.userid:
+        def hook_hurt_for_prisoner(counter, info):
+            if info.attacker != self.guard.index:
                 return False
 
             self._flawless[self.prisoner.userid] = False
 
-            show_damage(self.guard, game_event.get_int('dmg_health'))
+            show_damage(self.guard, info.damage)
 
             return True
 
@@ -164,13 +164,13 @@ class CombatGame(PrepareTime):
         def death_callback_for_prisoner():
             self.on_death(self.prisoner)
 
-        def hook_hurt_for_guard(counter, game_event):
-            if game_event.get_int('attacker') != self.prisoner.userid:
+        def hook_hurt_for_guard(counter, info):
+            if info.attacker != self.prisoner.index:
                 return False
 
             self._flawless[self.guard.userid] = False
 
-            show_damage(self.prisoner, game_event.get_int('dmg_health'))
+            show_damage(self.prisoner, info.damage)
 
             return True
 

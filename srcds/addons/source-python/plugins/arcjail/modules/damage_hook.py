@@ -1,10 +1,12 @@
-from entities.helpers import index_from_inthandle
-from events import Event
-from filters.entities import EntityIter
+from entities.constants import WORLD_ENTITY_INDEX
+from entities.entity import Entity
+from entities.hooks import EntityCondition, EntityPreHook
+from entities import TakeDamageInfo
 from listeners.tick import Delay
+from memory import make_object
 from messages import KeyHintText
 from players.constants import HideHudFlags
-from players.helpers import get_client_language
+from players.helpers import get_client_language, userid_from_pointer
 
 from controlled_cvars.handlers import int_handler
 
@@ -27,41 +29,50 @@ config_manager = build_module_config('damage_hook')
 config_manager.controlled_cvar(
     int_handler,
     "protection_hp",
-    default=1000,
+    default=100,
     description="Amount of health used to protect players against damage",
 )
 
 
 KEYHINT_REFRESH_INTERVAL = 1
-FINISHING_DAMAGE = 100
+FINISHING_DAMAGE = 1000
 HIDEHUD_PROP = 'm_Local.m_iHideHUD'
 
 
-def get_hook(flags, next_hook=(lambda counter, game_event: True)):
+def is_world(index):
+    if index == WORLD_ENTITY_INDEX:
+        return True
+
+    if Entity(index).classname != 'player':
+        return True
+
+    return False
+
+
+def get_hook(flags, next_hook=(lambda counter, info: True)):
     # Hooks: S = self, W = world, P = prisoners, G = guards
     flags = flags.upper()
 
-    def hook(counter, game_event):
-        userid = game_event.get_int('userid')
-        aid = game_event.get_int('attacker')
-
+    def hook(counter, info):
         if 'S' in flags:
-            if userid == aid:
-                return next_hook(counter, game_event)
+            if counter.owner.player.index == info.attacker:
+                return next_hook(counter, info)
 
         if 'W' in flags:
-            if not aid:
-                return next_hook(counter, game_event)
+            if is_world(info.attacker):
+                return next_hook(counter, info)
 
-        if userid != aid and aid:
-            attacker = main_player_manager[aid]
+        if (info.attacker != counter.owner.player.index and
+                not is_world(info.attacker)):
+
+            attacker = main_player_manager.get_by_index(info.attacker)
             if 'P' in flags:
                 if attacker.team == PRISONERS_TEAM:
-                    return next_hook(counter, game_event)
+                    return next_hook(counter, info)
 
             if 'G' in flags:
                 if attacker.team == GUARDS_TEAM:
-                    return next_hook(counter, game_event)
+                    return next_hook(counter, info)
 
         return False
 
@@ -82,51 +93,26 @@ class ProtectedPlayer:
             self.hook_death = lambda health_counter, game_event: True
             self.death_callback = lambda: None
 
-        def _hurt(self, game_event):
+        def _hurt(self, info):
             player = self.owner.player
-            if not self.hook_hurt(self, game_event):
-                return
+            if not self.hook_hurt(self, info):
+                return True
 
-            self.health -= game_event.get_int('dmg_health')
+            self.health -= info.damage
             if self.health <= 0:
-                if (self.hook_death(self, game_event) and
+                if (self.hook_death(self, info) and
                         not self.owner.dead):
 
                     self.owner._show_health(hide=True)
                     self.owner.dead = True
 
-                    player.health = 0
-
-                    aid = game_event.get_int('attacker')
-                    if aid != 0:
-                        attacker = main_player_manager[aid]
-
-                        for weapon in EntityIter("weapon_{0}".format(
-                                game_event.get_string('item'))):
-
-                            if weapon.owner == -1:
-                                continue
-                            if (index_from_inthandle(weapon.owner) ==
-                                    attacker.index):
-
-                                weapon_index = weapon.index
-                                break
-                        else:
-                            weapon_index = None
-
-                        player.take_damage(
-                            FINISHING_DAMAGE,
-                            attacker_index=attacker.index,
-                            weapon_index=weapon_index
-                        )
-
-                    else:
-                        player.take_damage(FINISHING_DAMAGE)
+                    info.damage = FINISHING_DAMAGE
 
                     self.death_callback()
 
             else:
                 self.owner._show_health()
+                info.damage = 0
 
         def delete(self):
             self.owner.delete_counter(self)
@@ -188,14 +174,12 @@ class ProtectedPlayer:
         if not self._counters:
             self._show_health(hide=True)
 
-    def _hurt(self, game_event):
+    def _hurt(self, info):
         if self._pre_protection_health is None:
             return
 
-        self.player.health = config_manager['protection_hp']
-
         for counter in self._counters:
-            counter._hurt(game_event)
+            counter._hurt(info)
 
     def _spawn(self, game_event):
         self._pre_protection_health = None
@@ -234,13 +218,14 @@ def on_main_player_deleted(event_var):
     protected_player_manager.delete(player)
 
 
-@Event('player_hurt')
-def on_player_hurt(game_event):
-    protected_player = protected_player_manager[game_event.get_int('userid')]
+@EntityPreHook(EntityCondition.is_player, 'on_take_damage')
+def on_take_damage(args):
+    protected_player = protected_player_manager[userid_from_pointer(args[0])]
     if protected_player.dead:
         return
 
-    protected_player._hurt(game_event)
+    info = make_object(TakeDamageInfo, args[1])
+    protected_player._hurt(info)
 
 
 @InternalEvent('player_respawn')

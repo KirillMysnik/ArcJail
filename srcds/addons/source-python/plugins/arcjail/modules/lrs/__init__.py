@@ -139,20 +139,6 @@ config_manager.controlled_cvar(
 )
 config_manager.controlled_cvar(
     sound_nullable_handler,
-    "flawless_sound",
-    default="arcjail/flawless.mp3",
-    description="Additional sound to play if the victory was flawless, "
-                "leave empty to disable",
-)
-config_manager.controlled_cvar(
-    string_handler,
-    "flawless_material",
-    default="overlays/arcjail/flawless",
-    description="Path to a FLAWLESS! material (VMT-file) without VMT "
-                "extension, leave empty to disable",
-)
-config_manager.controlled_cvar(
-    sound_nullable_handler,
     "availability_sound",
     default="arcjail/lr3.mp3",
     description="Sound to play when Last Request becomes available to play, "
@@ -195,7 +181,7 @@ config_manager.controlled_cvar(
     string_handler,
     "countdown_1_material",
     default="overlays/arcjail/1",
-    description="Path to a '1' material (VMT-file) without VMT "
+    description="Path to a '2' material (VMT-file) without VMT "
                 "extension, leave empty to disable",
 )
 config_manager.controlled_cvar(

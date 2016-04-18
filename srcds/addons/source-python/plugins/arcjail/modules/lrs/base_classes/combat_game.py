@@ -12,9 +12,9 @@ from ...equipment_switcher import (
 
 from ...falldmg_protector import unprotect
 
-from ...jail_map import get_lrs, teleport_player
+from ...games import play_flawless_effects
 
-from ...overlays import show_overlay
+from ...jail_map import get_lrs, teleport_player
 
 from ...show_damage import show_damage
 
@@ -215,14 +215,7 @@ class CombatGame(PrepareTime):
             winner, loser = self.prisoner, self.guard
 
         if self._flawless[winner.userid]:
-            if config_manager['flawless_sound'] is not None:
-                indexes = [player_.index for player_ in self._players]
-                config_manager['flawless_sound'].play(*indexes)
-
-            if config_manager['flawless_material'] != "":
-                for player in self._players:
-                    show_overlay(
-                        player, config_manager['flawless_material'], 3)
+            play_flawless_effects(self._players)
         
         self._results['winner'] = winner
         self._results['loser'] = loser

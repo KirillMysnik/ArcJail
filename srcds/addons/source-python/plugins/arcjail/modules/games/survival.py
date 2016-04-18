@@ -267,7 +267,7 @@ class SurvivalTeamBased(build_survival_base(MapGameTeamBased)):
         broadcast(strings_module['player_out'].tokenize(
             player=player.name,
             team=strings_common['team{}'.format(team.team_num)],
-            color=config_manager_common['team{}_color'].format(team.team_num),
+            color=config_manager_common['team{}_color'.format(team.team_num)],
         ))
 
 add_available_game(SurvivalTeamBased)
@@ -557,7 +557,7 @@ add_available_game(SurvivalTeamBasedFriendlyFire)
 
 
 class SurvivalPlayerBasedFriendlyFire(
-    build_survival_friendlyfire_base(SurvivalPlayerBased)):
+        build_survival_friendlyfire_base(SurvivalPlayerBased)):
 
     caption = strings_module['title playerbased_friendlyfire']
     module = 'survival_playerbased_friendlyfire'

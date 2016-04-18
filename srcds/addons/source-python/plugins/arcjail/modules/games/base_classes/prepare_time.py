@@ -6,6 +6,8 @@ from messages import TextMsg
 
 from ....arcjail import internal_event_manager
 
+from ...overlays import show_overlay
+
 from ...players import broadcast, main_player_manager
 
 from .. import config_manager, stage, strings_module
@@ -57,7 +59,15 @@ class PrepareTime(BaseGame):
                 config_manager['prepare_timeout'], callback)
 
             def countdown(ticks_left):
-                TextMsg(str(ticks_left)).send(*indexes)
+                if (ticks_left > 3 or ticks_left < 1 or config_manager[
+                        'countdown_{}_material'.format(ticks_left)] == ""):
+
+                    TextMsg(str(ticks_left)).send(*indexes)
+
+                else:
+                    for player in self._players:
+                        show_overlay(player, config_manager[
+                            'countdown_{}_material'.format(ticks_left)], 1)
 
                 if config_manager['countdown_sound'] is not None:
                     config_manager['countdown_sound'].play(*indexes)

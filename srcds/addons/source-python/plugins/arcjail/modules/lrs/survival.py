@@ -1,5 +1,6 @@
 from warnings import warn
 
+from cvars import ConVar
 from ..damage_hook import (
     get_hook, protected_player_manager, strings_module as strings_damage_hook)
 
@@ -10,13 +11,24 @@ from ..falldmg_protector import protect as falldmg_protect
 from ..games.survival import (
     PossibleDeadEndWarning, strings_module as strings_games)
 
-from ..overlays import show_overlay
+from ..games import play_flawless_effects
+
+from ..no_ff_spam import (
+    disable as no_ff_spam_disable, enable as no_ff_spam_enable)
+
+from ..players import main_player_manager
+
+from ..show_damage import show_damage
+
+from ..silent_cvars import silent_set
+
+from ..teams import GUARDS_TEAM, PRISONERS_TEAM
 
 from .base_classes.map_game import MapGame
 from .base_classes.map_game_team_based import MapGameTeamBased
 
 from . import (
-    add_available_game, game_event_handler, config_manager, push, stage)
+    add_available_game, game_event_handler, push, stage)
 
 
 def build_survival_base(*parent_classes):
@@ -142,14 +154,7 @@ def build_survival_base(*parent_classes):
                 winner, loser = self.prisoner, self.guard
 
             if self._flawless[winner.userid]:
-                if config_manager['flawless_sound'] is not None:
-                    indexes = [player_.index for player_ in self._players]
-                    config_manager['flawless_sound'].play(*indexes)
-
-                if config_manager['flawless_material'] != "":
-                    for player in self._players:
-                        show_overlay(
-                            player, config_manager['flawless_material'], 3)
+                play_flawless_effects(self._players)
 
             self._results['winner'] = winner
             self._results['loser'] = loser
@@ -179,3 +184,154 @@ class SurvivalTeamBased(build_survival_base(MapGameTeamBased)):
     module = 'survival_teambased_standard'
 
 add_available_game(SurvivalTeamBased)
+
+
+def build_survival_friendlyfire_base(*parent_classes):
+    class SurvivalFriendlyFireBase(*parent_classes):
+        cvar_friendlyfire = ConVar('mp_friendlyfire')
+
+        stage_groups = {
+            'mapgame-start': [
+                "mapgame-equip-weapons",
+                "mapgame-register-push-handlers",
+                "mapgame-apply-cvars",
+                "mapgame-fire-mapdata-outputs",
+                "survival-enable-ff",
+                "mapgame-entry",
+            ]
+        }
+
+        @stage('survival-enable-ff')
+        def stage_survival_enable_ff(self):
+            no_ff_spam_enable()
+
+            self._cvars['friendlyfire'] = self.cvar_friendlyfire.get_bool()
+
+            silent_set(self.cvar_friendlyfire, 'bool', True)
+
+        @stage('undo-survival-enable-ff')
+        def stage_undo_survival_enable_ff(self):
+            no_ff_spam_disable()
+
+            silent_set(
+                self.cvar_friendlyfire, 'bool', self._cvars['friendlyfire'])
+
+        @stage('survival-equip-damage-hooks')
+        def stage_survival_equip_damage_hooks(self):
+            for player in main_player_manager.values():
+                if player.dead:
+                    continue
+
+                p_player = protected_player_manager[player.userid]
+
+                if player in self._players:
+                    def hook_on_death(counter, game_event, player=player):
+                        saved_player = saved_player_manager[player.userid]
+                        saved_player.strip()
+                        self.on_death(player)
+
+                        return True
+
+                    def hook_min_damage(counter, game_event, player=player):
+                        min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
+                        current_damage = game_event.get_int('dmg_health')
+
+                        if current_damage >= min_damage:
+                            self._flawless[player.userid] = False
+                            return True
+
+                        return False
+
+                    def hook_game_p(counter, game_event, player=player):
+                        attacker_uid = game_event.get_int('attacker')
+                        if attacker_uid in (0, player.userid):
+                            return False
+
+                        attacker = main_player_manager[attacker_uid]
+
+                        if attacker in self._players:
+                            show_damage(
+                                attacker, game_event.get_int('dmg_health'))
+
+                            return hook_min_damage(counter, game_event)
+
+                        return False
+
+                    def hook_sw_game_p(counter, game_event, player=player):
+                        attacker_uid = game_event.get_int('attacker')
+                        if attacker_uid in (0, player.userid):
+                            return hook_min_damage(counter, game_event)
+
+                        attacker = main_player_manager[attacker_uid]
+
+                        if attacker in self._players:
+                            show_damage(
+                                attacker, game_event.get_int('dmg_health'))
+
+                            return hook_min_damage(counter, game_event)
+
+                        return False
+
+                    counter = p_player.new_counter(
+                        display=strings_damage_hook['health game'])
+
+                    if self.map_data['ALLOW_SELFDAMAGE']:
+                        counter.hook_hurt = hook_sw_game_p
+                    else:
+                        counter.hook_hurt = hook_game_p
+
+                    counter.hook_death = hook_on_death
+                    counter.health = self.map_data['INITIAL_HEALTH']
+
+                    self._counters[player.userid] = counter
+                    p_player.set_protected()
+
+                elif player.team == GUARDS_TEAM:
+                    def hook_sw_nongame_p(counter, game_event, player=player):
+                        attacker_uid = game_event.get_int('attacker')
+                        if attacker_uid in (0, player.userid):
+                            return True
+
+                        attacker = main_player_manager[attacker_uid]
+                        if attacker in self._players:
+                            return False
+
+                        if attacker.team == GUARDS_TEAM:
+                            return False
+
+                        return True
+
+                    counter = p_player.new_counter()
+                    counter.hook_hurt = hook_sw_nongame_p
+                    counter.display = strings_damage_hook['health general']
+
+                    self._counters[player.userid] = counter
+                    p_player.set_protected()
+
+                elif player.team == PRISONERS_TEAM:
+                    counter = p_player.new_counter()
+                    counter.hook_hurt = get_hook('SWG')
+                    counter.display = strings_damage_hook['health general']
+
+                    self._counters[player.userid] = counter
+                    p_player.set_protected()
+
+    return SurvivalFriendlyFireBase
+
+
+class SurvivalTeamBasedFriendlyFire(
+        build_survival_friendlyfire_base(SurvivalTeamBased)):
+
+    caption = strings_games['title teambased_friendlyfire']
+    module = 'survival_teambased_friendlyfire'
+
+add_available_game(SurvivalTeamBasedFriendlyFire)
+
+
+class SurvivalPlayerBasedFriendlyFire(
+        build_survival_friendlyfire_base(SurvivalPlayerBased)):
+
+    caption = strings_games['title playerbased_friendlyfire']
+    module = 'survival_playerbased_friendlyfire'
+
+add_available_game(SurvivalPlayerBasedFriendlyFire)

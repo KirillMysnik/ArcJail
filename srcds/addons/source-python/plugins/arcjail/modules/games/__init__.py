@@ -5,6 +5,7 @@ from warnings import warn
 from commands.say import SayCommand
 from events import Event
 from filters.players import PlayerIter
+from listeners.tick import Delay
 from menus import PagedMenu, PagedOption
 from players.helpers import get_client_language
 
@@ -29,6 +30,8 @@ from ..game_status import strings_module as strings_game_status
 from ..jail_menu import new_available_option
 
 from ..leaders import is_leader
+
+from ..overlays import show_overlay
 
 from ..players import main_player_manager, tell
 
@@ -171,10 +174,45 @@ config_manager.controlled_cvar(
     description="Countdown sound",
 )
 config_manager.controlled_cvar(
+    string_handler,
+    "countdown_3_material",
+    default="overlays/arcjail/3",
+    description="Path to a '3' material (VMT-file) without VMT "
+                "extension, leave empty to disable",
+)
+config_manager.controlled_cvar(
+    string_handler,
+    "countdown_2_material",
+    default="overlays/arcjail/2",
+    description="Path to a '2' material (VMT-file) without VMT "
+                "extension, leave empty to disable",
+)
+config_manager.controlled_cvar(
+    string_handler,
+    "countdown_1_material",
+    default="overlays/arcjail/1",
+    description="Path to a '1' material (VMT-file) without VMT "
+                "extension, leave empty to disable",
+)
+config_manager.controlled_cvar(
     float_handler,
     "prepare_timeout",
     default=3.0,
     description="Preparation timeout for games that require it",
+)
+config_manager.controlled_cvar(
+    sound_nullable_handler,
+    "flawless_sound",
+    default="arcjail/flawless.mp3",
+    description="Additional sound to play if the victory was flawless, "
+                "leave empty to disable",
+)
+config_manager.controlled_cvar(
+    string_handler,
+    "flawless_material",
+    default="overlays/arcjail/flawless",
+    description="Path to a FLAWLESS! material (VMT-file) without VMT "
+                "extension, leave empty to disable",
 )
 
 
@@ -208,6 +246,7 @@ _available_game_classes = []
 _downloadables_sounds = load_downloadables('games-base-sounds.res')
 _downloadables_sprites = load_downloadables('games-base-sprites.res')
 _saved_game_status = None
+_flawless_effects_delays = []
 
 
 def _launch_game(launcher, leader_player, players, **kwargs):
@@ -383,6 +422,25 @@ def reset():
         popup.close()
 
     _popups.clear()
+
+    for flawless_efects_delay in _flawless_effects_delays:
+        if flawless_efects_delay.running:
+            flawless_efects_delay.cancel()
+
+    _flawless_effects_delays.clear()
+
+
+def play_flawless_effects(players):
+    def callback():
+        if config_manager['flawless_sound'] is not None:
+            config_manager['flawless_sound'].play(
+                *[player_.index for player_ in players])
+
+        if config_manager['flawless_material'] != "":
+            for player in players:
+                show_overlay(player, config_manager['flawless_material'], 3)
+
+    _flawless_effects_delays.append(Delay(1.5, callback))
 
 
 @Event('round_start')

@@ -6,6 +6,7 @@ MIN_PLAYERS::							int:		0:				Minimum amount of living prisoners for this game
 MAX_PLAYERS::							int:		-1:				Maximum amount of living prisoners for this game to start, leave -1 to let server count spawnpoints instead
 TIMEOUT_BETWEEN_GAMES::					int:		0:				(NOT SUPPORTED) Amount of seconds server must wait after this game ends before starting game again, 0 - no limit
 MAX_SCORE::								int:		0:				Max amount of goals needed to win score-based game
+GOAL_SOUND::                            int:        1:              Goal sound type, can be customized by the server
 PUSHSCALE_OVERRIDE::                    int:        0:
 PUSHSCALE::								float:		1.0:			phys_pushscale value
 TIMESCALE_OVERRIDE::                    int:        0:

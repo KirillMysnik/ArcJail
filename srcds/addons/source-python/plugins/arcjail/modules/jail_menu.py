@@ -107,9 +107,9 @@ def on_unload(event_var):
 
 @SayCommand('!jmenu')
 def chat_on_jmenu(command, index, team_only):
-    send_popup(main_player_manager.get_by_index(index))
+    send_popup(main_player_manager[index])
 
 
 @ClientCommand('jmenu')
 def cmd_on_jmenu(command, index):
-    send_popup(main_player_manager.get_by_index(index))
+    send_popup(main_player_manager[index])

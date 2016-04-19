@@ -21,7 +21,7 @@ strings_module = build_module_strings('falldmg_protector')
 class FallProtectedPlayer:
     def __init__(self, player):
         self.player = player
-        self.p_player = protected_player_manager[player.userid]
+        self.p_player = protected_player_manager[player.index]
 
         self._delay = None
         self._counter = None
@@ -99,7 +99,9 @@ def on_main_player_deleted(event_var):
 
 @Event('player_death_real')
 def on_player_death_real(game_event):
-    p_player = fall_protected_player_manager[game_event.get_int('userid')]
+    p_player = fall_protected_player_manager.get_by_userid(
+        game_event.get_int('userid'))
+
     p_player.cancel_delay()
 
 
@@ -113,13 +115,13 @@ def protect(player, map_data):
     if map_data['FALL_DAMAGE_PROTECTION_TIMEOUT'] <= 0:
         return
 
-    fall_protected_player_manager[player.userid].protect(
+    fall_protected_player_manager[player.index].protect(
         map_data['FALL_DAMAGE_PROTECTION_TIMEOUT'])
 
 
 def unprotect(player):
-    fall_protected_player_manager[player.userid].unprotect()
+    fall_protected_player_manager[player.index].unprotect()
 
 
 def is_protected(player):
-    return fall_protected_player_manager[player.userid].protected
+    return fall_protected_player_manager[player.index].protected

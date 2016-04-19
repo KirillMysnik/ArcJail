@@ -91,7 +91,9 @@ class PrepareTime(JailGame):
             self.set_stage_group('prepare-continue')
 
     def _prepare_event_handler_player_death(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
         if player in self._players:
             self.set_stage_group('abort-prepare-interrupted')
 
@@ -101,7 +103,9 @@ class PrepareTime(JailGame):
             self.set_stage_group('abort-prepare-interrupted')
 
     def _prepare_event_handler_player_hurt(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
         if player in self._players:
             self.set_stage_group('abort-prepare-interrupted')
 

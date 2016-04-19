@@ -257,7 +257,7 @@ class MapGame(PrepareTime, JailGame):
             return
 
         for player in self._players_all:
-            equipment_player = saved_player_manager[player.userid]
+            equipment_player = saved_player_manager[player.index]
             equipment_player.save_weapons()
 
             equipment_player.infinite_weapons.clear()
@@ -283,7 +283,7 @@ class MapGame(PrepareTime, JailGame):
         unregister_weapon_pickup_filter(self._weapon_pickup_filter)
 
         for player in self._players_all:
-            equipment_player = saved_player_manager[player.userid]
+            equipment_player = saved_player_manager[player.index]
 
             if player in self._players:
                 equipment_player.restore_weapons()

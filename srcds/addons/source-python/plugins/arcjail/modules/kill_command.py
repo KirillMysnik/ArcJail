@@ -44,7 +44,7 @@ def get_kill_denial_reason(player):
 @SayCommand("!suicide")
 @SayCommand("!kill")
 def say_kill(command, index, team_only):
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
 
     reason = get_kill_denial_reason(player)
     if reason is not None:

@@ -81,12 +81,9 @@ def build_survival_base(*parent_classes):
                 return False
 
             def hook_death_for_prisoner(counter, game_event):
-                saved_player = saved_player_manager[self.prisoner.userid]
+                saved_player = saved_player_manager[self.prisoner.index]
                 saved_player.strip()
                 return True
-
-            def death_callback_for_prisoner():
-                self.on_death(self.prisoner)
 
             def hook_hurt_for_guard(counter, info):
                 min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
@@ -98,21 +95,17 @@ def build_survival_base(*parent_classes):
                 return False
 
             def hook_death_for_guard(counter, game_event):
-                saved_player = saved_player_manager[self.guard.userid]
+                saved_player = saved_player_manager[self.guard.index]
                 saved_player.strip()
                 return True
 
-            def death_callback_for_guard():
-                self.on_death(self.guard)
-
-            for hook_hurt, hook_death, death_callback, player in zip(
+            for hook_hurt, hook_death, player in zip(
                     (hook_hurt_for_prisoner, hook_hurt_for_guard),
                     (hook_death_for_prisoner, hook_death_for_guard),
-                    (death_callback_for_prisoner, death_callback_for_guard),
                     self._players
             ):
 
-                p_player = protected_player_manager[player.userid]
+                p_player = protected_player_manager[player.index]
                 counter = p_player.new_counter(
                     display=strings_damage_hook['health game'])
 
@@ -128,7 +121,6 @@ def build_survival_base(*parent_classes):
                     counter.hook_hurt = get_hook('', next_hook=hook_hurt)
 
                 counter.hook_death = hook_death
-                counter.death_callback = death_callback
                 counter.health = self.map_data['INITIAL_HEALTH']
 
                 self._counters[player.userid] = counter
@@ -138,7 +130,7 @@ def build_survival_base(*parent_classes):
         @stage('undo-survival-equip-damage-hooks')
         def stage_undo_survival_equip_damage_hooks(self):
             for player in self._players_all:
-                p_player = protected_player_manager[player.userid]
+                p_player = protected_player_manager[player.index]
                 p_player.delete_counter(self._counters[player.userid])
                 p_player.unset_protected()
 
@@ -147,7 +139,11 @@ def build_survival_base(*parent_classes):
             for player in self._players:
                 falldmg_protect(player, self.map_data)
 
-        def on_death(self, player):
+        @game_event_handler('jailgame-player-death', 'player_death')
+        def event_jailgame_player_death(self, game_event):
+            player = main_player_manager.get_by_userid(
+                game_event.get_int('userid'))
+
             if player == self.prisoner:
                 winner, loser = self.guard, self.prisoner
             else:
@@ -164,10 +160,6 @@ def build_survival_base(*parent_classes):
         @push(None, 'end_game')
         def push_end_game(self, args):
             self.set_stage_group('abort-map-cancelled')
-
-        @game_event_handler('jailgame-player-death', 'player_death')
-        def event_jailgame_player_death(self, game_event):
-            pass
 
     return SurvivalBase
 
@@ -222,13 +214,12 @@ def build_survival_friendlyfire_base(*parent_classes):
                 if player.dead:
                     continue
 
-                p_player = protected_player_manager[player.userid]
+                p_player = protected_player_manager[player.index]
 
                 if player in self._players:
                     def hook_on_death(counter, game_event, player=player):
-                        saved_player = saved_player_manager[player.userid]
+                        saved_player = saved_player_manager[player.index]
                         saved_player.strip()
-                        self.on_death(player)
 
                         return True
 
@@ -247,9 +238,7 @@ def build_survival_friendlyfire_base(*parent_classes):
 
                             return False
 
-                        attacker = main_player_manager.get_by_index(
-                            info.attacker)
-
+                        attacker = main_player_manager[info.attacker]
                         if attacker in self._players:
                             show_damage(attacker, info.damage)
                             return hook_min_damage(counter, info)
@@ -262,9 +251,7 @@ def build_survival_friendlyfire_base(*parent_classes):
 
                             return hook_min_damage(counter, info)
 
-                        attacker = main_player_manager.get_by_index(
-                            info.attacker)
-
+                        attacker = main_player_manager[info.attacker]
                         if attacker in self._players:
                             show_damage(attacker, info.damage)
                             return hook_min_damage(counter, info)
@@ -292,9 +279,7 @@ def build_survival_friendlyfire_base(*parent_classes):
 
                             return True
 
-                        attacker = main_player_manager.get_by_index(
-                            info.attacker)
-
+                        attacker = main_player_manager[info.attacker]
                         if attacker in self._players:
                             return False
 

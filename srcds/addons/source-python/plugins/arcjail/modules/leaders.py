@@ -114,7 +114,7 @@ def get_leadership_denial_reason(player):
 
 @Event('player_death_real')
 def on_player_death_real(game_event):
-    player = main_player_manager[game_event.get_int('userid')]
+    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
     if _leader is not None and player == _leader:
         broadcast(strings_module['leader_died'].tokenize(player=player.name))
 
@@ -147,7 +147,7 @@ def on_round_end(game_event):
 
 @SayCommand('!lead')
 def chat_on_lead(command, index, team_only):
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
     if _leader is not None and _leader == player:
         _drop_leadership()
         broadcast(strings_module['leader_drop'].tokenize(player=player.name))
@@ -165,7 +165,7 @@ def chat_on_lead(command, index, team_only):
 
 @SayCommand('!leaders')
 def chat_on_leaders(command, index, team_only):
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
 
     if _leader is None:
         tell(player, strings_module['no_current_leader'])

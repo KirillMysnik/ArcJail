@@ -91,5 +91,5 @@ def on_main_player_deleted(event_var):
 
 
 def show_damage(player, amount):
-    sd_player = show_damage_player_manager[player.userid]
+    sd_player = show_damage_player_manager[player.index]
     sd_player.show_damage(int(amount))

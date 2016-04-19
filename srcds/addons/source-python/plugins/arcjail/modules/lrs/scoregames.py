@@ -2,7 +2,9 @@ from ...resource.strings import build_module_strings
 
 from ..damage_hook import get_hook, protected_player_manager
 
-from ..games.scoregames import config_manager as config_manager_games
+from ..games.scoregames import (
+    get_goal_sound, config_manager as config_manager_games)
+
 from ..games import play_flawless_effects
 
 from ..players import broadcast
@@ -94,6 +96,10 @@ class ScoreGameBase(MapGameTeamBased):
         else:
             self.score[self.guard.userid] += 1
 
+        goal_sound = get_goal_sound(self.map_data['GOAL_SOUND'])
+        if goal_sound is not None:
+            goal_sound.play(self.prisoner.index, self.guard.index)
+
         self.set_stage_group('scoregame-new-score2')
 
 
@@ -135,7 +141,7 @@ class ScoreGameNoPropKill(ScoreGameBase):
     @stage('scoregame-equip-damage-hooks')
     def stage_scoregame_equip_damage_hooks(self):
         for player in self._players:
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
 
             self._counters[player.userid] = p_player.new_counter()
             self._counters[player.userid].hook_hurt = get_hook('')
@@ -145,7 +151,7 @@ class ScoreGameNoPropKill(ScoreGameBase):
     @stage('undo-scoregame-equip-damage-hooks')
     def stage_undo_scoregame_equip_damage_hooks(self):
         for player in self._players_all:
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
             p_player.delete_counter(self._counters[player.userid])
             p_player.unset_protected()
 

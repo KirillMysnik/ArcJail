@@ -34,7 +34,7 @@ from .base_classes.map_game_team_based import MapGameTeamBased
 
 from . import (
     add_available_game, config_manager as config_manager_common,
-    helper_set_loser, helper_set_winner, push, stage,
+    game_event_handler, helper_set_loser, helper_set_winner, push, stage,
     strings_module as strings_common)
 
 
@@ -87,9 +87,8 @@ def build_survival_base(*parent_classes):
         def stage_survival_equip_damage_hooks(self):
             def hook_on_death(counter, game_event):
                 player = counter.owner.player
-                saved_player = saved_player_manager[player.userid]
+                saved_player = saved_player_manager[player.index]
                 saved_player.strip()
-                self.on_death(player)
 
                 return True
 
@@ -101,7 +100,7 @@ def build_survival_base(*parent_classes):
                 if player.dead:
                     continue
 
-                p_player = protected_player_manager[player.userid]
+                p_player = protected_player_manager[player.index]
                 self._counters[player.userid] = []
                 if player in self._players:
                     counter1 = p_player.new_counter(
@@ -163,7 +162,7 @@ def build_survival_base(*parent_classes):
                 if player.userid not in self._counters:
                     continue
 
-                p_player = protected_player_manager[player.userid]
+                p_player = protected_player_manager[player.index]
                 for counter in self._counters[player.userid]:
                     p_player.delete_counter(counter)
 
@@ -179,9 +178,6 @@ def build_survival_base(*parent_classes):
 
             if not self.leader.dead and self.leader not in self._players:
                 falldmg_protect(self.leader, self.map_data)
-
-        def on_death(self, player):
-            raise NotImplementedError
 
     return SurvivalBase
 
@@ -247,7 +243,18 @@ class SurvivalTeamBased(build_survival_base(MapGameTeamBased)):
 
         self.set_stage_group('game-end-win-team{}'.format(max_team.team_num))
 
-    def on_death(self, player):
+    @game_event_handler('jailgame-player-death', 'player_death')
+    def event_jailgame_player_death(self, game_event):
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
+        if self.leader == player:
+            self.set_stage_group('abort-leader-dead')
+            return
+
+        if player not in self._players:
+            return
+
         team = self.get_player_team(player)
         team.remove(player)
 
@@ -325,7 +332,18 @@ class SurvivalPlayerBased(build_survival_base(MapGame)):
     def push_end_game(self, args):
         self.set_stage_group('survival-end-players-alive')
 
-    def on_death(self, player):
+    @game_event_handler('jailgame-player-death', 'player_death')
+    def event_jailgame_player_death(self, game_event):
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
+        if self.leader == player:
+            self.set_stage_group('abort-leader-dead')
+            return
+
+        if player not in self._players:
+            return
+
         self._players.remove(player)
         helper_set_loser(player, effects=False)
 
@@ -388,9 +406,8 @@ class SurvivalTeamBasedFriendlyFire(
 
         def hook_on_death(counter, game_event):
             player = counter.owner.player
-            saved_player = saved_player_manager[player.userid]
+            saved_player = saved_player_manager[player.index]
             saved_player.strip()
-            self.on_death(player)
 
             return True
 
@@ -404,7 +421,7 @@ class SurvivalTeamBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager.get_by_index(info.attacker)
+            attacker = main_player_manager[info.attacker]
 
             if attacker in self._players and (
                 victim in self._team1 and attacker not in self._team1 or
@@ -457,7 +474,7 @@ class SurvivalTeamBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager.get_by_index(info.attacker)
+            attacker = main_player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -492,7 +509,7 @@ class SurvivalTeamBasedFriendlyFire(
             if player.dead:
                 continue
 
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
             self._counters[player.userid] = []
             if player in self._players:
                 counter1 = p_player.new_counter(
@@ -561,9 +578,8 @@ class SurvivalPlayerBasedFriendlyFire(
 
         def hook_on_death(counter, game_event):
             player = counter.owner.player
-            saved_player = saved_player_manager[player.userid]
+            saved_player = saved_player_manager[player.index]
             saved_player.strip()
-            self.on_death(player)
 
             return True
 
@@ -573,7 +589,7 @@ class SurvivalPlayerBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager.get_by_index(info.attacker)
+            attacker = main_player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -588,7 +604,7 @@ class SurvivalPlayerBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return hook_min_damage(counter, info)
 
-            attacker = main_player_manager.get_by_index(info.attacker)
+            attacker = main_player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -601,7 +617,7 @@ class SurvivalPlayerBasedFriendlyFire(
             if player.dead:
                 continue
 
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
             self._counters[player.userid] = []
             if player in self._players:
                 counter1 = p_player.new_counter(
@@ -656,7 +672,7 @@ class SurvivalPlayerBasedFriendlyFire(
             if player.userid not in self._counters:
                 continue
 
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
             for counter in self._counters[player.userid]:
                 p_player.delete_counter(counter)
 

@@ -465,7 +465,10 @@ def send_rebel_popup(player, launcher, guard, settings):
 
         popup = _popups[guard.userid] = PagedMenu(
             select_callback=select_callback_rebel,
-            title=strings_module['let_him_play']
+            title=strings_module['let_him_play'].tokenize(
+                player=player.name,
+                game=launcher.caption,
+            )
         )
 
         popup.append(PagedOption(
@@ -675,7 +678,7 @@ def reset():
 
 @Event('player_hurt')
 def on_player_hurt(game_event):
-    victim = main_player_manager[game_event.get_int('userid')]
+    victim = main_player_manager.get_by_userid(game_event.get_int('userid'))
     if victim.dead:     # Will be handled by player_death
         return
 
@@ -683,7 +686,7 @@ def on_player_hurt(game_event):
     if attacker_uid in (victim.userid, 0):
         return
 
-    attacker = main_player_manager[attacker_uid]
+    attacker = main_player_manager.get_by_userid(attacker_uid)
     game_instance_victim = get_player_game_instance(victim)
     game_instance_attacker = get_player_game_instance(attacker)
     damage = game_event.get_int('dmg_health')
@@ -715,12 +718,12 @@ def on_player_hurt(game_event):
 def on_player_death_real(game_event):
     check_if_announced()
 
-    victim = main_player_manager[game_event.get_int('userid')]
+    victim = main_player_manager.get_by_userid(game_event.get_int('userid'))
     attacker_uid = game_event.get_int('attacker')
     if attacker_uid in (victim.userid, 0):
         return
 
-    attacker = main_player_manager[attacker_uid]
+    attacker = main_player_manager.get_by_userid(attacker_uid)
     game_instance_victim = get_player_game_instance(victim)
     game_instance_attacker = get_player_game_instance(attacker)
 
@@ -753,7 +756,7 @@ def on_unload(event_var):
 
 @SayCommand('!lr')
 def say_games(command, index, team_only):
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
     send_game_popup(player)
 
 

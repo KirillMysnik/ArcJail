@@ -157,12 +157,6 @@ config_manager.controlled_cvar(
 )
 config_manager.controlled_cvar(
     sound_nullable_handler,
-    "score_sound",
-    default="arcjail/goalsound.mp3",
-    description="Score sound",
-)
-config_manager.controlled_cvar(
-    sound_nullable_handler,
     "prepare_sound",
     default="arcjail/gameprepare.mp3",
     description="Prepare sound",
@@ -244,7 +238,7 @@ _popups = {}
 _game_instances = []
 _available_game_classes = []
 _downloadables_sounds = load_downloadables('games-base-sounds.res')
-_downloadables_sprites = load_downloadables('games-base-sprites.res')
+_downloadables_materials = load_downloadables('games-base-materials.res')
 _saved_game_status = None
 _flawless_effects_delays = []
 
@@ -258,8 +252,8 @@ def _launch_game(launcher, leader_player, players, **kwargs):
 def get_players_to_play():
     rs = []
     for player in PlayerIter(('jail_prisoner', 'alive')):
-        if player.userid in main_player_manager:
-            rs.append(main_player_manager[player.userid])
+        if player.index in main_player_manager:
+            rs.append(main_player_manager[player.index])
 
     return tuple(rs)
 
@@ -455,7 +449,7 @@ def on_unload(event_var):
 
 @SayCommand('!games')
 def say_games(command, index, team_only):
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
     send_popup(player)
 
 

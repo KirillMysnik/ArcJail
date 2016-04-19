@@ -62,7 +62,7 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
     def stage_survival_equip_damage_hooks(self):
         def hook_on_death(counter, game_event):
             player = counter.owner.player
-            saved_player = saved_player_manager[player.userid]
+            saved_player = saved_player_manager[player.index]
             saved_player.strip()
             self.on_death(player)
 
@@ -74,7 +74,7 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager.get_by_index(info.attacker)
+            attacker = main_player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -94,7 +94,7 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
             if player.dead:
                 continue
 
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
             self._counters[player.userid] = []
             if player in self._players:
                 counter1 = p_player.new_counter(
@@ -153,7 +153,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                 if info.attacker == victim.index or is_world(info.attacker):
                     return False
 
-                attacker = main_player_manager.get_by_index(info.attacker)
+                attacker = main_player_manager[info.attacker]
 
                 try:
                     attacker_team = self.get_player_team(attacker)
@@ -177,7 +177,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                 if info.attacker == victim.index or is_world(info.attacker):
                     return False
 
-                attacker = main_player_manager.get_by_index(info.attacker)
+                attacker = main_player_manager[info.attacker]
 
                 if attacker not in self._players:
                     return False
@@ -199,11 +199,11 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
             if player.dead:
                 continue
 
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
             self._counters[player.userid] = []
             if player in self._players:
                 def hook_on_death(counter, game_event, player=player):
-                    saved_player = saved_player_manager[player.userid]
+                    saved_player = saved_player_manager[player.index]
                     saved_player.strip()
                     self.on_death(player)
                     return True

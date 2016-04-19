@@ -1,12 +1,10 @@
-from core import echo_console
-
 from commands.client import ClientCommand
 from entities.entity import Entity
 from entities.helpers import edict_from_index
+from entities.helpers import index_from_inthandle
 from entities.helpers import index_from_pointer
 from listeners import OnEntitySpawned
 from listeners.tick import Delay
-from players.helpers import userid_from_inthandle
 from weapons.manager import weapon_manager
 
 from mathlib import NULL_VECTOR
@@ -79,7 +77,11 @@ class SavedPlayer:
     def strip(self):
         for index in self.player.weapon_indexes():
             weapon = Entity(index)
+            print("Dropping {}...".format(weapon.classname))
+            weapon.pointer
+            print("Got pointer, now to the actual drop")
             self.player.drop_weapon(weapon.pointer, NULL_VECTOR, NULL_VECTOR)
+            print("Dropped")
             weapon.remove()
 
     def restore_health(self):
@@ -164,7 +166,7 @@ def listener_on_entity_spawned(index, base_entity):
     if entity.owner == -1:
         return
 
-    saved_player = saved_player_manager[userid_from_inthandle(entity.owner)]
+    saved_player = saved_player_manager[index_from_inthandle(entity.owner)]
     weapon_classname = PROJECTILE_MAPPING[base_entity.classname]
     saved_player._nade_thrown(weapon_classname)
 
@@ -176,8 +178,7 @@ weapon_drop_filters = []
 
 def pre_bump_weapon(pointers):
     pointer_player, pointer_weapon = pointers
-    player = main_player_manager.get_by_index(
-        index_from_pointer(pointer_player))
+    player = main_player_manager[index_from_pointer(pointer_player)]
 
     weapon_index = index_from_pointer(pointer_weapon)
 
@@ -225,7 +226,7 @@ def unregister_weapon_pickup_filter(callback):
 
 @ClientCommand('drop')
 def cl_drop(command, index):
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
 
     for callback in weapon_drop_filters:
         if callback(player) is False:

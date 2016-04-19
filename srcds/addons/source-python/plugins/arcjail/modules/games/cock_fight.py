@@ -144,7 +144,8 @@ class CockFight(PrepareTime, JailGame):
         if not config_manager['sounds']:
             return
 
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
 
         if player in self.players:
             sound_name = choice(sounds)

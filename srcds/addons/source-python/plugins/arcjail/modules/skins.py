@@ -2,6 +2,7 @@ from warnings import warn
 
 from engines.precache import Model
 from events import Event
+from players.helpers import index_from_userid
 
 from controlled_cvars.handlers import bool_handler, string_handler
 
@@ -75,15 +76,15 @@ def _update_player(player):
     if player.dead:
         return
 
-    if player.userid not in _requests:
+    if player.index not in _requests:
         return
 
     request_max = None
-    for request in _requests[player.userid]:
+    for request in _requests[player.index]:
         if request_max is None or request.priority >= request_max.priority:
             request_max = request
 
-    if request_max:
+    if request_max is not None:
         player.model_index = _precache[request_max.model].index
 
 
@@ -96,29 +97,29 @@ def make_model_request(player, priority, id_, path):
                               "'{0}'".format(path)))
         return
 
-    if player.userid not in _requests:
-        _requests[player.userid] = []
+    if player.index not in _requests:
+        _requests[player.index] = []
 
-    for request in _requests[player.userid]:
+    for request in _requests[player.index]:
         if request.id == id_:
-            _requests[player.userid].remove(request)
+            _requests[player.index].remove(request)
             break
 
-    _requests[player.userid].append(PlayerModelRequest(id_, priority, path))
+    _requests[player.index].append(PlayerModelRequest(id_, priority, path))
     _update_player(player)
 
 
 def cancel_model_request(player, id_):
-    if player.userid not in _requests:
+    if player.index not in _requests:
         return
 
-    for request in _requests[player.userid]:
+    for request in _requests[player.index]:
         if request.id == id_:
-            _requests[player.userid].remove(request)
+            _requests[player.index].remove(request)
             break
 
-    if not _requests[player.userid]:
-        del _requests[player.userid]
+    if not _requests[player.index]:
+        del _requests[player.index]
 
     _update_player(player)
 
@@ -126,8 +127,8 @@ def cancel_model_request(player, id_):
 @InternalEvent('player_respawn')
 def on_player_respawn(event_var):
     player = event_var['player']
-    if player.userid in _requests:
-        _requests[player.userid].clear()
+    if player.index in _requests:
+        _requests[player.index].clear()
 
     if player.team == PRISONERS_TEAM:
         if config_manager['enable_prisoner_model']:
@@ -153,12 +154,12 @@ def on_player_respawn(event_var):
 @InternalEvent('main_player_deleted')
 def on_main_player_deleted(event_var):
     player = event_var['main_player']
-    if player.userid in _requests:
-        del _requests[player.userid]
+    if player.index in _requests:
+        del _requests[player.index]
 
 
 @Event('player_death_real')
 def on_player_death_real(game_event):
-    userid = game_event.get_int('userid')
-    if userid in _requests:
-        del _requests[userid]
+    index = index_from_userid(game_event.get_int('userid'))
+    if index in _requests:
+        del _requests[index]

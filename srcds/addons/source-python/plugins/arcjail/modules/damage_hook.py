@@ -1,12 +1,13 @@
 from entities.constants import WORLD_ENTITY_INDEX
 from entities.entity import Entity
+from entities.helpers import index_from_pointer
 from entities.hooks import EntityCondition, EntityPreHook
 from entities import TakeDamageInfo
 from listeners.tick import Delay
 from memory import make_object
 from messages import KeyHintText
 from players.constants import HideHudFlags
-from players.helpers import get_client_language, userid_from_pointer
+from players.helpers import get_client_language
 
 from controlled_cvars.handlers import int_handler
 
@@ -65,7 +66,7 @@ def get_hook(flags, next_hook=(lambda counter, info: True)):
         if (info.attacker != counter.owner.player.index and
                 not is_world(info.attacker)):
 
-            attacker = main_player_manager.get_by_index(info.attacker)
+            attacker = main_player_manager[info.attacker]
             if 'P' in flags:
                 if attacker.team == PRISONERS_TEAM:
                     return next_hook(counter, info)
@@ -91,10 +92,8 @@ class ProtectedPlayer:
 
             self.hook_hurt = lambda health_counter, game_event: True
             self.hook_death = lambda health_counter, game_event: True
-            self.death_callback = lambda: None
 
         def _hurt(self, info):
-            player = self.owner.player
             if not self.hook_hurt(self, info):
                 return True
 
@@ -108,11 +107,12 @@ class ProtectedPlayer:
 
                     info.damage = FINISHING_DAMAGE
 
-                    self.death_callback()
-
             else:
                 self.owner._show_health()
+
                 info.damage = 0
+
+            return None
 
         def delete(self):
             self.owner.delete_counter(self)
@@ -178,8 +178,14 @@ class ProtectedPlayer:
         if self._pre_protection_health is None:
             return
 
+        rs = []
         for counter in self._counters:
-            counter._hurt(info)
+            rs.append(counter._hurt(info))
+
+        if any(rs):
+            return True
+
+        return None
 
     def _spawn(self, game_event):
         self._pre_protection_health = None
@@ -220,18 +226,18 @@ def on_main_player_deleted(event_var):
 
 @EntityPreHook(EntityCondition.is_player, 'on_take_damage')
 def on_take_damage(args):
-    protected_player = protected_player_manager[userid_from_pointer(args[0])]
+    protected_player = protected_player_manager[index_from_pointer(args[0])]
     if protected_player.dead:
         return
 
     info = make_object(TakeDamageInfo, args[1])
-    protected_player._hurt(info)
+    return protected_player._hurt(info)
 
 
 @InternalEvent('player_respawn')
 def on_player_respawn(event_var):
     player = event_var['player']
-    protected_player = protected_player_manager[player.userid]
+    protected_player = protected_player_manager[player.index]
     protected_player._spawn(event_var['game_event'])
 
 

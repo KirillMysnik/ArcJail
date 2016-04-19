@@ -3,6 +3,7 @@ from filters.players import PlayerIter
 from listeners import OnClientActive, OnClientDisconnect, OnLevelInit
 from messages import SayText2
 from players.entity import Player
+from players.helpers import userid_from_index
 from players.teams import teams_by_name
 
 from ..arcjail import InternalEvent
@@ -10,7 +11,6 @@ from ..arcjail import InternalEvent
 from ..classes.base_player_manager import BasePlayerManager
 
 from ..resource.strings import COLOR_SCHEME, strings_common
-
 
 
 class MainPlayerManager(BasePlayerManager):
@@ -62,7 +62,7 @@ def on_unload(event_var):
 
 @Event('player_spawn')
 def on_player_spawn(game_event):
-    player = main_player_manager[game_event.get_int('userid')]
+    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
     if player.team != teams_by_name['un']:
         InternalEvent.fire(
             'player_respawn',
@@ -78,12 +78,12 @@ def listener_on_client_active(index):
 
 
 @OnClientDisconnect
-def on_client_disconnect(index):
-    player = Player(index)
+def listener_on_client_disconnect(index):
+    player = main_player_manager[index]
     main_player_manager.delete(player)
 
 
 @OnLevelInit
 def listener_on_level_init(map_name):
-    for player in list(main_player_manager.keys()):
+    for player in list(main_player_manager.values()):
         main_player_manager.delete(player)

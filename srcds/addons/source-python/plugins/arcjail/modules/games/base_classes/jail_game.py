@@ -55,29 +55,31 @@ class JailGame(BaseGame):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
         if self.leader == player:
             self.set_stage_group('abort-leader-dead')
 
-        else:
-            if player in self._players:
-                self._players.remove(player)
+        elif player in self._players:
+            self._players.remove(player)
 
-                if len(self._players) < MIN_PLAYERS_IN_GAME:
-                    self.set_stage_group('abort-not-enough-players')
+            if len(self._players) < MIN_PLAYERS_IN_GAME:
+                self.set_stage_group('abort-not-enough-players')
 
     @game_event_handler('jailgame-player-disconnect', 'player_disconnect')
     def event_jailgame_player_disconnect(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
         if self.leader == player:
             self.set_stage_group('abort-leader-disconnect')
 
-        else:
-            if player in self._players:
-                self._players.remove(player)
+        elif player in self._players:
+            self._players.remove(player)
 
-                if len(self._players) < MIN_PLAYERS_IN_GAME:
-                    self.set_stage_group('abort-not-enough-players')
+            if len(self._players) < MIN_PLAYERS_IN_GAME:
+                self.set_stage_group('abort-not-enough-players')
 
     @classmethod
     def get_available_launchers(cls, leader_player, players):

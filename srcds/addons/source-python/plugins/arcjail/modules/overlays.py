@@ -62,5 +62,5 @@ def on_round_start(game_event):
 
 
 def show_overlay(player, path, seconds=-1):
-    overlay_player = overlay_player_manager[player.userid]
+    overlay_player = overlay_player_manager[player.index]
     overlay_player.show(path, seconds)

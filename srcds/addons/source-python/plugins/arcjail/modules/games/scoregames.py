@@ -1,4 +1,7 @@
-from controlled_cvars.handlers import bool_handler, int_handler
+from controlled_cvars.handlers import (
+    bool_handler, int_handler, sound_nullable_handler)
+
+from ...arcjail import load_downloadables
 
 from ...resource.strings import build_module_strings
 
@@ -31,6 +34,36 @@ config_manager.controlled_cvar(
     default=5,
     description="Goals that team must score to win"
 )
+config_manager.controlled_cvar(
+    sound_nullable_handler,
+    "goal_sound1",
+    default="arcjail/goal1.mp3",
+    description="Goal Sound #1 (Referee whistle)"
+)
+config_manager.controlled_cvar(
+    sound_nullable_handler,
+    "goal_sound2",
+    default="arcjail/hitsound.wav",
+    description="Goal Sound #1 (Click)"
+)
+config_manager.controlled_cvar(
+    sound_nullable_handler,
+    "goal_sound3",
+    default="buttons/bell1.wav",
+    description="Goal Sound #3 (Bell)"
+)
+
+_downloadables_sounds = load_downloadables('games-scoregames-sounds.res')
+
+
+def get_goal_sound(sound_num):
+    if sound_num == 1:
+        return config_manager['goal_sound1']
+    if sound_num == 2:
+        return config_manager['goal_sound2']
+    if sound_num == 3:
+        return config_manager['goal_sound3']
+    return None
 
 
 class ScoreGameBase(MapGameTeamBased):
@@ -130,6 +163,13 @@ class ScoreGameBase(MapGameTeamBased):
         except (IndexError, ValueError, AssertionError):
             return
 
+        goal_sound = get_goal_sound(self.map_data['GOAL_SOUND'])
+        if goal_sound is not None:
+            indexes = list([player.index for player in self._players])
+            indexes.append(self.leader.index)
+            goal_sound.play(*indexes)
+
+
         self.score['team{}'.format(team_num)] += 1
         self.set_stage_group(
             'scoregame-new-score{}'.format(self.num_teams))
@@ -166,7 +206,7 @@ class ScoreGameNoPropKill(ScoreGameBase, PlayerPreserving):
     @stage('scoregame-equip-damage-hooks')
     def stage_scoregame_equip_damage_hooks(self):
         for player in self._players:
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
 
             self._counters[player.userid] = p_player.new_counter()
             self._counters[player.userid].hook_hurt = get_hook('G')
@@ -176,7 +216,7 @@ class ScoreGameNoPropKill(ScoreGameBase, PlayerPreserving):
     @stage('undo-scoregame-equip-damage-hooks')
     def stage_undo_scoregame_equip_damage_hooks(self):
         for player in self._players_all:
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
             p_player.delete_counter(self._counters[player.userid])
             p_player.unset_protected()
 

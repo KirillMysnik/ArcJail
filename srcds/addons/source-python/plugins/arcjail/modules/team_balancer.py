@@ -181,7 +181,7 @@ def cl_jointeam(command, index):
     if len(command) < 2:
         return False
 
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
 
     # Deny invalid args
     try:

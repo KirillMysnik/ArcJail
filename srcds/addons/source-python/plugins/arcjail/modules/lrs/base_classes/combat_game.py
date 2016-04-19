@@ -16,6 +16,8 @@ from ...games import play_flawless_effects
 
 from ...jail_map import get_lrs, teleport_player
 
+from ...players import main_player_manager
+
 from ...show_damage import show_damage
 
 from .. import config_manager, game_event_handler, stage
@@ -114,7 +116,7 @@ class CombatGame(PrepareTime):
     def stage_mapgame_equip_weapons(self):
         """Equip players with weapons."""
         for player in self._players_all:
-            equipment_player = saved_player_manager[player.userid]
+            equipment_player = saved_player_manager[player.index]
             equipment_player.save_weapons()
 
             equipment_player.infinite_weapons.clear()
@@ -137,7 +139,7 @@ class CombatGame(PrepareTime):
         unregister_weapon_pickup_filter(self._weapon_pickup_filter)
 
         for player in self._players_all:
-            equipment_player = saved_player_manager[player.userid]
+            equipment_player = saved_player_manager[player.index]
 
             if player in self._players:
                 equipment_player.restore_weapons()
@@ -157,12 +159,9 @@ class CombatGame(PrepareTime):
             return True
 
         def hook_death_for_prisoner(counter, game_event):
-            saved_player = saved_player_manager[self.prisoner.userid]
+            saved_player = saved_player_manager[self.prisoner.index]
             saved_player.strip()
             return True
-
-        def death_callback_for_prisoner():
-            self.on_death(self.prisoner)
 
         def hook_hurt_for_guard(counter, info):
             if info.attacker != self.prisoner.index:
@@ -175,21 +174,17 @@ class CombatGame(PrepareTime):
             return True
 
         def hook_death_for_guard(counter, game_event):
-            saved_player = saved_player_manager[self.guard.userid]
+            saved_player = saved_player_manager[self.guard.index]
             saved_player.strip()
             return True
 
-        def death_callback_for_guard():
-            self.on_death(self.guard)
-
-        for hook_hurt, hook_death, death_callback, player in zip(
+        for hook_hurt, hook_death, player in zip(
                 (hook_hurt_for_prisoner, hook_hurt_for_guard),
                 (hook_death_for_prisoner, hook_death_for_guard),
-                (death_callback_for_prisoner, death_callback_for_guard),
                 self._players
         ):
 
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
 
             counter = self._counters[player.userid] = p_player.new_counter(
                 display=strings_damage_hook['health game'])
@@ -197,18 +192,21 @@ class CombatGame(PrepareTime):
             counter.health = self._settings.get('health', 100)
             counter.hook_hurt = hook_hurt
             counter.hook_death = hook_death
-            counter.death_callback = death_callback
 
             p_player.set_protected()
 
     @stage('undo-equip-damage-hooks')
     def stage_undo_survival_equip_damage_hooks(self):
         for player in self._players_all:
-            p_player = protected_player_manager[player.userid]
+            p_player = protected_player_manager[player.index]
             p_player.delete_counter(self._counters[player.userid])
             p_player.unset_protected()
 
-    def on_death(self, player):
+    @game_event_handler('jailgame-player-death', 'player_death')
+    def event_jailgame_player_death(self, game_event):
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
         if player == self.prisoner:
             winner, loser = self.guard, self.prisoner
         else:
@@ -230,7 +228,3 @@ class CombatGame(PrepareTime):
 
         weapon_classname = edict_from_index(weapon_index).classname
         return weapon_classname in self._settings.get('weapons', ())
-
-    @game_event_handler('jailgame-player-death', 'player_death')
-    def event_jailgame_player_death(self, game_event):
-        pass

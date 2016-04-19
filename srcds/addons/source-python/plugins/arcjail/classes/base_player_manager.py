@@ -1,4 +1,4 @@
-from players.helpers import userid_from_index
+from players.helpers import index_from_userid
 
 from .callback import CallbackDecorator
 
@@ -35,20 +35,20 @@ class BasePlayerManager(dict):
         self._callbacks_on_player_unregistered = []
 
     def create(self, player):
-        self[player.userid] = self._base_class(player)
+        self[player.index] = self._base_class(player)
         for callback in self._callbacks_on_player_registered:
-            callback(self[player.userid])
+            callback(self[player.index])
 
-        return self[player.userid]
+        return self[player.index]
 
     def delete(self, player):
         for callback in self._callbacks_on_player_unregistered:
-            callback(self[player.userid])
+            callback(self[player.index])
 
-        return self.pop(player.userid)
+        return self.pop(player.index)
 
-    def get_by_index(self, index):
-        return self.get(userid_from_index(index))
+    def get_by_userid(self, userid):
+        return self.get(index_from_userid(userid))
 
     def register_player_registered_callback(self, callback):
         self._callbacks_on_player_registered.append(callback)

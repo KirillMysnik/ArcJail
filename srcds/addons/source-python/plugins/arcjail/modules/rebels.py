@@ -221,7 +221,7 @@ def unregister_rebel_filter(filter_):
 
 @Event('player_death_real')
 def on_player_death_real(game_event):
-    player = main_player_manager[game_event.get_int('userid')]
+    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
 
     if player not in _rebels:
         return
@@ -242,7 +242,7 @@ def on_player_death_real(game_event):
 
 @Event('player_hurt')
 def on_player_hurt(game_event):
-    player = main_player_manager[game_event.get_int('userid')]
+    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
 
     # Only able rebel against guards
     if player.team != GUARDS_TEAM:
@@ -258,7 +258,7 @@ def on_player_hurt(game_event):
     if aid == player.userid or not aid:
         return
 
-    attacker = main_player_manager[aid]
+    attacker = main_player_manager.get_by_userid(aid)
     # Further checks on attacker
     if not _can_rebel(attacker):
         return
@@ -300,7 +300,7 @@ def on_item_pickup(game_event):
         return (mapmaker_opinion == -1 and should_rebel or
                 mapmaker_opinion == 1)
 
-    player = main_player_manager[game_event.get_int('userid')]
+    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
     if player.dead or not _can_rebel(player):
         return
 
@@ -348,7 +348,7 @@ def on_round_end(game_event):
 
 @InternalEvent('load')
 def on_load(event_var):
-    is_rebel = lambda player: main_player_manager[player.userid] in _rebels
+    is_rebel = lambda player: main_player_manager[player.index] in _rebels
     PlayerIter.register_filter('jail_rebel', is_rebel)
 
 
@@ -364,7 +364,7 @@ def cmd_on_drop(command, index):
     if not config_manager['drop_hot_weapons']:
         return
 
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
     if not (player.team == GUARDS_TEAM or is_rebel(player)):
         return True
 

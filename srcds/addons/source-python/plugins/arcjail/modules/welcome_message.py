@@ -38,25 +38,25 @@ def announce(player):
 @InternalEvent('player_respawn')
 def on_player_respawn(event_var):
     player = event_var['player']
-    if player.userid not in _announced_uids:
-        _announced_uids[player.userid] = Delay(
+    if player.index not in _announced_uids:
+        _announced_uids[player.index] = Delay(
             SPAWN_ANNOUNCE_DELAY, announce, player)
 
 
 @InternalEvent('main_players_loaded')
 def on_main_players_loaded(event_var):
     for player in main_player_manager.values():
-        _announced_uids[player.userid] = None
+        _announced_uids[player.index] = None
         announce(player)
 
 
 @InternalEvent('main_player_deleted')
 def on_main_player_deleted(event_var):
     player = event_var['main_player']
-    if player.userid in _announced_uids:
-        if (_announced_uids[player.userid] is not None and
-                _announced_uids[player.userid].running):
+    if player.index in _announced_uids:
+        if (_announced_uids[player.index] is not None and
+                _announced_uids[player.index].running):
 
-            _announced_uids[player.userid].cancel()
+            _announced_uids[player.index].cancel()
 
-        del _announced_uids[player.userid]
+        del _announced_uids[player.index]

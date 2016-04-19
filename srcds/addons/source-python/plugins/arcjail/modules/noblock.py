@@ -93,7 +93,7 @@ def on_round_start(game_event):
 @SayCommand('!block')
 @SayCommand('!noblock')
 def say_noblock(command, index, team_only):
-    player = main_player_manager.get_by_index(index)
+    player = main_player_manager[index]
     reason = get_noblock_denial_reason(player)
     if reason:
         tell(player, reason)

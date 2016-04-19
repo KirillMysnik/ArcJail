@@ -36,22 +36,22 @@ def upgrade_health(player, new_amount):
 
 def restore_health(player):
     """Restore player's health to its maximum"""
-    player.health = max(player.health, players[player.userid])
+    player.health = max(player.health, players[player.index])
 
 
 def set_max_health(player, amount):
     """Set player's health maximum"""
-    players[player.userid] = amount
+    players[player.index] = amount
 
 
 def upgrade_max_health(player, new_amount):
     """Set player's maximum health to max(<current max health amount>, amount)"""
-    players[player.userid] = max(players[player.userid], new_amount)
+    players[player.index] = max(players[player.index], new_amount)
 
 
 def get_max_health(player):
     """Return player's health maximum"""
-    return players[player.userid]
+    return players[player.index]
 
 
 @InternalEvent('player_respawn')
@@ -68,4 +68,4 @@ def on_main_player_created(event_var):
 
 @InternalEvent('main_player_deleted')
 def on_main_player_deleted(event_var):
-    del players[event_var['main_player'].userid]
+    del players[event_var['main_player'].index]

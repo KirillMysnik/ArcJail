@@ -290,14 +290,15 @@ class MapGameTeamBased(MapGame):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
         if self.leader == player:
             self.set_stage_group('abort-leader-dead')
 
-        else:
-            if player in self._players:
-                self._players.remove(player)
-                self.get_player_team(player).remove(player)
+        elif player in self._players:
+            self._players.remove(player)
+            self.get_player_team(player).remove(player)
 
             if not all((self._team1,
                         self._team2,
@@ -311,21 +312,22 @@ class MapGameTeamBased(MapGame):
 
     @game_event_handler('jailgame-player-disconnect', 'player_disconnect')
     def event_jailgame_player_disconnect(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
+
         if self.leader == player:
             self.set_stage_group('abort-leader-disconnect')
 
-        else:
-            if player in self._players:
-                self._players.remove(player)
+        elif player in self._players:
+            self._players.remove(player)
 
-                for team_list in (self._team1,
-                                  self._team2,
-                                  self._team3,
-                                  self._team4):
+            for team_list in (self._team1,
+                              self._team2,
+                              self._team3,
+                              self._team4):
 
-                    if player in team_list:
-                        team_list.remove(player)
+                if player in team_list:
+                    team_list.remove(player)
 
             if not (self._team1 and
                     self._team2 and

@@ -103,7 +103,8 @@ class JailGame(BaseGame):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
 
         if player in self._players:
             self._players.remove(player)
@@ -112,7 +113,8 @@ class JailGame(BaseGame):
 
     @game_event_handler('jailgame-player-disconnect', 'player_disconnect')
     def event_jailgame_player_disconnect(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = main_player_manager.get_by_userid(
+            game_event.get_int('userid'))
 
         if player in self._players:
             self._players.remove(player)

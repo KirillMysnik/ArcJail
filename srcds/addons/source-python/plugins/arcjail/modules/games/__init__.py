@@ -270,6 +270,8 @@ def get_available_launchers(leader_player, players):
 
 
 def get_game_denial_reason(player):
+    from ..lrs import config_manager as config_manager_lrs
+
     if not config_manager['enabled']:
         return strings_module['fail_disabled']
 
@@ -288,6 +290,11 @@ def get_game_denial_reason(player):
 
     if not get_available_launchers(player, get_players_to_play()):
         return strings_module['fail_none_available']
+
+    if (len(PlayerIter(['jail_prisoner', 'alive'])) <=
+            config_manager_lrs['prisoners_limit']):
+
+        return strings_module['fail lrs_available']
 
     return None
 

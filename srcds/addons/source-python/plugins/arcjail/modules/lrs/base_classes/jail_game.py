@@ -36,20 +36,27 @@ class JailGame(BaseGame):
     def stage_set_initial_status(self):
         self._status = LastRequestGameStatus.NOT_STARTED
 
+        InternalEvent.fire(
+            'jail_lrs_status_set', instance=self, status=self._status)
+
     @stage('undo-set-initial-status')
     def stage_undo_set_initial_status(self):
         self._status = LastRequestGameStatus.FINISHED
+
+        InternalEvent.fire(
+            'jail_lrs_status_set', instance=self, status=self._status)
 
     @stage('set-start-status')
     def stage_set_start_status(self):
         self._status = LastRequestGameStatus.IN_PROGRESS
 
-        InternalEvent.fire('jail_lrs_start_status_set', instance=self)
+        InternalEvent.fire(
+            'jail_lrs_status_set', instance=self, status=self._status)
 
         broadcast(strings_module['game_started'].tokenize(
             player1=self.prisoner.name,
             player2=self.guard.name,
-            game=self.caption
+            game=self.full_caption
         ))
 
     @stage('unsend-popups')
@@ -83,7 +90,7 @@ class JailGame(BaseGame):
         broadcast(strings_module['common_victory'].tokenize(
             winner=winner.name,
             loser=loser.name,
-            game=self.caption,
+            game=self.full_caption,
         ))
 
         self.set_stage_group('destroy')
@@ -96,7 +103,7 @@ class JailGame(BaseGame):
         broadcast(strings_module['common_draw'].tokenize(
             winner=self.prisoner.name,
             loser=self.guard.name,
-            game=self.caption,
+            game=self.full_caption,
         ))
 
         self.set_stage_group('destroy')

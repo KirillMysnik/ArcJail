@@ -5,6 +5,8 @@ from filters.players import PlayerIter
 from filters.entities import EntityIter
 from listeners.tick import Delay
 
+from mathlib import NULL_VECTOR
+
 from controlled_cvars.handlers import (bool_handler, color_handler,
                                        list_handler, sound_handler,
                                        string_handler)
@@ -219,6 +221,16 @@ def unregister_rebel_filter(filter_):
     _filters.remove(filter_)
 
 
+def mark_weapon_hot(entity):
+    if entity.index in _hot_weapons:
+        _hot_weapons[entity.index].cancel()
+
+    def cool_weapon(entity=entity):
+        _hot_weapons.pop(entity.index, None)
+
+    _hot_weapons[entity.index] = Delay(HOT_WEAPON_TIMEOUT, cool_weapon)
+
+
 @Event('player_death_real')
 def on_player_death_real(game_event):
     player = main_player_manager.get_by_userid(game_event.get_int('userid'))
@@ -282,12 +294,11 @@ def on_player_hurt(game_event):
 @Event('item_pickup')
 def on_item_pickup(game_event):
     def does_weapon_trigger_rebel(player, weapon_class, entity):
-        # TODO: Save this cvar on change, don't require it every time
         should_rebel = weapon_class[7:] in config_manager['forbidden_weapons']
 
         if IGNORE_MAP_REBELWEAPONS:
             return should_rebel
-        # ArcJail allows mapmakers to say if a picked weapon:
+        # ArcJail allows mapmakers to decide if a picked weapon:
         # 1 - should always make its owner a rebel
         # 0 - should never make its owner a rebel
         # -1 - doesn't have any particular restrictions (server default)
@@ -305,7 +316,6 @@ def on_item_pickup(game_event):
         return
 
     weapon_class = 'weapon_%s' % game_event.get_string('item')
-
     for entity in EntityIter(weapon_class):
         try:
             owner_index = index_from_inthandle(entity.owner)
@@ -320,8 +330,8 @@ def on_item_pickup(game_event):
 
     if does_weapon_trigger_rebel(player, weapon_class, entity):
         if entity.index in _hot_weapons:
-            player.client_command("use {0};".format(weapon_class), True)
-            player.client_command("drop;", True)
+            player.drop_weapon(entity.pointer, NULL_VECTOR, NULL_VECTOR)
+            mark_weapon_hot(entity)
         else:
             _set_rebel(player)
             broadcast(strings_module['by_pickup'].tokenize(rebel=player.name))
@@ -359,8 +369,6 @@ def on_unload(event_var):
 
 @ClientCommand('drop')
 def cmd_on_drop(command, index):
-    # TODO: Save this cvar on change, don't require it every time
-    # We're in client command callback, they can DoS by spamming this command
     if not config_manager['drop_hot_weapons']:
         return
 
@@ -391,13 +399,7 @@ def cmd_on_drop(command, index):
                 if owner_index == player.index:
                     continue
 
-            if entity.index in _hot_weapons:
-                _hot_weapons[entity.index].cancel()
-
-            def cool_weapon(entity=entity):
-                _hot_weapons.pop(entity.index, None)
-
-            _hot_weapons[entity.index] = Delay(HOT_WEAPON_TIMEOUT, cool_weapon)
+            mark_weapon_hot(entity)
 
     Delay(0, confirm_weapon_drop)
 

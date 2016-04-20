@@ -2,7 +2,7 @@ from ...resource.strings import build_module_strings
 
 from ..damage_hook import get_hook, protected_player_manager
 
-from ..games.scoregames import (
+from ..games.scoregame import (
     get_goal_sound, config_manager as config_manager_games)
 
 from ..games import play_flawless_effects
@@ -15,7 +15,7 @@ from . import (
     add_available_game, config_manager as config_manager_common, push, stage)
 
 
-strings_module = build_module_strings('lrs/scoregames')
+strings_module = build_module_strings('lrs/scoregame')
 
 
 class ScoreGameBase(MapGameTeamBased):

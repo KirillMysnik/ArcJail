@@ -19,8 +19,8 @@ from . import (
     play_flawless_effects, push, stage, strings_module as strings_common)
 
 
-strings_module = build_module_strings('games/scoregames')
-config_manager = build_module_config('games/scoregames')
+strings_module = build_module_strings('games/scoregame')
+config_manager = build_module_config('games/scoregame')
 
 config_manager.controlled_cvar(
     bool_handler,
@@ -168,7 +168,6 @@ class ScoreGameBase(MapGameTeamBased):
             indexes = list([player.index for player in self._players])
             indexes.append(self.leader.index)
             goal_sound.play(*indexes)
-
 
         self.score['team{}'.format(team_num)] += 1
         self.set_stage_group(

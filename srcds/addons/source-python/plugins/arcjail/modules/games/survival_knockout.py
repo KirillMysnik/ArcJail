@@ -64,8 +64,6 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
             player = counter.owner.player
             saved_player = saved_player_manager[player.index]
             saved_player.strip()
-            self.on_death(player)
-
             return True
 
         def hook_p(counter, info):
@@ -205,7 +203,6 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                 def hook_on_death(counter, game_event, player=player):
                     saved_player = saved_player_manager[player.index]
                     saved_player.strip()
-                    self.on_death(player)
                     return True
 
                 counter1 = p_player.new_counter(

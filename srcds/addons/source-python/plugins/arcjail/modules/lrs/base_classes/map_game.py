@@ -100,6 +100,10 @@ class MapGame(PrepareTime):
             attr.game_instance = self
             self._pushes[(attr.slot_id, attr.push_id)] = attr
 
+    @property
+    def full_caption(self):
+        return self.map_data.caption or self.caption
+
     def _weapon_drop_filter(self, player):
         return player not in self._players
 
@@ -114,18 +118,6 @@ class MapGame(PrepareTime):
     def stage_abort(self):
         broadcast(strings_module['abort map_cancelled'])
         self.set_stage_group('destroy')
-
-    @stage('set-start-status')
-    def stage_set_start_status(self):
-        self._status = LastRequestGameStatus.IN_PROGRESS
-
-        InternalEvent.fire('jail_lrs_start_status_set', instance=self)
-
-        broadcast(strings_module['game_started'].tokenize(
-            player1=self.prisoner.name,
-            player2=self.guard.name,
-            game=self.map_data.caption or self.caption
-        ))
 
     @stage('mapgame-swap-guard')
     def stage_mapgame_swap_guard(self):
@@ -221,8 +213,9 @@ class MapGame(PrepareTime):
 
     @stage('mapgame-fire-mapdata-outputs')
     def stage_mapgame_fire_mapdata_outputs(self):
-        """Fire OnStart output on controller entity."""
+        """Fire OnStart and OnLastRequestStart outputs on controller entity."""
         self.map_data.start()
+        self.map_data.last_request_start()
 
     @stage('undo-mapgame-fire-mapdata-outputs')
     def stage_undo_mapgame_fire_mapdata_outputs(self):

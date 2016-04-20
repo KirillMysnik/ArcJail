@@ -182,7 +182,7 @@ class ProtectedPlayer:
         for counter in self._counters:
             rs.append(counter._hurt(info))
 
-        if any(rs):
+        if any(rs) and not self.dead:
             return True
 
         return None

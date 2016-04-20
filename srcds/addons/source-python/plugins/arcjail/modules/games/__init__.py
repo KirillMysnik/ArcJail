@@ -39,6 +39,8 @@ from .. import build_module_config, parse_modules
 
 
 MIN_PLAYERS_IN_GAME = 2
+MAX_PLAYERS_NAMES_LIST_LENGTH = 36
+MAX_PLAYER_NAME_LENGTH = 10
 
 strings_module = build_module_strings('games/common')
 config_manager = build_module_config('games/common')
@@ -435,6 +437,21 @@ def play_flawless_effects(players):
                 show_overlay(player, config_manager['flawless_material'], 3)
 
     _flawless_effects_delays.append(Delay(1.5, callback))
+
+
+def format_player_names(players):
+    names = []
+    for player in players:
+        if len(player.name) > MAX_PLAYER_NAME_LENGTH:
+            names.append(player.name[:MAX_PLAYER_NAME_LENGTH] + "~")
+        else:
+            names.append(player.name)
+
+    string = ', '.join(names)
+    if len(string) > MAX_PLAYERS_NAMES_LIST_LENGTH:
+        string = string[:MAX_PLAYERS_NAMES_LIST_LENGTH] + "..."
+
+    return string
 
 
 @Event('round_start')

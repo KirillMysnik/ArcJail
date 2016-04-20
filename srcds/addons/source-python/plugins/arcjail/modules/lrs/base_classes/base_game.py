@@ -33,6 +33,10 @@ class BaseGame(BaseGame):
         for game_internal_event_handler_ in self._internal_events.values():
             game_internal_event_handler_.game_instance = self
 
+    @property
+    def full_caption(self):
+        return self.caption
+
     @stage('destroy')
     def stage_destroy(self):
         self.undo_stages()

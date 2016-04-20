@@ -53,6 +53,10 @@ class RaceBase(MapGame):
 
             self._recollect_delay = None
 
+    @push(None, 'end_game')
+    def push_end_game(self, args):
+        self.set_stage_group('game-end-draw')
+
 
 class RaceSingleWinnerStandard(RaceBase):
     caption = strings_module['title single_winner standard']

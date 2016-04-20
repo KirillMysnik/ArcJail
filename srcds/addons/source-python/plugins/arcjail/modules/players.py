@@ -3,7 +3,6 @@ from filters.players import PlayerIter
 from listeners import OnClientActive, OnClientDisconnect, OnLevelInit
 from messages import SayText2
 from players.entity import Player
-from players.helpers import userid_from_index
 from players.teams import teams_by_name
 
 from ..arcjail import InternalEvent

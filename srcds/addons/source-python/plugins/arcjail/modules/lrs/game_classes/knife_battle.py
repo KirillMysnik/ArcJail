@@ -1,10 +1,10 @@
-from ...resource.strings import build_module_strings
+from ....resource.strings import build_module_strings
 
-from . import (
+from .. import (
     add_available_game, HiddenSetting, Setting, SettingOption,
     strings_module as strings_common)
 
-from .base_classes.combat_game import CombatGame
+from ..base_classes.combat_game import CombatGame
 
 
 strings_module = build_module_strings('lrs/knife_battle')

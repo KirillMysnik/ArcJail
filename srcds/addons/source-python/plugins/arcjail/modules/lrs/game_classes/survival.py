@@ -2,34 +2,32 @@ from warnings import warn
 
 from cvars import ConVar
 
-from ..damage_hook import (
+from ...damage_hook import (
     get_hook, is_world, protected_player_manager,
     strings_module as strings_damage_hook)
 
-from ..equipment_switcher import saved_player_manager
+from ...equipment_switcher import saved_player_manager
 
-from ..falldmg_protector import protect as falldmg_protect
+from ...falldmg_protector import protect as falldmg_protect
 
-from ..games.survival import (
+from ...games.survival import (
     PossibleDeadEndWarning, strings_module as strings_games)
 
-from ..games import play_flawless_effects
+from ...games import play_flawless_effects
 
-from ..no_ff_spam import (
+from ...no_ff_spam import (
     disable as no_ff_spam_disable, enable as no_ff_spam_enable)
 
-from ..players import main_player_manager
+from ...players import main_player_manager
 
-from ..show_damage import show_damage
+from ...show_damage import show_damage
 
-from ..silent_cvars import silent_set
+from ...silent_cvars import silent_set
 
-from ..teams import GUARDS_TEAM, PRISONERS_TEAM
+from ..base_classes.map_game import MapGame
+from ..base_classes.map_game_team_based import MapGameTeamBased
 
-from .base_classes.map_game import MapGame
-from .base_classes.map_game_team_based import MapGameTeamBased
-
-from . import (
+from .. import (
     add_available_game, game_event_handler, push, stage)
 
 
@@ -123,7 +121,7 @@ def build_survival_base(*parent_classes):
                 counter.hook_death = hook_death
                 counter.health = self.map_data['INITIAL_HEALTH']
 
-                self._counters[player.userid] = counter
+                self._counters[player.userid] = [counter, ]
 
                 p_player.set_protected()
 
@@ -131,7 +129,9 @@ def build_survival_base(*parent_classes):
         def stage_undo_survival_equip_damage_hooks(self):
             for player in self._players_all:
                 p_player = protected_player_manager[player.index]
-                p_player.delete_counter(self._counters[player.userid])
+                for counter in self._counters[player.userid]:
+                    p_player.delete_counter(counter)
+
                 p_player.unset_protected()
 
         @stage('survival-fall-protection')
@@ -210,98 +210,63 @@ def build_survival_friendlyfire_base(*parent_classes):
 
         @stage('survival-equip-damage-hooks')
         def stage_survival_equip_damage_hooks(self):
-            for player in main_player_manager.values():
-                if player.dead:
-                    continue
-
+            for player in self._players:
                 p_player = protected_player_manager[player.index]
 
-                if player in self._players:
-                    def hook_on_death(counter, game_event, player=player):
-                        saved_player = saved_player_manager[player.index]
-                        saved_player.strip()
+                def hook_on_death(counter, game_event, player=player):
+                    saved_player = saved_player_manager[player.index]
+                    saved_player.strip()
 
+                    return True
+
+                def hook_min_damage(counter, info, player=player):
+                    min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
+
+                    if info.damage >= min_damage:
+                        self._flawless[player.userid] = False
                         return True
 
-                    def hook_min_damage(counter, info, player=player):
-                        min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
+                    return False
 
-                        if info.damage >= min_damage:
-                            self._flawless[player.userid] = False
-                            return True
-
-                        return False
-
-                    def hook_game_p(counter, info, player=player):
-                        if (info.attacker == player.index or
-                                is_world(info.attacker)):
-
-                            return False
-
-                        attacker = main_player_manager[info.attacker]
-                        if attacker in self._players:
-                            show_damage(attacker, info.damage)
-                            return hook_min_damage(counter, info)
+                def hook_game_p(counter, info, player=player):
+                    if (info.attacker == player.index or
+                            is_world(info.attacker)):
 
                         return False
 
-                    def hook_sw_game_p(counter, info, player=player):
-                        if (info.attacker == player.index or
-                                is_world(info.attacker)):
+                    attacker = main_player_manager[info.attacker]
+                    if attacker in self._players:
+                        show_damage(attacker, info.damage)
+                        return hook_min_damage(counter, info)
 
-                            return hook_min_damage(counter, info)
+                    return False
 
-                        attacker = main_player_manager[info.attacker]
-                        if attacker in self._players:
-                            show_damage(attacker, info.damage)
-                            return hook_min_damage(counter, info)
+                def hook_sw_game_p(counter, info, player=player):
+                    if (info.attacker == player.index or
+                            is_world(info.attacker)):
 
-                        return False
+                        return hook_min_damage(counter, info)
 
-                    counter = p_player.new_counter(
-                        display=strings_damage_hook['health game'])
+                    attacker = main_player_manager[info.attacker]
+                    if attacker in self._players:
+                        show_damage(attacker, info.damage)
+                        return hook_min_damage(counter, info)
 
-                    if self.map_data['ALLOW_SELFDAMAGE']:
-                        counter.hook_hurt = hook_sw_game_p
-                    else:
-                        counter.hook_hurt = hook_game_p
+                    return False
 
-                    counter.hook_death = hook_on_death
-                    counter.health = self.map_data['INITIAL_HEALTH']
+                counter = p_player.new_counter(
+                    display=strings_damage_hook['health game'])
 
-                    self._counters[player.userid] = counter
-                    p_player.set_protected()
+                if self.map_data['ALLOW_SELFDAMAGE']:
+                    counter.hook_hurt = hook_sw_game_p
+                else:
+                    counter.hook_hurt = hook_game_p
 
-                elif player.team == GUARDS_TEAM:
-                    def hook_sw_nongame_p(counter, info, player=player):
-                        if (info.attacker == player.index or
-                                is_world(info.attacker)):
+                counter.hook_death = hook_on_death
+                counter.health = self.map_data['INITIAL_HEALTH']
 
-                            return True
-
-                        attacker = main_player_manager[info.attacker]
-                        if attacker in self._players:
-                            return False
-
-                        if attacker.team == GUARDS_TEAM:
-                            return False
-
-                        return True
-
-                    counter = p_player.new_counter()
-                    counter.hook_hurt = hook_sw_nongame_p
-                    counter.display = strings_damage_hook['health general']
-
-                    self._counters[player.userid] = counter
-                    p_player.set_protected()
-
-                elif player.team == PRISONERS_TEAM:
-                    counter = p_player.new_counter()
-                    counter.hook_hurt = get_hook('SWG')
-                    counter.display = strings_damage_hook['health general']
-
-                    self._counters[player.userid] = counter
-                    p_player.set_protected()
+                self._counters[player.userid] = [counter, ]
+                p_player.set_protected()
 
     return SurvivalFriendlyFireBase
 

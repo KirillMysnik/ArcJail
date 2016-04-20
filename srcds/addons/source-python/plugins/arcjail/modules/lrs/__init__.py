@@ -676,71 +676,9 @@ def reset():
     _popups.clear()
 
 
-@Event('player_hurt')
-def on_player_hurt(game_event):
-    victim = main_player_manager.get_by_userid(game_event.get_int('userid'))
-    if victim.dead:     # Will be handled by player_death
-        return
-
-    attacker_uid = game_event.get_int('attacker')
-    if attacker_uid in (victim.userid, 0):
-        return
-
-    attacker = main_player_manager.get_by_userid(attacker_uid)
-    game_instance_victim = get_player_game_instance(victim)
-    game_instance_attacker = get_player_game_instance(attacker)
-    damage = game_event.get_int('dmg_health')
-
-    # Case 1. Attacker and victim are in the same LR
-    # Will be handled inside LR if needed
-    if game_instance_victim == game_instance_attacker:
-        return
-
-    # Case 2. Non-LR player attacks LR player
-    if game_instance_victim is not None and game_instance_attacker is None:
-        victim.health += damage
-        attacker.take_damage(attacker.health + 1)
-
-        broadcast(strings_module['crime external slay'].tokenize(
-            player=attacker.name))
-
-        return
-
-    # Cases 3 and 4. LR player attacks non-LR player
-    # or LR player attacks player from different LR
-    if game_instance_attacker is not None:
-        victim.health += damage
-
-        return
-
-
-@Event('player_death_real')
-def on_player_death_real(game_event):
+@Event('player_death')
+def on_player_death(game_event):
     check_if_announced()
-
-    victim = main_player_manager.get_by_userid(game_event.get_int('userid'))
-    attacker_uid = game_event.get_int('attacker')
-    if attacker_uid in (victim.userid, 0):
-        return
-
-    attacker = main_player_manager.get_by_userid(attacker_uid)
-    game_instance_victim = get_player_game_instance(victim)
-    game_instance_attacker = get_player_game_instance(attacker)
-
-    # Case 1 (see comments to on_player_hurt)
-    if game_instance_victim == game_instance_attacker:
-        return
-
-    # Cases 2, 3 and 4
-    if (game_instance_victim is not None and game_instance_attacker is None or
-            game_instance_attacker is not None):
-
-        attacker.take_damage(attacker.health + 1)
-
-        broadcast(strings_module['crime external slay'].tokenize(
-            player=attacker.name))
-
-        return
 
 
 @Event('round_start')
@@ -761,6 +699,12 @@ def say_games(command, index, team_only):
 
 
 # =============================================================================
+# >> SUBMODULES IMPORT
+# =============================================================================
+from . import *
+
+
+# =============================================================================
 # >> BASE CLASSES IMPORT
 # =============================================================================
 from . import base_classes
@@ -772,5 +716,4 @@ from . import base_classes
 current_dir = os.path.dirname(__file__)
 __all__ = parse_modules(current_dir)
 
-
-from . import *
+from . import game_classes

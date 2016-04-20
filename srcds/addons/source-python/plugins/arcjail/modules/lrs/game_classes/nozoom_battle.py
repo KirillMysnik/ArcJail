@@ -2,13 +2,13 @@ from entities.entity import Entity
 from entities.helpers import index_from_inthandle
 from listeners.tick import on_tick_listener_manager
 
-from ...resource.strings import build_module_strings
+from ....resource.strings import build_module_strings
 
-from . import (
+from .. import (
     add_available_game, config_manager, Setting, SettingOption, stage,
     strings_module as strings_common)
 
-from .base_classes.combat_game import CombatGame
+from ..base_classes.combat_game import CombatGame
 
 
 strings_module = build_module_strings('lrs/nozoom_battle')

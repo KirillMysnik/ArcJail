@@ -1,18 +1,17 @@
-from ...resource.strings import build_module_strings
+from ....resource.strings import build_module_strings
 
-from ..damage_hook import get_hook, protected_player_manager
+from ...damage_hook import get_hook, protected_player_manager
 
-from ..games.scoregame import (
+from ...games.scoregame import (
     get_goal_sound, config_manager as config_manager_games)
 
-from ..games import play_flawless_effects
+from ...games import play_flawless_effects
 
-from ..players import broadcast
+from ...players import broadcast
 
-from .base_classes.map_game_team_based import MapGameTeamBased
+from ..base_classes.map_game_team_based import MapGameTeamBased
 
-from . import (
-    add_available_game, config_manager as config_manager_common, push, stage)
+from .. import add_available_game, push, stage
 
 
 strings_module = build_module_strings('lrs/scoregame')

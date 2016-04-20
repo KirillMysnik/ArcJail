@@ -55,7 +55,7 @@ def push_by_damage_amount(victim, attacker, damage, map_data):
 
 
 class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
-    caption = strings_module['title playerbased_standard']
+    caption = strings_module['title knockout_playerbased']
     module = 'survival_knockout_playerbased'
 
     @stage('survival-equip-damage-hooks')
@@ -139,7 +139,7 @@ add_available_game(SurvivalKnockoutPlayerBased)
 
 
 class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
-    caption = strings_module['title teambased_standard']
+    caption = strings_module['title knockout_teambased']
     module = 'survival_knockout_teambased'
 
     @stage('survival-equip-damage-hooks')

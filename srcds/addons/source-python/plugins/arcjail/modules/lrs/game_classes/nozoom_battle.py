@@ -35,16 +35,12 @@ class NozoomBattle(CombatGame):
                 ),
     ]
 
-    @stage('mapgame-entry')
-    def stage_mapgame_entry(self):
-        if config_manager['combat_lr_start_sound'] is not None:
-            indexes = (self.prisoner.index, self.guard.index)
-            config_manager['combat_lr_start_sound'].play(*indexes)
-
+    @stage('combatgame-entry')
+    def stage_combatgame_entry(self):
         on_tick_listener_manager.register_listener(self._nozoom_tick_handler)
 
-    @stage('undo-mapgame-entry')
-    def stage_undo_mapgame_entry(self):
+    @stage('undo-combatgame-entry')
+    def stage_undo_combatgame_entry(self):
         on_tick_listener_manager.unregister_listener(self._nozoom_tick_handler)
 
     def _nozoom_tick_handler(self):

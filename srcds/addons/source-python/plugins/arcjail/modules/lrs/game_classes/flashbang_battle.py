@@ -34,12 +34,8 @@ class FlashbangBattle(CombatGame):
                 ),
     ]
 
-    @stage('mapgame-entry')
-    def stage_mapgame_entry(self):
-        if config_manager['combat_lr_start_sound'] is not None:
-            indexes = (self.prisoner.index, self.guard.index)
-            config_manager['combat_lr_start_sound'].play(*indexes)
-
+    @stage('combatgame-entry')
+    def stage_combatgame_entry(self):
         tell(self.prisoner, strings_module['aim'].tokenize(
             player=self.guard.name))
 
@@ -54,8 +50,8 @@ class FlashbangBattle(CombatGame):
 
         add_hook_or_wait(self.pre_detonate)
 
-    @stage('undo-mapgame-entry')
-    def stage_undo_mapgame_entry(self):
+    @stage('undo-combatgame-entry')
+    def stage_undo_combatgame_entry(self):
         remove_hook_or_stop_waiting(self.pre_detonate)
 
     @staticmethod

@@ -31,6 +31,12 @@ class CombatGame(PrepareTime):
     health = 100
 
     stage_groups = {
+        'destroy': [
+            "prepare-cancel-delays",
+            "unsend-popups",
+            "combatgame-cancel-delays",
+            "destroy",
+        ],
         'mapgame-prepare': [
             "mapgame-cancel-falldmg-protection",
             "mapgame-teleport-players",
@@ -42,6 +48,7 @@ class CombatGame(PrepareTime):
             "equip-damage-hooks",
             "mapgame-fire-mapdata-outputs",
             "mapgame-entry",
+            "combatgame-entry",
         ],
     }
 
@@ -59,6 +66,15 @@ class CombatGame(PrepareTime):
             self.guard.userid: True,
         }
         self._counters = {}
+        self._delays = []
+
+    @stage('combatgame-cancel-delays')
+    def stage_combatgame_cancel_delays(self):
+        for delay in self._delays:
+            if delay.running:
+                delay.cancel()
+
+        self._delays.clear()
 
     @stage('basegame-entry')
     def stage_basegame_entry(self):

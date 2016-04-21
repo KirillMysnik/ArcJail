@@ -1,4 +1,5 @@
 from contextlib import suppress
+from random import shuffle
 
 from entities.helpers import edict_from_index
 
@@ -109,6 +110,8 @@ class CombatGame(PrepareTime):
             return
 
         spawnpoints = list(self.map_data.spawnpoints)
+        shuffle(spawnpoints)
+
         for player in self._players:
             teleport_player(player, spawnpoints.pop())
 

@@ -1,4 +1,5 @@
 from contextlib import suppress
+from random import shuffle
 
 from cvars import ConVar
 from entities.constants import INVALID_ENTITY_INDEX
@@ -227,6 +228,8 @@ class MapGame(PrepareTime):
     def stage_mapgame_teleport_players(self):
         """Teleport players and game leader."""
         spawnpoints = list(self.map_data.get_spawnpoints('team1'))
+        shuffle(spawnpoints)
+
         for player in self._players:
             teleport_player(player, spawnpoints.pop())
 

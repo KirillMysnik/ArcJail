@@ -114,10 +114,14 @@ class MapGameTeamBased(MapGame):
     @stage('mapgame-teleport-players2')
     def stage_mapgame_teleport_players2(self):
         spawnpoints = list(self.map_data.get_spawnpoints('team1'))
+        shuffle(spawnpoints)
+
         for player in self._team1:
             teleport_player(player, spawnpoints.pop())
 
         spawnpoints = list(self.map_data.get_spawnpoints('team2'))
+        shuffle(spawnpoints)
+
         for player in self._team2:
             teleport_player(player, spawnpoints.pop())
 
@@ -126,14 +130,20 @@ class MapGameTeamBased(MapGame):
     @stage('mapgame-teleport-players3')
     def stage_mapgame_teleport_players3(self):
         spawnpoints = list(self.map_data.get_spawnpoints('team1'))
+        shuffle(spawnpoints)
+
         for player in self._team1:
             teleport_player(player, spawnpoints.pop())
 
         spawnpoints = list(self.map_data.get_spawnpoints('team2'))
+        shuffle(spawnpoints)
+
         for player in self._team2:
             teleport_player(player, spawnpoints.pop())
 
         spawnpoints = list(self.map_data.get_spawnpoints('team3'))
+        shuffle(spawnpoints)
+
         for player in self._team3:
             teleport_player(player, spawnpoints.pop())
 
@@ -142,18 +152,26 @@ class MapGameTeamBased(MapGame):
     @stage('mapgame-teleport-players4')
     def stage_mapgame_teleport_players4(self):
         spawnpoints = list(self.map_data.get_spawnpoints('team1'))
+        shuffle(spawnpoints)
+
         for player in self._team1:
             teleport_player(player, spawnpoints.pop())
 
         spawnpoints = list(self.map_data.get_spawnpoints('team2'))
+        shuffle(spawnpoints)
+
         for player in self._team2:
             teleport_player(player, spawnpoints.pop())
 
         spawnpoints = list(self.map_data.get_spawnpoints('team3'))
+        shuffle(spawnpoints)
+
         for player in self._team3:
             teleport_player(player, spawnpoints.pop())
 
         spawnpoints = list(self.map_data.get_spawnpoints('team4'))
+        shuffle(spawnpoints)
+
         for player in self._team4:
             teleport_player(player, spawnpoints.pop())
 

@@ -1,3 +1,5 @@
+from random import shuffle
+
 from ...jail_map import get_games, teleport_player
 
 from .. import stage
@@ -17,9 +19,13 @@ class MapGameTeamBased(MapGame):
     @stage('mapgame-teleport-players2')
     def stage_mapgame_teleport_players2(self):
         spawnpoints = list(self.map_data.get_spawnpoints('team1'))
+        shuffle(spawnpoints)
+
         teleport_player(self.prisoner, spawnpoints.pop())
 
         spawnpoints = list(self.map_data.get_spawnpoints('team2'))
+        shuffle(spawnpoints)
+
         teleport_player(self.guard, spawnpoints.pop())
 
     @classmethod

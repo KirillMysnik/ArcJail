@@ -17,13 +17,14 @@ from .players import main_player_manager
 
 
 INFINITE_AMMO_REFILL_INTERVAL = 5
-PROJECTILE_REFILL_DELAY = 1
+PROJECTILE_REFILL_DELAY = 1.5
 PROJECTILE_MAPPING = {
     'hegrenade_projectile': 'weapon_hegrenade',
     'smokegrenade_projectile': 'weapon_smokegrenade',
     'flashbang_projectile': 'weapon_flashbang',
     # TODO: Add CS:GO grenades and export all these to a file
 }
+PROJECTILE_CLASSNAMES = PROJECTILE_MAPPING.values()
 
 
 class SavedPlayer:
@@ -45,7 +46,8 @@ class SavedPlayer:
         self._nade_refill_delay = Delay(
             PROJECTILE_REFILL_DELAY,
             self.player.give_named_item,
-            weapon_classname, 0)
+            weapon_classname, 0
+        )
 
     def save_health(self):
         self.health = self.player.health
@@ -77,11 +79,7 @@ class SavedPlayer:
     def strip(self):
         for index in self.player.weapon_indexes():
             weapon = Entity(index)
-            print("Dropping {}...".format(weapon.classname))
-            weapon.pointer
-            print("Got pointer, now to the actual drop")
             self.player.drop_weapon(weapon.pointer, NULL_VECTOR, NULL_VECTOR)
-            print("Dropped")
             weapon.remove()
 
     def restore_health(self):
@@ -109,6 +107,9 @@ class SavedPlayer:
         for index in self.player.weapon_indexes():
             weapon_classname = edict_from_index(index).classname
             if weapon_classname not in weapon_classnames:
+                continue
+
+            if weapon_classname in PROJECTILE_CLASSNAMES:
                 continue
 
             weapon_class = weapon_manager[weapon_classname]

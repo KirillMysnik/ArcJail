@@ -235,13 +235,6 @@ def get_jail_names():
 
 
 def reload_map_info():
-    for game in MapData.games.values():
-        game.destroy_connections()
-
-    for lr in MapData.lrs.values():
-        lr.destroy_connections()
-
-    MapData.destroy_connections()
     MapData.reset()
 
     mapdata_json = MAPDATA_PATH / '{0}.json'.format(global_vars.map_name)
@@ -422,10 +415,8 @@ def get_map_var(var_name, default=None):
     return default
 
 
-
 def get_map_var_list(var_name):
     return tuple(MapData.settings.get(var_name, ()))
-
 
 
 def get_map_connections(output_name):
@@ -530,3 +521,21 @@ def srv_push(command):
         except:
             warn(Warning("Exception during handling {0}.{1} "
                 "push:\n{2}".format(slot_id, push_id, format_exc())))
+
+
+@ServerCommand('arcjail_reload_map_data')
+def srv_arcjail_reload_map_data(command):
+    for game in MapData.games.values():
+        game.destroy_connections()
+
+    for lr in MapData.lrs.values():
+        lr.destroy_connections()
+
+    MapData.destroy_connections()
+
+    reload_map_info()
+
+
+@ServerCommand('arcjail_reload_map_scripts')
+def srv_arcjail_reload_map_scripts(command):
+    reload_map_scripts()

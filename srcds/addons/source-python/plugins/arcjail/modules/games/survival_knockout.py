@@ -1,3 +1,5 @@
+from entities.entity import Entity
+
 from mathlib import Vector
 
 from ...resource.strings import build_module_strings
@@ -26,9 +28,10 @@ from . import (
 strings_module = build_module_strings('games/survival_knockout')
 
 
-def push_by_damage_amount(victim, attacker, damage, map_data):
+def push_by_damage_info(victim, attacker, info, map_data):
     # TODO: When damage_hook module is refactored, use TakeDamageInfo instead
-    d = victim.origin - attacker.origin
+    inflictor = Entity(info.inflictor)
+    d = victim.origin - inflictor.origin
 
     dmg_base = map_data['ARENA_DAMAGE_BASE']
     base_force_h = map_data['ARENA_HORIZONTAL_FORCE_BASE']
@@ -48,8 +51,8 @@ def push_by_damage_amount(victim, attacker, damage, map_data):
     if f is None:
         return
 
-    k_h = (base_force_h / vec_len) * f(damage / dmg_base)
-    k_v = f(damage / dmg_base)
+    k_h = (base_force_h / vec_len) * f(info.damage / dmg_base)
+    k_v = f(info.damage / dmg_base)
 
     victim.base_velocity = Vector(d.x * k_h, d.y * k_h, force_v * k_v)
 
@@ -76,8 +79,7 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
-                push_by_damage_amount(
-                    victim, attacker, info.damage, self.map_data)
+                push_by_damage_info(victim, attacker, info, self.map_data)
 
             return False
 
@@ -163,8 +165,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                     return False
 
                 show_damage(attacker, info.damage)
-                push_by_damage_amount(
-                    victim, attacker, info.damage, self.map_data)
+                push_by_damage_info(victim, attacker, info, self.map_data)
 
                 return False
 
@@ -181,8 +182,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                     return False
 
                 show_damage(attacker, info.damage)
-                push_by_damage_amount(
-                    victim, attacker, info.damage, self.map_data)
+                push_by_damage_info(victim, attacker, info, self.map_data)
 
                 return False
 

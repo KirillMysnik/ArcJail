@@ -3,7 +3,7 @@ from ...equipment_switcher import saved_player_manager
 from ...damage_hook import is_world, protected_player_manager
 
 from ...games.survival_knockout import (
-    push_by_damage_amount, strings_module as strings_games)
+    push_by_damage_info, strings_module as strings_games)
 
 from ...players import main_player_manager
 
@@ -38,8 +38,8 @@ def build_survival_knockout_base(*parent_classes):
                     if attacker in self._players:
                         self._flawless[player.userid] = False
                         show_damage(attacker, info.damage)
-                        push_by_damage_amount(
-                            player, attacker, info.damage, self.map_data)
+                        push_by_damage_info(
+                            player, attacker, info, self.map_data)
 
                     return False
 

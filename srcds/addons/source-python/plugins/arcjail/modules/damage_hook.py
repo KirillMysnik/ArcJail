@@ -122,7 +122,7 @@ class ProtectedPlayer:
                 return None
 
             return self.display.tokenize(
-                amount=self.health if self.health > 0 else '∞')
+                amount=int(self.health) if self.health > 0 else '∞')
 
     def __init__(self, player):
         self.player = player

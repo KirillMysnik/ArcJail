@@ -80,6 +80,10 @@ class CombatGame(PrepareTime):
     def stage_basegame_entry(self):
         self.set_stage_group('mapgame-start')
 
+    @stage('combatgame-entry')
+    def stage_combatgame_entry(self):
+        pass
+
     @stage('prepare-entry')
     def stage_prepare_entry(self):
         self.insert_stage_group('mapgame-prepare')
@@ -226,6 +230,9 @@ class CombatGame(PrepareTime):
         player = main_player_manager.get_by_userid(
             game_event.get_int('userid'))
 
+        if player not in self._players:
+            return
+
         if player == self.prisoner:
             winner, loser = self.guard, self.prisoner
         else:
@@ -236,6 +243,9 @@ class CombatGame(PrepareTime):
         
         self._results['winner'] = winner
         self._results['loser'] = loser
+
+        self._players.remove(player)
+
         self.set_stage_group('win')
 
     def _weapon_drop_filter(self, player):

@@ -22,7 +22,7 @@ from ...resource.strings import build_module_strings, COLOR_SCHEME
 
 from ..admin import section
 
-from ..effects import set_player_sprite
+from ..effects.sprites import set_player_sprite
 
 from ..game_status import get_status, GameStatus, set_status
 from ..game_status import strings_module as strings_game_status

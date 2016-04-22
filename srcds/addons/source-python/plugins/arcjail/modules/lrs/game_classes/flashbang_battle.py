@@ -1,5 +1,10 @@
+from effects import temp_entities
+from engines.precache import Model
 from entities.entity import Entity
+from entities.helpers import index_from_inthandle
+from filters.recipients import RecipientFilter
 from listeners import on_entity_created_listener_manager
+from listeners import on_entity_spawned_listener_manager
 from memory import make_object
 from memory.hooks import HookType
 
@@ -14,8 +19,11 @@ from ...players import tell
 from ..base_classes.combat_game import CombatGame
 
 from .. import (
-    add_available_game, config_manager, HiddenSetting, Setting, SettingOption,
-    stage, strings_module as strings_common)
+    add_available_game, HiddenSetting, Setting, SettingOption, stage,
+    strings_module as strings_common)
+
+
+BEAM_MODEL = Model('sprites/laserbeam.vmt')
 
 
 strings_module = build_module_strings('lrs/flashbang_battle')
@@ -27,6 +35,11 @@ class FlashbangBattle(CombatGame):
     settings = [
         HiddenSetting('health', 1),
         HiddenSetting('weapons', ('weapon_flashbang', )),
+        Setting('trails', strings_module['settings trails'],
+                SettingOption(
+                    True, strings_module['setting trails yes'], True),
+                SettingOption(False, strings_module['setting trails no']),
+                ),
         Setting('using_map_data', strings_common['settings map_data'],
                 SettingOption(
                     True, strings_common['setting map_data yes'], True),
@@ -50,19 +63,61 @@ class FlashbangBattle(CombatGame):
 
         add_hook_or_wait(self.pre_detonate)
 
+        if self._settings['trails']:
+            on_entity_spawned_listener_manager.register_listener(
+                self.listener_on_entity_spawned)
+
     @stage('undo-combatgame-entry')
     def stage_undo_combatgame_entry(self):
         remove_hook_or_stop_waiting(self.pre_detonate)
 
-    @staticmethod
-    def pre_detonate(args):
+        if self._settings['trails']:
+            on_entity_spawned_listener_manager.unregister_listener(
+                self.listener_on_entity_spawned)
+
+    def pre_detonate(self, args):
         entity = make_object(Entity, args[0])
         if entity.classname != 'flashbang_projectile':
+            return
+
+        try:
+            owner_index = index_from_inthandle(entity.owner)
+        except (OverflowError, ValueError):
+            return
+
+        if owner_index not in (self.prisoner.index, self.guard.index):
             return
 
         dissolve(entity)
         return True
 
+    def listener_on_entity_spawned(self, index, base_entity):
+        if base_entity.classname != 'flashbang_projectile':
+            return
+
+        try:
+            owner_index = index_from_inthandle(Entity(index).owner)
+        except (OverflowError, ValueError):
+            return
+
+        if owner_index not in (self.prisoner.index, self.guard.index):
+            return
+
+        temp_entities.beam_follow(
+            RecipientFilter(*[player.index for player in self._players]),
+            0,                  # Delay
+            index,              # Entity index
+            BEAM_MODEL.index,   # Model index
+            BEAM_MODEL.index,   # Halo index
+            1,                  # Life
+            3,                  # Width
+            3,                  # EndWidth
+            1,                  # FadeLength
+            255,                # R
+            255,                # G
+            255,                # B
+            150                 # A
+        )
 
 add_available_game(FlashbangBattle)
 

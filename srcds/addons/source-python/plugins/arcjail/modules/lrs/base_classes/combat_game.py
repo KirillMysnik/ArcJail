@@ -27,14 +27,10 @@ from .prepare_time import PrepareTime
 
 
 class CombatGame(PrepareTime):
-    module = None
-    health = 100
-
     stage_groups = {
         'destroy': [
             "prepare-cancel-delays",
             "unsend-popups",
-            "combatgame-cancel-delays",
             "destroy",
         ],
         'mapgame-prepare': [
@@ -67,14 +63,6 @@ class CombatGame(PrepareTime):
         }
         self._counters = {}
         self._delays = []
-
-    @stage('combatgame-cancel-delays')
-    def stage_combatgame_cancel_delays(self):
-        for delay in self._delays:
-            if delay.running:
-                delay.cancel()
-
-        self._delays.clear()
 
     @stage('basegame-entry')
     def stage_basegame_entry(self):

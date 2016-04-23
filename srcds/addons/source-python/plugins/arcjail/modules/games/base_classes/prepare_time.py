@@ -27,15 +27,16 @@ from ...players import broadcast, main_player_manager
 
 from .. import config_manager, stage, strings_module
 
-from .base_game import BaseGame
+from .jail_game import JailGame
 
 
-class PrepareTime(BaseGame):
+class PrepareTime(JailGame):
     stage_groups = {
         'init': ["prepare-prepare", ],
         'destroy': [
             "prepare-cancel-delays",
             "unsend-popups",
+            "cancel-delays",
             "destroy",
         ],
         'prepare-start': [

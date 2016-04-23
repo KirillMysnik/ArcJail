@@ -72,7 +72,7 @@ for line in _downloadables_sounds:
     sounds.append(line[len("sound/"):])
 
 
-class CockFight(PrepareTime, JailGame):
+class CockFight(PrepareTime):
     caption = strings_module['title']
     stage_groups = {
         'cockfight-register-tick': ["cockfight-register-tick", ],

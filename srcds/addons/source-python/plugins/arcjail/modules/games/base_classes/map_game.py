@@ -52,7 +52,7 @@ from .prepare_time import PrepareTime
 DEFAULT_GRAVITY = 800
 
 
-class MapGame(PrepareTime, JailGame):
+class MapGame(PrepareTime):
     module = None
     caption = strings_module['title mapgame']
 

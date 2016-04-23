@@ -28,6 +28,7 @@ class JailGame(BaseGame):
     stage_groups = {
         'destroy': [
             "unsend-popups",
+            "cancel-delays",
             "destroy",
         ],
         'abort': ["abort", ],
@@ -40,6 +41,7 @@ class JailGame(BaseGame):
         super().__init__(leader_player, players, **kwargs)
 
         self._popups = {}
+        self._delays = []
 
     @stage('unsend-popups')
     def stage_unsend_popups(self):
@@ -47,6 +49,14 @@ class JailGame(BaseGame):
             popup.close()
 
         self._popups.clear()
+
+    @stage('cancel-delays')
+    def stage_cancel_delays(self):
+        for delay in self._delays:
+            if delay.running:
+                delay.cancel()
+
+        self._delays.clear()
 
     @stage('abort')
     def stage_abort(self):

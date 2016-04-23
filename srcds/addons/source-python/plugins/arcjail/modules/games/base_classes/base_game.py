@@ -120,6 +120,24 @@ class BaseGame(metaclass=GameMeta):
             if self._cur_stage_id is None:
                 self.launch_stages()
 
+    def append_stage_group(self, stage_group_id):
+        if self._lock_stage_queue:
+            return
+
+        if stage_group_id not in self._stage_groups:
+            warn(UnknownStageWarning(
+                "{}: Unknown stage group id '{}', destroying".format(
+                    self.__class__.__name__, stage_group_id)))
+
+            self.set_stage_group('destroy')
+
+        else:
+            self._stage_queue = (self._stage_queue +
+                                 self._stage_groups[stage_group_id])
+
+            if self._cur_stage_id is None:
+                self.launch_stages()
+
     def undo_stages(self, stage_group_ids=None):
         if stage_group_ids is None:
             stage_group_ids = self._stage_groups.keys()

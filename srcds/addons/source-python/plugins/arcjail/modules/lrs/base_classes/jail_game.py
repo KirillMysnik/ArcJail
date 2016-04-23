@@ -18,8 +18,8 @@ from ....arcjail import InternalEvent
 from ...players import broadcast, main_player_manager
 
 from .. import (
-    config_manager, game_event_handler, LastRequestGameStatus, stage,
-    strings_module)
+    config_manager, game_event_handler, LastRequestGameStatus,
+    launch_win_reward, stage, strings_module)
 
 from .base_game import BaseGame
 
@@ -40,6 +40,7 @@ class JailGame(BaseGame):
         'abort': ["abort", ],
         'abort-player-out': ["abort-player-out", ],
         'win': ["win", ],
+        'winreward': ["winreward", ],
         'draw': ["draw", ],
     }
 
@@ -119,6 +120,13 @@ class JailGame(BaseGame):
         ))
 
         self.set_stage_group('destroy')
+
+        if not loser.dead:
+            self.append_stage_group('winreward')
+
+    @stage('winreward')
+    def stage_winreward(self):
+        launch_win_reward(self._results['winner'], self._results['loser'])
 
     @stage('draw')
     def stage_draw(self):

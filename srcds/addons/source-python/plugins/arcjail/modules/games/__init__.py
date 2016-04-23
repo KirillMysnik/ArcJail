@@ -633,6 +633,15 @@ class GameEventHandler:
         if self.callback is not None:
             self.callback(self.game_instance, event_data)
 
+    def __eq__(self, other):
+        if not isinstance(other, GameEventHandler):
+            return False
+
+        return (
+            (self.game_instance, self.callback) ==
+            (other.game_instance, other.callback)
+        )
+
 
 def game_internal_event_handler(alias, event):
     def decorator(func):

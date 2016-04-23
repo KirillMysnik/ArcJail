@@ -15,6 +15,7 @@
 
 from random import randint
 
+from players.constants import HitGroup
 from events import event_manager
 
 from controlled_cvars.handlers import int_handler
@@ -155,8 +156,9 @@ class RussianRoulette(CombatGame):
             self._killing_loser = True
 
             player.take_damage(
-                self._settings['health'],
+                self._settings['health'] + 1,
                 attacker_index=opponent.index,
+                hitgroup=HitGroup.HEAD
             )
 
         else:

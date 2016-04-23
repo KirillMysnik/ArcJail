@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>{% block title %}ArcJail{% endblock %}</title>
+		{% for stylesheet in stylesheets %}<link rel="stylesheet" type="text/css" href="/static/css/{{ stylesheet }}.css?{{ auth_token }}" />
+		{% endfor %}
+		{% block header_css %}{% endblock %}
+		<script type="application/javascript">
+		    var STEAMID = "{{ steamid }}",
+                AUTH_TOKEN = "{{ auth_token }}",
+                SESSION_ID = "{{ session_id }}",
+                CSRF_TOKEN = "{{ csrf_token }}";
+
+			var APP = {};
+		</script>
+        {% for script in scripts %}<script type="application/javascript" src="/static/js/{{ script }}.js?{{ auth_token }}"></script>
+        {% endfor %}
+		{% block header_js %}{% endblock %}
+	</head>
+	<body>
+		{% block body %}{% endblock %}
+		{% block footer_js %}{% endblock %}
+	</body>
+</html>

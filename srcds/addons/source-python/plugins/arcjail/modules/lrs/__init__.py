@@ -277,6 +277,14 @@ def _launch_game(launcher, players, **kwargs):
     game.set_stage_group('init')
 
 
+def launch_win_reward(winner, loser):
+    from .win_reward import WinReward
+
+    game = WinReward((winner, loser), winner=winner, loser=loser)
+    add_instance(game)
+    game.set_stage_group('init')
+
+
 def _rebel_filter(player):
     for game_instance in _game_instances:
         if game_instance.status != LastRequestGameStatus.IN_PROGRESS:

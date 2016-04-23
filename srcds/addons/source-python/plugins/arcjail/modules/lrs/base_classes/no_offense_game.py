@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ...damage_hook import protected_player_manager
+from ...damage_hook import get_hook, protected_player_manager
 
 from .. import stage
 
@@ -47,7 +47,7 @@ class NoOffenseGame(JailGame):
             p_player = protected_player_manager[player.index]
 
             counter = self._counters[player.userid] = p_player.new_counter()
-            counter.hook_hurt = lambda counter, info: False
+            counter.hook_hurt = get_hook('SW')
 
             p_player.set_protected()
 

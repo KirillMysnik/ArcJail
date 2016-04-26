@@ -167,6 +167,8 @@ class MapData:
     stashes = []
     ct_zones = []
 
+    shop_windows = []
+
     @classmethod
     def reset(cls):
         cls.settings = {}
@@ -182,6 +184,8 @@ class MapData:
         cls.armories = []
         cls.stashes = []
         cls.ct_zones = []
+
+        cls.shop_windows = []
 
     @classmethod
     def destroy_connections(cls):
@@ -366,6 +370,11 @@ def reload_map_info():
         if section_name == 'jails':
             for jail_name in section:
                 MapData.jails.append(jail_name)
+            continue
+
+        if section_name == 'shop_windows':
+            MapData.shop_windows.extend(section)
+            continue
 
     # TODO: Add map_strings
 
@@ -373,6 +382,10 @@ def reload_map_info():
 def reload_map_scripts():
     # TODO
     pass
+
+
+def is_shop_window(entity):
+    return entity.get_key_value_int('hammerid') in MapData.shop_windows
 
 
 def is_point_in_area(point, area):

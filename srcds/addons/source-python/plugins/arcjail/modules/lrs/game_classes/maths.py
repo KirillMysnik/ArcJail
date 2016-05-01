@@ -15,7 +15,7 @@
 
 from random import randint
 
-from ....resource.strings import build_module_strings
+from ...games.maths import strings_module as strings_games
 
 from ..base_classes.chat_game import ChatGame
 
@@ -27,13 +27,11 @@ MAX_OPERATIONS = 4
 MIN_SUMMAND_VALUE = 0
 MAX_SUMMAND_VALUE = 50
 
-strings_module = build_module_strings('lrs/maths')
-
 
 class Maths(ChatGame):
-    caption = strings_module['title']
+    caption = strings_games['title']
     rules = [
-        strings_module['rules 1'],
+        strings_games['rules 1'],
     ]
 
     @stage('chatgame-generate-test')
@@ -56,7 +54,7 @@ class Maths(ChatGame):
 
         self._game_data['expr'] = expr
         self._game_data['answer'] = str(answer)
-        self._question = strings_module['question'].tokenize(expr=expr)
+        self._question = strings_games['question'].tokenize(expr=expr)
 
     def answer_accepted(self, player, message):
         if message != self._game_data['answer']:

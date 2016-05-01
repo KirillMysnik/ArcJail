@@ -33,8 +33,8 @@ from .. import (
 from .player_preserving import PlayerPreserving
 
 
-config_manager = build_module_config('lrs/chat_game')
-strings_module = build_module_strings('lrs/chat_game')
+config_manager = build_module_config('games/chat_game')
+strings_module = build_module_strings('games/chat_game')
 
 config_manager.controlled_cvar(
     float_handler,

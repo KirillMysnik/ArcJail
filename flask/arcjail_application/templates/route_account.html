@@ -1,0 +1,15 @@
+{% extends "main.html" %}
+
+{% block main %}
+    <h1>YOUR ACCOUNT</h1>
+    <div class="content">
+        Your account: <span id="current-account" class="credits"></span>
+    </div>
+{% endblock %}
+
+{% block footer_js %}
+    <script type="text/javascript">
+        var motdPlayer = new MOTDPlayer("{{ server_id }}", "arcjail", "account", STEAMID, AUTH_TOKEN, SESSION_ID);
+        var account = new APP['account'](motdPlayer);
+    </script>
+{% endblock %}

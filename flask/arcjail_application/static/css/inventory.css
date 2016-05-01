@@ -1,0 +1,85 @@
+.items-container {
+    width: 450px;
+    min-height: 350px;
+    margin: 15px;
+    background-color: #262626;
+}
+
+.item-container {
+    position: relative;
+    float: left;
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    box-shadow: 0 0 2px #000000;
+    background-color: #C0C0C0;
+    cursor: pointer;
+}
+
+.item-container.cannot-buy, .inventory-container.cannot-use {
+    background-color: #C30013;
+}
+
+.item-container .price-tag {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: inline-block;
+    font-size: 7pt;
+    font-weight: bold;
+    text-shadow: 0 0 2px #000;
+    color: #fff;
+    background-color: #00FF00;
+}
+
+.item-container .price-tag.too-expensive {
+    background-color: #FF0033;
+}
+
+.item-container:hover .price-tag {
+    display: none;
+}
+
+.item-stats {
+    display: none;
+    z-index: 5;
+    position: fixed;
+    width: 250px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgba(51, 55, 61, .85);
+    color: #fff;
+}
+
+.item-stats.visible {
+    display: block;
+}
+
+.item-stats .name {
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+.item-stats .description {
+    font-size: 10pt;
+    color: #FFBFEF;
+}
+
+.item-stats .price {
+    color: #00FF00;
+}
+
+.item-stats .cannot-buy-reason, .item-stats .cannot-use-reason {
+    font-weight: bold;
+    color: #C30013;
+}
+
+.item-stats ul {
+    font-size: 10pt;
+    list-style-type: none;
+    border: 1px solid #fff;
+}
+
+.item-stats ul li {
+    padding: 2px 5px;
+}

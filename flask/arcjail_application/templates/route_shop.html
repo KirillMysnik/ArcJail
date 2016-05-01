@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+
+{% block main %}
+    <div id="item-stats" class="item-stats"></div>
+    <h1>!Shop - SMUGGLING STUFF SINCE 2016</h1>
+    <div class="content">
+        Your account: <span id="current-account" class="credits"></span><br />
+        <div id="items-container" class="items-container">
+
+        </div>
+        <div id="inventory-container" class="items-container">
+
+        </div>
+        <div class="clear"></div>
+    </div>
+{% endblock %}
+
+{% block footer_js %}
+    <script type="text/javascript">
+        var motdPlayer = new MOTDPlayer("{{ server_id }}", "arcjail", "shop", STEAMID, AUTH_TOKEN, SESSION_ID);
+        var shop = new APP['shop'](motdPlayer);
+    </script>
+{% endblock %}

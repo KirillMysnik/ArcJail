@@ -24,7 +24,7 @@ APP['shop'] = function (motdPlayer) {
 
                 var itemContainer = nodes['items-container'].appendChild(document.createElement('div'));
                 itemContainer.classList.add('item-container');
-                itemContainer.style.backgroundImage = 'url("/static/img/items/' + item.icon + '")';
+                itemContainer.style.backgroundImage = 'url("/static/arcjail/img/items/' + item.icon + '")';
 
                 var priceTag = itemContainer.appendChild(document.createElement('div'));
                 priceTag.classList.add('price-tag');
@@ -128,7 +128,7 @@ APP['shop'] = function (motdPlayer) {
 
                 var itemContainer = nodes['inventory-container'].appendChild(document.createElement('div'));
                 itemContainer.classList.add('item-container');
-                itemContainer.style.backgroundImage = 'url("/static/img/items/' + item.icon + '")';
+                itemContainer.style.backgroundImage = 'url("/static/arcjail/img/items/' + item.icon + '")';
 
                 var canUse = true;
 

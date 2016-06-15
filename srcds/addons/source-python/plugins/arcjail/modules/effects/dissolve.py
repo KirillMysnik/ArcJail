@@ -21,11 +21,11 @@ from memory import Convention, DataType, find_binary, NULL
 if PLATFORM == 'windows':
     DISSOLVE_IDENTIFIER = b'\x55\x8B\xEC\x80\x7D\x10\x00\x56\x57\x8B\xF1\x74\x14'
 else:
-    DISSOLVE_IDENTIFIER = None
+    DISSOLVE_IDENTIFIER = "_ZN14CBaseAnimating8DissolveEPKcfbi6Vectori"
 
 server = find_binary('server')
 
-DISSOLVE = server[DISSOLVE_IDENTIFIER].make_function(
+dissolve_srv = server[DISSOLVE_IDENTIFIER].make_function(
     Convention.THISCALL,
     (
         DataType.POINTER,
@@ -41,7 +41,7 @@ DISSOLVE = server[DISSOLVE_IDENTIFIER].make_function(
 
 
 def dissolve(entity, type_=0):
-    DISSOLVE(
+    dissolve_srv(
         entity.pointer, NULL,
         global_vars.current_time,
         False, type_, entity.origin, 2

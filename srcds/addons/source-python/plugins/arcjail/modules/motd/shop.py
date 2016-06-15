@@ -30,7 +30,7 @@ def send_page(player):
 
     arcjail_user = arcjail_user_manager[player.index]
     if not arcjail_user.loaded:
-        tell(player, strings_arcjail['not synced'])
+        tell(player, strings_arcjail['not_synced'])
         return
 
     def shop_callback(data, error):

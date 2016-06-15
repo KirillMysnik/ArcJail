@@ -52,7 +52,7 @@ class ArcjailUser:
 
         if db_arcoin_user is not None:
             self.account = db_arcoin_user.account
-            self.slot_data.update = loads(db_arcoin_user.slot_data)
+            self.slot_data.update(loads(db_arcoin_user.slot_data))
 
         self._loaded = True
 
@@ -158,4 +158,3 @@ def server_arcjail_add_credits(command):
     arcjail_user.account += credits
     echo_console("Added {} credits to {}'s account".format(
         credits, arcjail_user.player.name))
-

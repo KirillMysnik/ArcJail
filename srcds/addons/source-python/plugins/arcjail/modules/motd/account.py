@@ -27,7 +27,7 @@ from . import plugin_instance
 def send_page(player):
     arcjail_user = arcjail_user_manager[player.index]
     if not arcjail_user.loaded:
-        tell(player, strings_arcoins['not synced'])
+        tell(player, strings_arcoins['not_synced'])
         return
 
     def account_callback(data, error):

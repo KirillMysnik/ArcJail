@@ -16,20 +16,31 @@
 import os
 
 from colors import Color
+from core import GAME_NAME
 
 from advanced_ts import BaseLangStrings
 
 from ..info import info
 
 
-# Map color variables in translation files to actual Color instances
-COLOR_SCHEME = {
-    'color_tag': Color(242, 242, 242),
-    'color_highlight': Color(255, 137, 0),
-    'color_default': Color(242, 242, 242),
-    'color_error': Color(255, 54, 54),
-    'color_warning': Color(255, 54, 54),
-}
+if GAME_NAME in ('csgo', ):
+    COLOR_SCHEME = {
+        'color_tag': "\x01",
+        'color_highlight': "\x10",
+        'color_default': "\x01",
+        'color_error': "\x02",
+        'color_warning': "\x02",
+    }
+
+else:
+    # Map color variables in translation files to actual Color instances
+    COLOR_SCHEME = {
+        'color_tag': Color(242, 242, 242),
+        'color_highlight': Color(255, 137, 0),
+        'color_default': Color(242, 242, 242),
+        'color_error': Color(255, 54, 54),
+        'color_warning': Color(255, 54, 54),
+    }
 
 
 strings_common = BaseLangStrings(os.path.join(info.basename, "common"))

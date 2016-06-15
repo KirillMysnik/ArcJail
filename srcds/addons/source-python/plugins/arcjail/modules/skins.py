@@ -45,7 +45,7 @@ with open(ARCJAIL_CFG_PATH / "other" / "skins-precache.res") as f:
         _precache[line] = Model(line)
 
 
-config_manager = build_module_config('rebels')
+config_manager = build_module_config('skins')
 
 
 config_manager.controlled_cvar(

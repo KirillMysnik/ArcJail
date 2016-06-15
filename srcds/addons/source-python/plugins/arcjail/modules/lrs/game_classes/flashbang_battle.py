@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from effects import temp_entities
+from effects.base import TempEntity
 from engines.precache import Model
 from entities.entity import Entity
 from entities.helpers import index_from_inthandle
@@ -118,21 +118,18 @@ class FlashbangBattle(CombatGame):
         if owner_index not in (self.prisoner.index, self.guard.index):
             return
 
-        temp_entities.beam_follow(
-            RecipientFilter(*[player.index for player in self._players]),
-            0,                  # Delay
-            index,              # Entity index
-            BEAM_MODEL.index,   # Model index
-            BEAM_MODEL.index,   # Halo index
-            1,                  # Life
-            3,                  # Width
-            3,                  # EndWidth
-            1,                  # FadeLength
-            255,                # R
-            255,                # G
-            255,                # B
-            150                 # A
-        )
+        temp_entity = TempEntity('BeamFollow')
+        temp_entity.entity_index = index
+        temp_entity.model_index = BEAM_MODEL.index
+        temp_entity.halo_index = BEAM_MODEL.index
+        temp_entity.life_time = 1
+        temp_entity.start_width = 3
+        temp_entity.end_width = 3
+        temp_entity.fade_length = 1
+        temp_entity.red = 255
+        temp_entity.green = 255
+        temp_entity.blue  = 255
+        temp_entity.alpha = 150
 
 add_available_game(FlashbangBattle)
 

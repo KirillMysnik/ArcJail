@@ -100,13 +100,6 @@ def build_survival_base(*parent_classes):
 
         @stage('survival-equip-damage-hooks')
         def stage_survival_equip_damage_hooks(self):
-            def hook_on_death(counter, game_event):
-                player = counter.owner.player
-                saved_player = saved_player_manager[player.index]
-                saved_player.strip()
-
-                return True
-
             def hook_min_damage(counter, info):
                 min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
                 return info.damage >= min_damage
@@ -122,7 +115,6 @@ def build_survival_base(*parent_classes):
                         display=strings_damage_hook['health against_guards'])
 
                     counter1.hook_hurt = get_hook('G')
-                    counter1.hook_death = hook_on_death
 
                     counter2 = p_player.new_counter(
                         display=strings_damage_hook['health game'])
@@ -140,7 +132,6 @@ def build_survival_base(*parent_classes):
                         counter2.hook_hurt = get_hook(
                             '', next_hook=hook_min_damage)
 
-                    counter2.hook_death = hook_on_death
                     counter2.health = self.map_data['INITIAL_HEALTH']
 
                     self._counters[player.userid].append(counter1)
@@ -193,6 +184,17 @@ def build_survival_base(*parent_classes):
 
             if not self.leader.dead and self.leader not in self._players:
                 falldmg_protect(self.leader, self.map_data)
+
+        @game_event_handler('survival-player-death', 'player_death')
+        def event_survival_player_death(self, game_event):
+            player = main_player_manager.get_by_userid(
+                game_event.get_int('userid'))
+
+            if player not in self._players_all:
+                return
+
+            saved_player = saved_player_manager[player.index]
+            saved_player.strip()
 
     return SurvivalBase
 
@@ -419,13 +421,6 @@ class SurvivalTeamBasedFriendlyFire(
             min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
             return info.damage >= min_damage
 
-        def hook_on_death(counter, game_event):
-            player = counter.owner.player
-            saved_player = saved_player_manager[player.index]
-            saved_player.strip()
-
-            return True
-
         def hook_enemy_p(counter, info):
             """
             Damage done by:
@@ -531,7 +526,6 @@ class SurvivalTeamBasedFriendlyFire(
                     display=strings_damage_hook['health against_guards'])
 
                 counter1.hook_hurt = get_hook('G')
-                counter1.hook_death = hook_on_death
 
                 counter2 = p_player.new_counter(
                     display=strings_damage_hook['health game'])
@@ -548,7 +542,6 @@ class SurvivalTeamBasedFriendlyFire(
                     else:
                         counter2.hook_hurt = hook_game_p
 
-                counter2.hook_death = hook_on_death
                 counter2.health = self.map_data['INITIAL_HEALTH']
 
                 self._counters[player.userid].append(counter1)
@@ -591,13 +584,6 @@ class SurvivalPlayerBasedFriendlyFire(
             min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
             return info.damage >= min_damage
 
-        def hook_on_death(counter, game_event):
-            player = counter.owner.player
-            saved_player = saved_player_manager[player.index]
-            saved_player.strip()
-
-            return True
-
         def hook_enemy_p(counter, info):
             victim = counter.owner.player
 
@@ -639,7 +625,6 @@ class SurvivalPlayerBasedFriendlyFire(
                     display=strings_damage_hook['health against_guards'])
 
                 counter1.hook_hurt = get_hook('G')
-                counter1.hook_death = hook_on_death
 
                 counter2 = p_player.new_counter(
                     display=strings_damage_hook['health game'])
@@ -650,7 +635,6 @@ class SurvivalPlayerBasedFriendlyFire(
                 else:
                     counter2.hook_hurt = hook_enemy_p
 
-                counter2.hook_death = hook_on_death
                 counter2.health = self.map_data['INITIAL_HEALTH']
 
                 self._counters[player.userid].append(counter1)

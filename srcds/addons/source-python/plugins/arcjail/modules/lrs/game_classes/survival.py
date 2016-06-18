@@ -93,11 +93,6 @@ def build_survival_base(*parent_classes):
 
                 return False
 
-            def hook_death_for_prisoner(counter, game_event):
-                saved_player = saved_player_manager[self.prisoner.index]
-                saved_player.strip()
-                return True
-
             def hook_hurt_for_guard(counter, info):
                 min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
 
@@ -107,14 +102,8 @@ def build_survival_base(*parent_classes):
 
                 return False
 
-            def hook_death_for_guard(counter, game_event):
-                saved_player = saved_player_manager[self.guard.index]
-                saved_player.strip()
-                return True
-
-            for hook_hurt, hook_death, player in zip(
+            for hook_hurt, player in zip(
                     (hook_hurt_for_prisoner, hook_hurt_for_guard),
-                    (hook_death_for_prisoner, hook_death_for_guard),
                     self._players
             ):
 
@@ -133,7 +122,6 @@ def build_survival_base(*parent_classes):
 
                     counter.hook_hurt = get_hook('', next_hook=hook_hurt)
 
-                counter.hook_death = hook_death
                 counter.health = self.map_data['INITIAL_HEALTH']
 
                 self._counters[player.userid] = [counter, ]
@@ -171,6 +159,17 @@ def build_survival_base(*parent_classes):
             self._results['loser'] = loser
 
             self.set_stage_group('win')
+
+        @game_event_handler('survival-player-death', 'player_death')
+        def event_survival_player_death(self, game_event):
+            player = main_player_manager.get_by_userid(
+                game_event.get_int('userid'))
+
+            if player not in self._players:
+                return
+
+            saved_player = saved_player_manager[player.index]
+            saved_player.strip()
 
         @push(None, 'end_game')
         def push_end_game(self, args):
@@ -228,12 +227,6 @@ def build_survival_friendlyfire_base(*parent_classes):
             for player in self._players:
                 p_player = protected_player_manager[player.index]
 
-                def hook_on_death(counter, game_event, player=player):
-                    saved_player = saved_player_manager[player.index]
-                    saved_player.strip()
-
-                    return True
-
                 def hook_min_damage(counter, info, player=player):
                     min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
 
@@ -277,7 +270,6 @@ def build_survival_friendlyfire_base(*parent_classes):
                 else:
                     counter.hook_hurt = hook_game_p
 
-                counter.hook_death = hook_on_death
                 counter.health = self.map_data['INITIAL_HEALTH']
 
                 self._counters[player.userid] = [counter, ]

@@ -7,6 +7,7 @@ materials/models/player/arcjail/regular/t_leet_normal.vtf
 models/player/arcjail/regular/regular.dx80.vtx
 models/player/arcjail/regular/regular.dx90.vtx
 models/player/arcjail/regular/regular.mdl
+models/player/arcjail/regular/regular.phy
 models/player/arcjail/regular/regular.sw.vtx
 models/player/arcjail/regular/regular.vvd
 materials/models/player/arcjail/rebel/t_leet.vmt
@@ -18,6 +19,7 @@ materials/models/player/arcjail/rebel/t_leet_normal.vtf
 models/player/arcjail/rebel/rebel.dx80.vtx
 models/player/arcjail/rebel/rebel.dx90.vtx
 models/player/arcjail/rebel/rebel.mdl
+models/player/arcjail/rebel/rebel.phy
 models/player/arcjail/rebel/rebel.sw.vtx
 models/player/arcjail/rebel/rebel.vvd
 materials/models/player/arcjail/team_alpha/t_leet.vmt
@@ -29,6 +31,7 @@ materials/models/player/arcjail/team_alpha/t_leet_normal.vtf
 models/player/arcjail/team_alpha/team_alpha.dx80.vtx
 models/player/arcjail/team_alpha/team_alpha.dx90.vtx
 models/player/arcjail/team_alpha/team_alpha.mdl
+models/player/arcjail/team_alpha/team_alpha.phy
 models/player/arcjail/team_alpha/team_alpha.sw.vtx
 models/player/arcjail/team_alpha/team_alpha.vvd
 materials/models/player/arcjail/team_bravo/t_leet.vmt
@@ -40,6 +43,7 @@ materials/models/player/arcjail/team_bravo/t_leet_normal.vtf
 models/player/arcjail/team_bravo/team_bravo.dx80.vtx
 models/player/arcjail/team_bravo/team_bravo.dx90.vtx
 models/player/arcjail/team_bravo/team_bravo.mdl
+models/player/arcjail/team_bravo/team_bravo.phy
 models/player/arcjail/team_bravo/team_bravo.sw.vtx
 models/player/arcjail/team_bravo/team_bravo.vvd
 materials/models/player/arcjail/team_charlie/t_leet.vmt
@@ -51,6 +55,7 @@ materials/models/player/arcjail/team_charlie/t_leet_normal.vtf
 models/player/arcjail/team_charlie/team_charlie.dx80.vtx
 models/player/arcjail/team_charlie/team_charlie.dx90.vtx
 models/player/arcjail/team_charlie/team_charlie.mdl
+models/player/arcjail/team_charlie/team_charlie.phy
 models/player/arcjail/team_charlie/team_charlie.sw.vtx
 models/player/arcjail/team_charlie/team_charlie.vvd
 materials/models/player/arcjail/team_delta/t_leet.vmt
@@ -62,5 +67,6 @@ materials/models/player/arcjail/team_delta/t_leet_normal.vtf
 models/player/arcjail/team_delta/team_delta.dx80.vtx
 models/player/arcjail/team_delta/team_delta.dx90.vtx
 models/player/arcjail/team_delta/team_delta.mdl
+models/player/arcjail/team_delta/team_delta.phy
 models/player/arcjail/team_delta/team_delta.sw.vtx
 models/player/arcjail/team_delta/team_delta.vvd

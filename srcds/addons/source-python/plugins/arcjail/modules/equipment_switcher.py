@@ -78,7 +78,8 @@ class SavedPlayer:
                 'ammo': None,
                 'subtype': None,
             }
-            if weapon.ammoprop > -1:
+            weapon_class = weapon_manager[weapon.classname]
+            if weapon_class.ammoprop is not None:
                 weapon_dict['ammo'] = self.player.get_ammo(weapon.classname)
 
             weapon_dict['clip'] = weapon.clip

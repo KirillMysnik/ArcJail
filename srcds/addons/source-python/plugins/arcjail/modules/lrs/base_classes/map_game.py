@@ -18,9 +18,8 @@ from random import shuffle
 
 from cvars import ConVar
 from entities.constants import INVALID_ENTITY_INDEX
+from entities.entity import Entity
 from entities.helpers import edict_from_index
-
-from ....arcjail import InternalEvent
 
 from ...games import Push
 from ...games.base_classes.map_game import DEFAULT_GRAVITY
@@ -138,13 +137,13 @@ class MapGame(PrepareTime):
     @stage('mapgame-swap-guard')
     def stage_mapgame_swap_guard(self):
         lock_teams()
-        self.guard.set_property_int('m_iTeamNum', PRISONERS_TEAM)
+        Entity(self.guard.index).team = PRISONERS_TEAM
 
     @stage('undo-mapgame-swap-guard')
     def stage_undo_mapgame_swap_guard(self):
+        # TODO: Is this the correct way to check if player is connected?
         if self.guard.index != INVALID_ENTITY_INDEX:
-            # TODO: Is this the correct way to check if player is connected?
-            self.guard.set_property_int('m_iTeamNum', GUARDS_TEAM)
+            Entity(self.guard.index).team = GUARDS_TEAM
 
         unlock_teams()
 

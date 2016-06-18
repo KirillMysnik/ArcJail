@@ -16,6 +16,7 @@
 from events import Event
 from filters.players import PlayerIter
 from menus import PagedMenu, PagedOption
+from players.constants import LifeState
 
 from controlled_cvars.handlers import bool_handler
 
@@ -58,8 +59,8 @@ _popups = {}
 
 
 def respawn(player):
-    player.set_property_int('m_iPlayerState', 0)
-    player.set_property_int('m_lifeState', 512)
+    player.player_state = 0    # TODO: Change to PlayerStates.CLIENT?
+    player.life_state = LifeState.ALIVE
     player.spawn()
 
 

@@ -22,6 +22,6 @@ def init(app_, db_):
 
     from motdplayer.plugin_instance import PluginInstance
 
-    plugin_instance = PluginInstance(app, config.get('server', 'id'), 'arcrpg')
+    plugin_instance = PluginInstance(app, config.get('server', 'id'), 'arcjail')
 
     import views

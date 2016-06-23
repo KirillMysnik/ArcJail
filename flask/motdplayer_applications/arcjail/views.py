@@ -29,11 +29,11 @@ def route_account(steamid, auth_method, auth_token, session_id):
         'auth_token': auth_token,
         'session_id': session_id,
     }
-    return render_template('route_account.html', **context)
+    return render_template('arcjail/route_account.html', **context)
 
 
 @plugin_instance.json_authed_request('json-account')
-def route_json_accout(data_exchanger, json_data):
+def route_json_account(data_exchanger, json_data):
     if json_data['action'] != "init":
         return None
 
@@ -53,7 +53,7 @@ def route_shop(steamid, auth_method, auth_token, session_id):
         'auth_token': auth_token,
         'session_id': session_id,
     }
-    return render_template('route_shop.html', **context)
+    return render_template('arcjail/route_shop.html', **context)
 
 
 @plugin_instance.json_authed_request('json-shop')

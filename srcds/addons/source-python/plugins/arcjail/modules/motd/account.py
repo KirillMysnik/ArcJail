@@ -20,7 +20,6 @@ from ..arcjail.arcjail_user import arcjail_user_manager
 
 from ..players import main_player_manager, tell
 
-
 from . import plugin_instance
 
 

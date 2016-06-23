@@ -157,11 +157,6 @@ class Shot4Shot(CombatGame):
 
                     return True
 
-            def hook_death(counter, info, player=player, opponent=opponent):
-                saved_player = saved_player_manager[player.index]
-                saved_player.strip()
-                return True
-
             p_player = protected_player_manager[player.index]
 
             counter = self._counters[player.userid] = p_player.new_counter(
@@ -169,7 +164,6 @@ class Shot4Shot(CombatGame):
 
             counter.health = self._settings.get('health', 100)
             counter.hook_hurt = hook_hurt
-            counter.hook_death = hook_death
 
             p_player.set_protected()
 

@@ -184,11 +184,6 @@ class CombatGame(PrepareTime):
 
             return True
 
-        def hook_death_for_prisoner(counter, game_event):
-            saved_player = saved_player_manager[self.prisoner.index]
-            saved_player.strip()
-            return True
-
         def hook_hurt_for_guard(counter, info):
             if info.attacker != self.prisoner.index:
                 return False
@@ -199,14 +194,8 @@ class CombatGame(PrepareTime):
 
             return True
 
-        def hook_death_for_guard(counter, game_event):
-            saved_player = saved_player_manager[self.guard.index]
-            saved_player.strip()
-            return True
-
-        for hook_hurt, hook_death, player in zip(
+        for hook_hurt, player in zip(
                 (hook_hurt_for_prisoner, hook_hurt_for_guard),
-                (hook_death_for_prisoner, hook_death_for_guard),
                 self._players
         ):
 
@@ -217,7 +206,6 @@ class CombatGame(PrepareTime):
 
             counter.health = self._settings.get('health', 100)
             counter.hook_hurt = hook_hurt
-            counter.hook_death = hook_death
 
             p_player.set_protected()
 
@@ -235,6 +223,9 @@ class CombatGame(PrepareTime):
 
         if player not in self._players:
             return
+
+        saved_player = saved_player_manager[player.index]
+        saved_player.strip()
 
         if player == self.prisoner:
             winner, loser = self.guard, self.prisoner

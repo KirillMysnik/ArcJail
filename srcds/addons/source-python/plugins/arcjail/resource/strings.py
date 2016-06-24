@@ -30,6 +30,7 @@ if GAME_NAME in ('csgo', ):
         'color_default': "\x01",
         'color_error': "\x02",
         'color_warning': "\x02",
+        'color_credits': "\x04",
     }
 
 else:
@@ -40,6 +41,7 @@ else:
         'color_default': Color(242, 242, 242),
         'color_error': Color(255, 54, 54),
         'color_warning': Color(255, 54, 54),
+        'color_credits': Color(0, 220, 55),
     }
 
 

@@ -128,6 +128,6 @@ class WinReward(JailGame):
         winner, loser = self._results['winner'], self._results['loser']
 
         if player == winner:
-            loser.take_damage(loser.health, attacker_index=winner.index)
+            loser.take_damage(loser.health + 1, attacker_index=winner.index)
 
         self.set_stage_group('destroy')

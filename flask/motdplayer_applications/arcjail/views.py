@@ -66,7 +66,8 @@ def route_json_shop(data_exchanger, json_data):
     if json_data['action'] in ("buy", "use"):
         return data_exchanger.exchange({
             'action': json_data['action'],
-            'item_id': json_data['item_id'],
+            'class_id': json_data['class_id'],
+            'instance_id': json_data['instance_id'],
         })
 
     return None

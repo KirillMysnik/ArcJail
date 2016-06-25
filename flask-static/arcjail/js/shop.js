@@ -46,7 +46,8 @@ APP['shop'] = function (motdPlayer) {
                     itemContainer.addEventListener('click', function (e) {
                         motdPlayer.post({
                             action: "buy",
-                            item_id: item.id,
+                            class_id: item.class_id,
+                            instance_id: item.instance_id,
                         }, function (data) {
                             handleResponseData(data);
                         }, function (error) {
@@ -141,7 +142,8 @@ APP['shop'] = function (motdPlayer) {
                     itemContainer.addEventListener('click', function (e) {
                         motdPlayer.post({
                             action: "use",
-                            item_id: item.id,
+                            class_id: item.class_id,
+                            instance_id: item.instance_id,
                         }, function (data) {
                             handleResponseData(data);
                         }, function (error) {

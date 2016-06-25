@@ -13,12 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+from sqlalchemy import Column, Integer, String
 
-from ... import parse_modules
+from ..resource.config import config
+from ..resource.sqlalchemy import Base
 
 
-current_dir = os.path.dirname(__file__)
-__all__ = parse_modules(current_dir)
+class Item(Base):
+    __tablename__ = config['database']['prefix'] + "items"
 
-from . import *
+    id = Column(Integer, primary_key=True)
+    current_owner = Column(String(32))
+
+    class_id = Column(String(32))
+    instance_id = Column(String(32))
+    amount = Column(Integer)
+
+    def __repr__(self):
+        return "<Item({})>".format(self.id)

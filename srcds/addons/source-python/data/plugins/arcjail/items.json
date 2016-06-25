@@ -1,0 +1,66 @@
+{
+  "weapon_with_delivery": {
+    "glock": {
+      "caption": "title glock",
+      "description": "description glock",
+      "icon": "pistol-delivered.png",
+      "max_per_slot": 1,
+      "price": 5000,
+      "entity_to_give": "weapon_glock"
+    },
+    "grenade": {
+      "caption": "title hegrenade",
+      "description": "description hegrenade",
+      "icon": "grenade-delivered.png",
+      "max_per_slot": 1,
+      "price": 2500,
+      "entity_to_give": "weapon_hegrenade"
+    }
+  },
+  "weapon_instant": {
+    "glock": {
+      "caption": "title glock",
+      "description": "description glock",
+      "icon": "pistol.png",
+      "max_per_slot": 1,
+      "price": 2500,
+      "entity_to_give": "weapon_glock",
+      "max_sold_per_round": 10
+    },
+    "grenade": {
+      "caption": "title hegrenade",
+      "description": "description hegrenade",
+      "icon": "grenade.png",
+      "max_per_slot": 1,
+      "price": 1750,
+      "entity_to_give": "weapon_hegrenade",
+      "max_sold_per_round": 10
+    }
+  },
+  "disposable_prop": {
+    "barrel": {
+      "caption": "title barrel",
+      "description": "description barrel",
+      "icon": "prop-barrel.png",
+      "max_per_slot": 5,
+      "price": 150,
+      "entity_classname": "prop_physics",
+      "model_path": "models/props_c17/oildrum001.mdl",
+      "z_offset": 24,
+      "skin_min": 0,
+      "skin_max": 5
+    },
+    "bicycle": {
+      "caption": "title bicycle",
+      "description": "description bicycle",
+      "icon": "bicycle.png",
+      "max_per_slot": 5,
+      "price": 150,
+      "entity_classname": "prop_physics",
+      "model_path": "models/props_junk/bicycle01a.mdl",
+      "z_offset": 24,
+      "skin_min": 0,
+      "skin_max": 2
+    }
+  }
+}

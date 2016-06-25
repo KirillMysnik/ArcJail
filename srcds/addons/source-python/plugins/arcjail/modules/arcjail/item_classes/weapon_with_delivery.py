@@ -15,38 +15,31 @@
 
 from ....arcjail import InternalEvent
 
-from ....resource.strings import build_module_strings
-
 from ...teams import PRISONERS_TEAM
 
-from ..base_classes.base_item import BaseItem
+from ..item_instance import BaseItemInstance
 
-from .. import (
-    get_player_item, items_json, register_item_class, take_item_from_player)
-
-
-ITEM_ID = "sidearm_with_delivery"
+from . import register_item_instance_class
 
 
-strings_module = build_module_strings('shop/items/sidearm_with_delivery')
-
-
-class SidearmWithDelivery(BaseItem):
-    id = ITEM_ID
-    caption = strings_module['title']
-    description = strings_module['description']
-    icon = "pistol-delivered.png"
-    max_per_slot = 1
+class WeaponWithDelivery(BaseItemInstance):
     team_restriction = (PRISONERS_TEAM, )
-    price = items_json[ITEM_ID]['price']
 
-register_item_class(SidearmWithDelivery)
+register_item_instance_class('weapon_with_delivery', WeaponWithDelivery)
 
 
 @InternalEvent("player_respawn")
 def on_player_respawn(event_var):
-    player = event_var['player']
+    from ..arcjail_user import arcjail_user_manager
 
-    if get_player_item(player, ITEM_ID) is not None:
-        take_item_from_player(player, ITEM_ID)
-        player.give_named_item(items_json[ITEM_ID]['entity_to_give'], 0)
+    player = event_var['player']
+    if player.team not in WeaponWithDelivery.team_restriction:
+        return
+
+    arcjail_user = arcjail_user_manager[player.index]
+
+    for item in arcjail_user.iter_items_by_class_id('weapon_with_delivery'):
+        arcjail_user.take_item(item, amount=1, async=True)
+
+        # TODO: Adjust give_named_item to CS:GO
+        player.give_named_item(item.class_['entity_to_give'], 0)

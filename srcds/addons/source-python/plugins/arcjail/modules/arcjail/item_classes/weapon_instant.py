@@ -12,36 +12,19 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ....resource.strings import build_module_strings
-
 from ...teams import PRISONERS_TEAM
 
-from ..base_classes.base_item import BaseItem
+from ..item_instance import BaseItemInstance
 
-from .. import items_json, register_item_class
-
-
-ITEM_ID = "sidearm_instant"
+from . import register_item_instance_class
 
 
-strings_module = build_module_strings('shop/items/sidearm_instant')
-
-
-class SidearmInstant(BaseItem):
-    id = ITEM_ID
-    caption = strings_module['title']
-    description = strings_module['description']
-    icon = "pistol.png"
-    max_per_slot = 1
+class WeaponInstant(BaseItemInstance):
     auto_activation = True
     team_restriction = (PRISONERS_TEAM, )
-    max_sold_per_round = 10
-    price = items_json[ITEM_ID]['price']
 
-    def activate(self):
-        super().activate()
+    def activate(self, player, amount):
+        player.give_named_item(self['entity_to_give'], 0)
+        return super().activate(player, amount)
 
-        self.player.give_named_item(items_json[ITEM_ID]['entity_to_give'], 0)
-
-
-register_item_class(SidearmInstant)
+register_item_instance_class('weapon_instant', WeaponInstant)

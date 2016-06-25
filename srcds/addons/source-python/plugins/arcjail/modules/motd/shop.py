@@ -17,6 +17,10 @@ from players.helpers import get_client_language
 
 from ..arcjail import strings_module as strings_arcjail
 from ..arcjail.arcjail_user import arcjail_user_manager
+from ..arcjail.item_classes import (
+    get_item_instance, iter_item_instance_classes)
+
+from ..credits import spend_credits
 
 from ..players import tell
 
@@ -24,10 +28,6 @@ from . import plugin_instance
 
 
 def send_page(player):
-    from ..shop import (
-        get_player_item, give_item_to_player, registered_item_classes,
-        take_item_from_player)
-
     arcjail_user = arcjail_user_manager[player.index]
     if not arcjail_user.loaded:
         tell(player, strings_arcjail['not_synced'])
@@ -37,68 +37,106 @@ def send_page(player):
         pass
 
     def json_shop_callback(data, error):
-        from ..shop import get_all_player_items, strings_module as strings_shop
+        from ..shop import config_manager, strings_module as strings_shop
 
         if error is not None:
             return
 
-        if data['action'] == "buy":
-            item_id = data['item_id']
+        language = get_client_language(player.index)
+
+        if data['action'] in ("buy", "use"):
+            class_id = data['class_id']
+            instance_id = data['instance_id']
+
+            item_instance = get_item_instance(class_id, instance_id)
 
             # Is it known item?
-            if item_id not in registered_item_classes:
-                return {}
+            if item_instance is None:
+                return {'error': "APPERR_UNKNOWN_ITEM"}
 
-            # Does player have enough credits to buy it?
-            item_class = registered_item_classes[item_id]
-            if item_class.price > arcjail_user.account:
-                return {}
+            if data['action'] == "buy":
+                # Does player have enough credits to buy it?
+                if item_instance['price'] > arcjail_user.account:
+                    return {'error': "APPERR_TOO_EXPENSIVE"}
 
-            # Maybe players already has too many of these items?
-            item = get_player_item(player, item_id)
-            amount = 0 if item is None else item.amount
+                item = arcjail_user.get_item_by_instance_id(
+                    class_id, instance_id)
 
-            if amount >= item_class.max_per_slot:
-                return {}
+                # Maybe players already has too many of these items?
+                amount = 0 if item is None else item.amount
+                max_per_slot = item_instance.get('max_per_slot', -1)
 
-            # Does player's team fit requirements?
-            if player.team not in item_class.team_restriction:
-                return {}
+                if -1 < max_per_slot <= amount:
+                    return {'error': "APPERR_MAX_PER_SLOT_LIMIT"}
 
-            # Ok, let's sell it
-            arcjail_user.account -= item_class.price
-            item = give_item_to_player(player, item_id)
+                # Does player's team fit requirements?
+                if player.team not in item_instance.team_restriction:
+                    return {'error': "APPERR_WRONG_TEAM"}
 
-            if item_class.auto_activation:
-                item = take_item_from_player(player, item_id)
-                item.activate()
+                # Ok, let's sell it
+                spend_credits(
+                    player,
+                    item_instance['price'],
+                    strings_shop['credits_reason'].tokenize(
+                        item=item_instance.caption.get_string(language),
+                    )
+                )
+
+                item = arcjail_user.give_item(
+                    class_id, instance_id, async=False)
+
+                if config_manager['checkout_sound'] is not None:
+                    config_manager['checkout_sound'].play(player.index)
+
+                if item_instance.auto_activation:
+                    if item_instance.activate(player, item.amount - 1):
+                        arcjail_user.take_item(item, amount=1, async=False)
+
+            elif data['action'] == "use":
+                if not item_instance.manual_activation:
+                    return {'error': "APPERR_NO_MANUAL_ACTIVATION"}
+
+                if player.team not in item_instance.use_team_restriction:
+                    return {'error': "APPERR_WRONG_TEAM"}
+
+                item = arcjail_user.get_item_by_instance_id(
+                    class_id, instance_id)
+
+                if item is None:
+                    return {'error': "APPERR_DOES_NOT_BELONG_TO_PLAYER"}
+
+                if item_instance.activate(player, item.amount - 1):
+                    arcjail_user.take_item(item, amount=1, async=False)
 
         shop_items = []
         inventory_items = []
-        language = get_client_language(player.index)
 
         # Shop
-        for item_class in registered_item_classes.values():
+        for item_instance in iter_item_instance_classes():
             item_json = {
-                'id': item_class.id,
-                'caption': item_class.caption.get_string(language),
-                'description': item_class.description.get_string(language),
-                'price': item_class.price,
-                'icon': item_class.icon,
+                'class_id': item_instance.class_id,
+                'instance_id': item_instance.instance_id,
+                'caption': item_instance.caption.get_string(language),
+                'description': item_instance.description.get_string(language),
+                'price': item_instance['price'],
+                'icon': item_instance['icon'],
                 'cannot_buy_reason': None,
             }
 
             # Maybe players already has too many of these items?
-            item = get_player_item(player, item_class.id)
-            amount = 0 if item is None else item.amount
+            item = arcjail_user.get_item_by_instance_id(
+                item_instance.class_id, item_instance.instance_id)
 
-            if amount >= item_class.max_per_slot:
+            amount = 0 if item is None else item.amount
+            max_per_slot = item_instance.get('max_per_slot', -1)
+
+            if -1 < max_per_slot <= amount:
                 item_json['cannot_buy_reason'] = \
                     strings_shop['cannot_buy max_per_slot'].get_string(
                         language)
 
             # Does player's team fit requirements?
-            if player.team not in item_class.team_restriction:
+            if player.team not in item_instance.team_restriction:
                 item_json['cannot_buy_reason'] = \
                     strings_shop['cannot_buy team_restriction'].get_string(
                         language)
@@ -109,10 +147,9 @@ def send_page(player):
                               'stat_manual_activation',
                               'stat_auto_activation',
                               'stat_max_sold_per_round',
-                              'stat_price',
-                              ):
+                              'stat_price'):
 
-                stat = getattr(item_class, stat_name)()
+                stat = getattr(item_instance, stat_name)
                 if stat is None:
                     item_json[stat_name] = None
                 else:
@@ -121,23 +158,24 @@ def send_page(player):
             shop_items.append(item_json)
 
         # Inventory
-        for item in get_all_player_items(player):
+        for item in arcjail_user.iter_all_items():
             item_json = {
-                'id': item.id,
-                'caption': item.caption.get_string(language),
-                'description': item.description.get_string(language),
-                'icon': item.icon,
+                'class_id': item.class_.class_id,
+                'instance_id': item.class_.instance_id,
+                'description': item.class_.description.get_string(language),
+                'icon': item.class_['icon'],
+                'amount': item.amount,
                 'cannot_use_reason': None,
             }
 
             # Does player's team fit requirements?
-            if player.team not in item.team_restriction:
+            if player.team not in item.class_.team_restriction:
                 item_json['cannot_use_reason'] = \
                     strings_shop['cannot_buy team_restriction'].get_string(
                         language)
 
             # Does this item allow manual activation?
-            if not item.manual_activation:
+            if not item.class_.manual_activation:
                 item_json['cannot_use_reason'] = \
                     strings_shop['cannot_use no_manual_activation'].get_string(
                         language)
@@ -148,10 +186,9 @@ def send_page(player):
                               'stat_manual_activation',
                               'stat_auto_activation',
                               'stat_max_sold_per_round',
-                              'stat_price',
-                              ):
+                              'stat_price'):
 
-                stat = getattr(item, stat_name)()
+                stat = getattr(item.class_, stat_name)
                 if stat is None:
                     item_json[stat_name] = None
                 else:

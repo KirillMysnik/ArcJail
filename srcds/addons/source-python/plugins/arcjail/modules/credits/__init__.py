@@ -40,7 +40,9 @@ def earn_credits(player, credits, reason):
     if not arcjail_user.loaded:
         return
 
-    credits_earned_storage[player.index] += credits
+    credits_earned_storage[player.index] = credits_earned_storage.get(
+        player.index, 0) + credits
+
     arcjail_user.account += credits
 
     tell(player, strings_module['credits_earned'],
@@ -52,7 +54,9 @@ def spend_credits(player, credits, reason):
     if not arcjail_user.loaded:
         return
 
-    credits_spent_storage[player.index] += credits
+    credits_spent_storage[player.index] = credits_spent_storage.get(
+        player.index, 0) + credits
+
     arcjail_user.account -= credits
 
     tell(player, strings_module['credits_paid'],

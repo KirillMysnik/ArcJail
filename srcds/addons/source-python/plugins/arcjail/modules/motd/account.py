@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
+from commands.client import ClientCommand
 from commands.say import SayCommand
 
 from ..arcjail import strings_module as strings_arcoins
@@ -54,7 +55,8 @@ def send_page(player):
         player, 'account', account_callback, account_retargeting_callback)
 
 
+@ClientCommand('account')
 @SayCommand('!account')
-def say_account(command, index, team_only):
+def say_account(command, index, team_only=None):
     player = main_player_manager[index]
     send_page(player)

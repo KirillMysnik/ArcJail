@@ -335,6 +335,7 @@ class SurvivalPlayerBased(build_survival_base(MapGame)):
     @stage('survival-end-players-alive')
     def stage_survival_end_players_alive(self):
         self._results['winners'] = self._players[:]
+        self._results['losers'] = ()
         self.set_stage_group('game-end-players-won')
 
     @push(None, 'end_game')

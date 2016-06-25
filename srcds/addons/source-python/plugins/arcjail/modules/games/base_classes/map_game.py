@@ -79,7 +79,6 @@ class MapGame(PrepareTime):
         ],
         'game-end-draw': ['game-end-draw', ],
         'game-end-players-won': ['game-end-players-won', ],
-        'game-end-players-lost': ['game-end-players-lost', ],
     }
 
     class GameLauncher(GameLauncher):

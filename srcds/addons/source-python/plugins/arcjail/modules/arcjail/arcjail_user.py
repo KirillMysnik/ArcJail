@@ -45,6 +45,9 @@ class ArcjailUser:
         return self._loaded
 
     def load_from_database(self):
+        if self.player.steamid == "BOT":
+            return
+
         db_session = Session()
 
         db_arcoin_user = db_session.query(DBArcjailUser).filter_by(
@@ -59,6 +62,9 @@ class ArcjailUser:
         db_session.close()
 
     def save_to_database(self):
+        if self.player.steamid == "BOT":
+            return
+
         if not self._loaded:
             raise RuntimeError("User couldn't be synced with database")
 

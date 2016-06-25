@@ -295,7 +295,7 @@ class MapGameTeamBased(MapGame):
     def stage_game_end_win_team2(self):
         InternalEvent.fire(
             'jail_game_map_game_team_based_winners',
-            winners=self._team1,
+            winners=self._team2,
             num_teams=self.num_teams,
             starting_player_number=self._starting_player_number,
             team_num=2,
@@ -317,7 +317,7 @@ class MapGameTeamBased(MapGame):
     def stage_game_end_win_team3(self):
         InternalEvent.fire(
             'jail_game_map_game_team_based_winners',
-            winners=self._team1,
+            winners=self._team3,
             num_teams=self.num_teams,
             starting_player_number=self._starting_player_number,
             team_num=3,
@@ -339,7 +339,7 @@ class MapGameTeamBased(MapGame):
     def stage_game_end_win_team4(self):
         InternalEvent.fire(
             'jail_game_map_game_team_based_winners',
-            winners=self._team1,
+            winners=self._team4,
             num_teams=self.num_teams,
             starting_player_number=self._starting_player_number,
             team_num=4,

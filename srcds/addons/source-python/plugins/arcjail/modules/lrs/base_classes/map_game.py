@@ -130,7 +130,7 @@ class MapGame(PrepareTime):
         return weapon_classname in self.map_data['ARENA_EQUIPMENT']
 
     @stage('abort-map-cancelled')
-    def stage_abort(self):
+    def stage_abort_map_cancelled(self):
         broadcast(strings_module['abort map_cancelled'])
         self.set_stage_group('destroy')
 

@@ -50,6 +50,16 @@
       "skin_min": 0,
       "skin_max": 5
     },
+    "explosive_barrel": {
+      "caption": "title explosive_barrel",
+      "description": "description explosive_barrel",
+      "icon": "explosive-barrel.png",
+      "max_per_slot": 1,
+      "price": 1000,
+      "entity_classname": "prop_physics",
+      "model_path": "models/props_c17/oildrum001_explosive.mdl",
+      "z_offset": 24
+    },
     "bicycle": {
       "caption": "title bicycle",
       "description": "description bicycle",

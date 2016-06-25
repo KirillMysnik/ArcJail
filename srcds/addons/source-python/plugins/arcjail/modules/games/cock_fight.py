@@ -21,7 +21,7 @@ from listeners.tick import on_tick_listener_manager
 
 from controlled_cvars.handlers import bool_handler, int_handler
 
-from ...arcjail import load_downloadables
+from ...arcjail import InternalEvent, load_downloadables
 
 from ...resource.strings import build_module_strings
 
@@ -113,15 +113,23 @@ class CockFight(PrepareTime):
 
                     if self._score <= current_score:
                         names = []
+                        winners = []
                         for player__ in self._players:
                             if player__ == player_:
                                 continue
 
                             helper_set_winner(player__)
                             names.append(player__.name)
+                            winners.append(player__)
 
                         broadcast(strings_module['players_alive'].tokenize(
                                   players=' '.join(names)))
+
+                        InternalEvent.fire(
+                            'jail_game_cock_fight_winners',
+                            winners=winners,
+                            starting_players_number=self._max_score,
+                        )
 
                         self.set_stage_group('destroy')
 

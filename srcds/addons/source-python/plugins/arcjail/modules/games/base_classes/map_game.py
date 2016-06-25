@@ -42,9 +42,9 @@ from ...rebels import get_rebels
 
 from ...silent_cvars import silent_set
 
-from .. import config_manager, GameLauncher, Push, stage, strings_module
-
-from .jail_game import JailGame
+from .. import (
+    config_manager, format_player_names, GameLauncher, helper_set_loser,
+    helper_set_neutral, helper_set_winner, Push, stage, strings_module)
 
 from .prepare_time import PrepareTime
 
@@ -77,6 +77,9 @@ class MapGame(PrepareTime):
             "mapgame-fire-mapdata-outputs",
             "mapgame-entry",
         ],
+        'game-end-draw': ['game-end-draw', ],
+        'game-end-players-won': ['game-end-players-won', ],
+        'game-end-players-lost': ['game-end-players-lost', ],
     }
 
     class GameLauncher(GameLauncher):
@@ -127,6 +130,9 @@ class MapGame(PrepareTime):
     def __init__(self, leader_player, players, **kwargs):
         super().__init__(leader_player, players, **kwargs)
 
+        self._starting_player_number = len(players)
+        self._results = {}
+
         self._pushes = {}
         self._cvars = {
             'pushscale': 1,
@@ -156,6 +162,41 @@ class MapGame(PrepareTime):
 
         weapon_classname = edict_from_index(weapon_index).classname
         return weapon_classname in self.map_data['ARENA_EQUIPMENT']
+
+    @stage('game-end-draw')
+    def stage_game_end_draw(self):
+        broadcast(strings_module['draw'])
+        self.set_stage_group('destroy')
+
+    @stage('game-end-players-won')
+    def game_end_players_won(self):
+        winners = self._results['winners']
+        losers = self._results['losers']
+
+        InternalEvent.fire(
+            'jail_game_map_game_winners',
+            winners=winners,
+            starting_player_number=self._starting_player_number)
+
+        if winners:
+            broadcast(strings_module['win_players'].tokenize(
+                players=format_player_names(winners)))
+
+        if losers:
+            broadcast(strings_module['lose_players'].tokenize(
+                players=format_player_names(losers)))
+
+        for player in self._players_all:
+            if player in winners:
+                helper_set_winner(player)
+
+            elif player in losers:
+                helper_set_loser(player)
+
+            else:
+                helper_set_neutral(player)
+
+        self.set_stage_group('destroy')
 
     @stage('basegame-entry')
     def stage_basegame_entry(self):

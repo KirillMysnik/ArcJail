@@ -15,6 +15,8 @@
 
 from random import shuffle
 
+from ....arcjail import InternalEvent
+
 from ...jail_map import teleport_player, get_games
 
 from ...player_colors import cancel_color_request, make_color_request
@@ -87,6 +89,8 @@ class MapGameTeamBased(MapGame):
         super().__init__(leader_player, players, **kwargs)
 
         assert TEAM_NUM_MIN <= self.num_teams <= TEAM_NUM_MAX
+
+        self._starting_player_number = len(players)
 
         self._team1 = self.PlayerTeam(1)
         self._team2 = self.PlayerTeam(2)
@@ -267,6 +271,14 @@ class MapGameTeamBased(MapGame):
 
     @stage('game-end-win-team1')
     def stage_game_end_win_team1(self):
+        InternalEvent.fire(
+            'jail_game_map_game_team_based_winners',
+            winners=self._team1,
+            num_teams=self.num_teams,
+            starting_player_number=self._starting_player_number,
+            team_num=1,
+        )
+
         broadcast(strings_module['win_team'].tokenize(
             color=config_manager['team1_color'],
             team=strings_module['team1']
@@ -281,6 +293,14 @@ class MapGameTeamBased(MapGame):
 
     @stage('game-end-win-team2')
     def stage_game_end_win_team2(self):
+        InternalEvent.fire(
+            'jail_game_map_game_team_based_winners',
+            winners=self._team1,
+            num_teams=self.num_teams,
+            starting_player_number=self._starting_player_number,
+            team_num=2,
+        )
+
         broadcast(strings_module['win_team'].tokenize(
             color=config_manager['team2_color'],
             team=strings_module['team2']
@@ -295,6 +315,14 @@ class MapGameTeamBased(MapGame):
 
     @stage('game-end-win-team3')
     def stage_game_end_win_team3(self):
+        InternalEvent.fire(
+            'jail_game_map_game_team_based_winners',
+            winners=self._team1,
+            num_teams=self.num_teams,
+            starting_player_number=self._starting_player_number,
+            team_num=3,
+        )
+
         broadcast(strings_module['win_team'].tokenize(
             color=config_manager['team3_color'],
             team=strings_module['team3']
@@ -309,6 +337,14 @@ class MapGameTeamBased(MapGame):
 
     @stage('game-end-win-team4')
     def stage_game_end_win_team4(self):
+        InternalEvent.fire(
+            'jail_game_map_game_team_based_winners',
+            winners=self._team1,
+            num_teams=self.num_teams,
+            starting_player_number=self._starting_player_number,
+            team_num=4,
+        )
+
         broadcast(strings_module['win_team'].tokenize(
             color=config_manager['team4_color'],
             team=strings_module['team4']

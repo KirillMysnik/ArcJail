@@ -20,6 +20,8 @@ from listeners.tick import Delay
 from controlled_cvars.handlers import (
     bool_handler, float_handler, int_handler, sound_nullable_handler)
 
+from ....arcjail import InternalEvent
+
 from ....resource.strings import build_module_strings
 
 from ...players import broadcast, main_player_manager, tell
@@ -121,6 +123,8 @@ class ChatGame(PlayerPreserving):
     @stage('game-end-player-won')
     def stage_game_end_player_won(self):
         winner = self._results['winner']
+
+        InternalEvent.fire('jail_game_chat_game_winner', winner=winner)
 
         broadcast(strings_games['win_player'].tokenize(player=winner.name))
 

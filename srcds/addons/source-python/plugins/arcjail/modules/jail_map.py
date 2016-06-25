@@ -491,7 +491,7 @@ def get_games(module):
 
 
 def get_lrs(module):
-   return tuple(filter(lambda game: game.module == module,
+    return tuple(filter(lambda game: game.module == module,
                        MapData.lrs.values()))
 
 

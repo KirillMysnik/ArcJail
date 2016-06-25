@@ -25,7 +25,7 @@
       "max_per_slot": 1,
       "price": 2500,
       "entity_to_give": "weapon_glock",
-      "max_sold_per_round": 10
+      "max_sold_per_round": 8
     },
     "grenade": {
       "caption": "title hegrenade",
@@ -34,7 +34,7 @@
       "max_per_slot": 1,
       "price": 1750,
       "entity_to_give": "weapon_hegrenade",
-      "max_sold_per_round": 10
+      "max_sold_per_round": 8
     }
   },
   "disposable_prop": {

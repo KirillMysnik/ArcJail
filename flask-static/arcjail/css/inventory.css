@@ -40,6 +40,17 @@
     display: none;
 }
 
+.item-container .amount {
+    position: absolute;
+    bottom: 0;
+    right: left;
+    display: inline-block;
+    font-size: 7pt;
+    font-weight: bold;
+    color: #fff;
+    background-color: #000;
+}
+
 .item-stats {
     display: none;
     z-index: 5;

@@ -86,8 +86,11 @@ class BaseItemInstance(dict):
     def stat_price(self):
         return strings_module['item_stat price'].tokenize(price=self['price'])
 
-    def activate(self, player, left):
-        tell(player, strings_module['activated'].tokenize(
-            item=self.caption, left=left))
+    def get_purchase_denial_reason(self, player, amount):
+        return None
 
-        return True
+    def try_activate(self, player, amount):
+        tell(player, strings_module['activated'].tokenize(
+            item=self.caption, left=amount))
+
+        return None

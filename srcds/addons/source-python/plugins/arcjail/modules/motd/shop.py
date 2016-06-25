@@ -43,6 +43,7 @@ def send_page(player):
             return
 
         language = get_client_language(player.index)
+        popup_notify = popup_error = None
 
         if data['action'] in ("buy", "use"):
             class_id = data['class_id']
@@ -73,24 +74,34 @@ def send_page(player):
                 if player.team not in item_instance.team_restriction:
                     return {'error': "APPERR_WRONG_TEAM"}
 
-                # Ok, let's sell it
-                spend_credits(
-                    player,
-                    item_instance['price'],
-                    strings_shop['credits_reason'].tokenize(
-                        item=item_instance.caption.get_string(language),
+                # Item-specific checks
+                reason = item_instance.get_purchase_denial_reason(player, 1)
+                if reason is not None:
+                    popup_error = reason
+
+                else:
+                    # Ok, let's sell it
+                    spend_credits(
+                        player,
+                        item_instance['price'],
+                        strings_shop['credits_reason'].tokenize(
+                            item=item_instance.caption.get_string(language),
+                        )
                     )
-                )
 
-                item = arcjail_user.give_item(
-                    class_id, instance_id, async=False)
+                    item = arcjail_user.give_item(
+                        class_id, instance_id, async=False)
 
-                if config_manager['checkout_sound'] is not None:
-                    config_manager['checkout_sound'].play(player.index)
+                    if config_manager['checkout_sound'] is not None:
+                        config_manager['checkout_sound'].play(player.index)
 
-                if item_instance.auto_activation:
-                    if item_instance.activate(player, item.amount - 1):
+                    if item_instance.auto_activation:
+                        item_instance.try_activate(player, item.amount - 1)
                         arcjail_user.take_item(item, amount=1, async=False)
+
+                    popup_notify = strings_shop[
+                        'popup_notify purchased'].tokenize(
+                            caption=item_instance.caption)
 
             elif data['action'] == "use":
                 if not item_instance.manual_activation:
@@ -105,8 +116,16 @@ def send_page(player):
                 if item is None:
                     return {'error': "APPERR_DOES_NOT_BELONG_TO_PLAYER"}
 
-                if item_instance.activate(player, item.amount - 1):
+                reason = item_instance.try_activate(player, item.amount - 1)
+                if reason is not None:
+                    popup_error = reason
+
+                else:
                     arcjail_user.take_item(item, amount=1, async=False)
+
+                    popup_notify = strings_shop[
+                        'popup_notify activated'].tokenize(
+                            caption=item.class_.caption)
 
         shop_items = []
         inventory_items = []
@@ -162,6 +181,7 @@ def send_page(player):
             item_json = {
                 'class_id': item.class_.class_id,
                 'instance_id': item.class_.instance_id,
+                'caption': item.class_.caption.get_string(language),
                 'description': item.class_.description.get_string(language),
                 'icon': item.class_['icon'],
                 'amount': item.amount,
@@ -196,11 +216,19 @@ def send_page(player):
 
             inventory_items.append(item_json)
 
+        if popup_notify is not None:
+            popup_notify = popup_notify.get_string(language)
+
+        if popup_error is not None:
+            popup_error = popup_error.get_string(language)
+
         return {
             'account': arcjail_user.account,
             'account_formatted': "{:,}".format(arcjail_user.account),
             'shop_items': shop_items,
             'inventory_items': inventory_items,
+            'popup_notify': popup_notify,
+            'popup_error': popup_error,
         }
 
     def shop_retargeting_callback(new_page_id):

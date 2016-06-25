@@ -38,7 +38,9 @@ def on_player_respawn(event_var):
 
     arcjail_user = arcjail_user_manager[player.index]
 
-    for item in arcjail_user.iter_items_by_class_id('weapon_with_delivery'):
+    for item in tuple(
+            arcjail_user.iter_items_by_class_id('weapon_with_delivery')):
+
         arcjail_user.take_item(item, amount=1, async=True)
 
         # TODO: Adjust give_named_item to CS:GO

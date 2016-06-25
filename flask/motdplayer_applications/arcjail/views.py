@@ -46,8 +46,8 @@ def route_json_account(data_exchanger, json_data):
 def route_shop(steamid, auth_method, auth_token, session_id):
     context = {
         'server_id': plugin_instance.server_id,
-        'stylesheets': ('motdplayer', 'main', 'inventory', 'shop'),
-        'scripts': ('motdplayer', 'dom', 'shop'),
+        'stylesheets': ('main', 'inventory', 'shop', 'notifications'),
+        'scripts': ('dom', 'shop', 'notifications'),
         'steamid': steamid,
         'auth_method': auth_method,
         'auth_token': auth_token,

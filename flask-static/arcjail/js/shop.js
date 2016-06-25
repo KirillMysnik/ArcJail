@@ -131,6 +131,10 @@ APP['shop'] = function (motdPlayer) {
                 itemContainer.classList.add('item-container');
                 itemContainer.style.backgroundImage = 'url("/static/arcjail/img/items/' + item.icon + '")';
 
+                var amountLabel = itemContainer.appendChild(document.createElement('div'));
+                amountLabel.classList.add('amount');
+                amountLabel.appendChild(document.createTextNode("x" + item.amount));
+
                 var canUse = true;
 
                 if (item['cannot_use_reason']) {
@@ -215,6 +219,12 @@ APP['shop'] = function (motdPlayer) {
     };
 
     var handleResponseData = function (data) {
+        if (data['popup_notify'])
+            popupNotification(data['popup_notify']);
+
+        if (data['popup_error'])
+            popupError(data['popup_error']);
+
         currentAccount = data['account'];
         renderShopItems(data['shop_items']);
         renderInventoryItems(data['inventory_items']);

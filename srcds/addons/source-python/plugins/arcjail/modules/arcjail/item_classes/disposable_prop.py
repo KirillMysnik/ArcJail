@@ -24,8 +24,6 @@ from mathlib import Vector
 
 from ....resource.strings import build_module_strings
 
-from ...players import tell
-
 from ..item_instance import BaseItemInstance
 
 from . import register_item_instance_class
@@ -43,21 +41,18 @@ props_disposed = 0
 class DisposableProp(BaseItemInstance):
     manual_activation = True
 
-    def activate(self, player, amount):
+    def try_activate(self, player, amount):
         global props_disposed
 
-        if props_disposed > MAX_DISPOSED_PROPS_PER_ROUND:
-            tell(player, strings_module['fail too_many'])
-            return False
+        if props_disposed >= MAX_DISPOSED_PROPS_PER_ROUND:
+            return strings_module['fail too_many']
 
         coords = player.get_view_coordinates()
         if coords is None:
-            tell(player, strings_module['fail wrong_place'])
-            return False
+            return strings_module['fail wrong_place']
 
         if coords.get_distance(player.origin) > MAX_TARGET_DISTANCE:
-            tell(player, strings_module['fail too_far'])
-            return False
+            return strings_module['fail too_far']
 
         # TODO: Add game area check
 
@@ -74,9 +69,9 @@ class DisposableProp(BaseItemInstance):
         entity.spawn()
 
         Sound(SPAWN_SOUND_PATH, index=entity.index,
-              attenuation=Attenuation.STATIC)
+              attenuation=Attenuation.STATIC).play()
 
-        return super().activate(player, amount)
+        return super().try_activate(player, amount)
 
 register_item_instance_class('disposable_prop', DisposableProp)
 

@@ -1,0 +1,21 @@
+.popup-notification, .popup-error {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    font-size: 20pt;
+    text-align: center;
+    color: #fff;
+    font-family: "Roboto";
+    padding: 10px 0 10px 0;
+    opacity: 1;
+    transition: opacity 2.5s;
+}
+
+.popup-notification {
+    background-color: rgba(120, 192, 255, .75);
+}
+
+.popup-error {
+    background-color: rgba(255, 40, 60, .75);
+}

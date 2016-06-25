@@ -36,16 +36,24 @@ credits_config.read(CREDITS_CONFIG_FILE)
 
 
 def earn_credits(player, credits, reason):
+    arcjail_user = arcjail_user_manager[player.index]
+    if not arcjail_user.loaded:
+        return
+
     credits_earned_storage[player.index] += credits
-    arcjail_user_manager[player.index].account += credits
+    arcjail_user.account += credits
 
     tell(player, strings_module['credits_earned'],
          credits=credits, reason=reason)
 
 
 def spend_credits(player, credits, reason):
+    arcjail_user = arcjail_user_manager[player.index]
+    if not arcjail_user.loaded:
+        return
+
     credits_spent_storage[player.index] += credits
-    arcjail_user_manager[player.index].account -= credits
+    arcjail_user.account -= credits
 
     tell(player, strings_module['credits_paid'],
          credits=credits, reason=reason)
@@ -70,7 +78,7 @@ def on_round_start(game_event):
 
 @Event('round_end')
 def on_round_end(game_event):
-    for index, credits_earned in credits_earned_storage:
+    for index, credits_earned in credits_earned_storage.items():
         credits_spent = credits_spent_storage[index]
 
         player = main_player_manager[index]

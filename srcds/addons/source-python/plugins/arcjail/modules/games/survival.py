@@ -109,7 +109,7 @@ def build_survival_base(*parent_classes):
                     continue
 
                 p_player = protected_player_manager[player.index]
-                self._counters[player.userid] = []
+                self._counters[player.index] = []
                 if player in self._players:
                     counter1 = p_player.new_counter(
                         display=strings_damage_hook['health against_guards'])
@@ -134,8 +134,8 @@ def build_survival_base(*parent_classes):
 
                     counter2.health = self.map_data['INITIAL_HEALTH']
 
-                    self._counters[player.userid].append(counter1)
-                    self._counters[player.userid].append(counter2)
+                    self._counters[player.index].append(counter1)
+                    self._counters[player.index].append(counter2)
 
                 elif player.team == GUARDS_TEAM:
                     counter = p_player.new_counter()
@@ -148,7 +148,7 @@ def build_survival_base(*parent_classes):
                         counter.hook_hurt = get_hook('SW')
                         counter.display = strings_damage_hook['health general']
 
-                    self._counters[player.userid].append(counter)
+                    self._counters[player.index].append(counter)
 
                 p_player.set_protected()
 
@@ -165,11 +165,11 @@ def build_survival_base(*parent_classes):
                 if player.dead:
                     continue
 
-                if player.userid not in self._counters:
+                if player.index not in self._counters:
                     continue
 
                 p_player = protected_player_manager[player.index]
-                for counter in self._counters[player.userid]:
+                for counter in self._counters[player.index]:
                     p_player.delete_counter(counter)
 
                 p_player.unset_protected()
@@ -187,8 +187,7 @@ def build_survival_base(*parent_classes):
 
         @game_event_handler('survival-player-death', 'player_death')
         def event_survival_player_death(self, game_event):
-            player = main_player_manager.get_by_userid(
-                game_event.get_int('userid'))
+            player = main_player_manager.get_by_userid(game_event['userid'])
 
             if player not in self._players_all:
                 return
@@ -262,8 +261,7 @@ class SurvivalTeamBased(build_survival_base(MapGameTeamBased)):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = main_player_manager.get_by_userid(game_event['userid'])
 
         if self.leader == player:
             self.set_stage_group('abort-leader-dead')
@@ -344,8 +342,7 @@ class SurvivalPlayerBased(build_survival_base(MapGame)):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = main_player_manager.get_by_userid(game_event['userid'])
 
         if self.leader == player:
             self.set_stage_group('abort-leader-dead')
@@ -513,7 +510,7 @@ class SurvivalTeamBasedFriendlyFire(
                 continue
 
             p_player = protected_player_manager[player.index]
-            self._counters[player.userid] = []
+            self._counters[player.index] = []
             if player in self._players:
                 counter1 = p_player.new_counter(
                     display=strings_damage_hook['health against_guards'])
@@ -537,8 +534,8 @@ class SurvivalTeamBasedFriendlyFire(
 
                 counter2.health = self.map_data['INITIAL_HEALTH']
 
-                self._counters[player.userid].append(counter1)
-                self._counters[player.userid].append(counter2)
+                self._counters[player.index].append(counter1)
+                self._counters[player.index].append(counter2)
 
             elif player.team == GUARDS_TEAM:
                 counter = p_player.new_counter()
@@ -551,7 +548,7 @@ class SurvivalTeamBasedFriendlyFire(
                     counter.hook_hurt = get_hook('SW')
                     counter.display = strings_damage_hook['health general']
 
-                self._counters[player.userid].append(counter)
+                self._counters[player.index].append(counter)
 
             p_player.set_protected()
 
@@ -612,7 +609,7 @@ class SurvivalPlayerBasedFriendlyFire(
                 continue
 
             p_player = protected_player_manager[player.index]
-            self._counters[player.userid] = []
+            self._counters[player.index] = []
             if player in self._players:
                 counter1 = p_player.new_counter(
                     display=strings_damage_hook['health against_guards'])
@@ -630,8 +627,8 @@ class SurvivalPlayerBasedFriendlyFire(
 
                 counter2.health = self.map_data['INITIAL_HEALTH']
 
-                self._counters[player.userid].append(counter1)
-                self._counters[player.userid].append(counter2)
+                self._counters[player.index].append(counter1)
+                self._counters[player.index].append(counter2)
 
             elif player.team == GUARDS_TEAM:
                 counter = p_player.new_counter()
@@ -644,7 +641,7 @@ class SurvivalPlayerBasedFriendlyFire(
                     counter.hook_hurt = get_hook('SW')
                     counter.display = strings_damage_hook['health general']
 
-                self._counters[player.userid].append(counter)
+                self._counters[player.index].append(counter)
 
             p_player.set_protected()
 
@@ -661,11 +658,11 @@ class SurvivalPlayerBasedFriendlyFire(
             if player.dead:
                 continue
 
-            if player.userid not in self._counters:
+            if player.index not in self._counters:
                 continue
 
             p_player = protected_player_manager[player.index]
-            for counter in self._counters[player.userid]:
+            for counter in self._counters[player.index]:
                 p_player.delete_counter(counter)
 
             p_player.unset_protected()

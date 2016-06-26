@@ -222,8 +222,8 @@ class ScoreGameNoPropKill(ScoreGameBase, PlayerPreserving):
         for player in self._players:
             p_player = protected_player_manager[player.index]
 
-            self._counters[player.userid] = p_player.new_counter()
-            self._counters[player.userid].hook_hurt = get_hook('G')
+            self._counters[player.index] = p_player.new_counter()
+            self._counters[player.index].hook_hurt = get_hook('G')
 
             p_player.set_protected()
 
@@ -231,7 +231,7 @@ class ScoreGameNoPropKill(ScoreGameBase, PlayerPreserving):
     def stage_undo_scoregame_equip_damage_hooks(self):
         for player in self._players_all:
             p_player = protected_player_manager[player.index]
-            p_player.delete_counter(self._counters[player.userid])
+            p_player.delete_counter(self._counters[player.index])
             p_player.unset_protected()
 
 

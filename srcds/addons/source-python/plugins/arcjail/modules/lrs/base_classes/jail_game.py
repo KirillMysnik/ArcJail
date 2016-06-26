@@ -108,7 +108,8 @@ class JailGame(BaseGame):
         if winner is None or loser is None:
             return
 
-        InternalEvent.fire('jail_lr_won', winner=winner, loser=loser)
+        InternalEvent.fire(
+            'jail_lr_won', winner=winner, loser=loser, game_instance=self)
 
         if config_manager['victory_sound'] is not None:
             config_manager['victory_sound'].play(winner.index)

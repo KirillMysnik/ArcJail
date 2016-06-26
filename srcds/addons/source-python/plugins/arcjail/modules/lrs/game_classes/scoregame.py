@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
+from ....arcjail import InternalEvent
+
 from ....resource.strings import build_module_strings
 
 from ...damage_hook import get_hook, protected_player_manager
@@ -42,8 +44,8 @@ class ScoreGameBase(MapGameTeamBased):
         super().__init__(players, **kwargs)
 
         self.score = {
-            self.prisoner.userid: 0,
-            self.guard.userid: 0,
+            self.prisoner.index: 0,
+            self.guard.index: 0,
         }
         self.win_score = (self.map_data['MAX_SCORE'] if
                           self.map_data['MAX_SCORE'] > 0 else
@@ -53,19 +55,19 @@ class ScoreGameBase(MapGameTeamBased):
     def stage_scoregame_new_score2(self):
         broadcast(strings_module['new_score2'].tokenize(
             player1=self.prisoner.name,
-            score1=self.score[self.prisoner.userid],
+            score1=self.score[self.prisoner.index],
             player2=self.guard.name,
-            score2=self.score[self.guard.userid]
+            score2=self.score[self.guard.index]
         ))
 
         self.set_stage_group('scoregame-check-team-scores')
 
     @stage('scoregame-check-team-scores')
     def stage_scoregame_check_team_scores(self):
-        if self.score[self.prisoner.userid] == self.win_score:
+        if self.score[self.prisoner.index] == self.win_score:
             winner, loser = self.prisoner, self.guard
 
-        elif self.score[self.guard.userid] == self.win_score:
+        elif self.score[self.guard.index] == self.win_score:
             winner, loser = self.guard, self.prisoner
 
         else:
@@ -74,16 +76,16 @@ class ScoreGameBase(MapGameTeamBased):
         self._results['winner'] = winner
         self._results['loser'] = loser
 
-        if self.score[loser.userid] == 0:
+        if self.score[loser.index] == 0:
             play_flawless_effects(self._players)
 
         self.set_stage_group('win')
 
     @push(None, 'end_game')
     def push_end_game(self, args):
-        if self.score[self.prisoner.userid] > self.score[self.guard.userid]:
+        if self.score[self.prisoner.index] > self.score[self.guard.index]:
             winner, loser = self.prisoner, self.guard
-        elif self.score[self.prisoner.userid] < self.score[self.guard.userid]:
+        elif self.score[self.prisoner.index] < self.score[self.guard.index]:
             winner, loser = self.guard, self.prisoner
         else:
             self.set_stage_group('draw')
@@ -92,7 +94,7 @@ class ScoreGameBase(MapGameTeamBased):
         self._results['winner'] = winner
         self._results['loser'] = loser
 
-        if self.score[loser.userid] == 0:
+        if self.score[loser.index] == 0:
             play_flawless_effects(self._players)
 
         self.set_stage_group('win')
@@ -106,9 +108,11 @@ class ScoreGameBase(MapGameTeamBased):
             return
 
         if team_num == 1:
-            self.score[self.prisoner.userid] += 1
+            self.score[self.prisoner.index] += 1
         else:
-            self.score[self.guard.userid] += 1
+            self.score[self.guard.index] += 1
+
+        InternalEvent.fire('jail_stop_accepting_bets', instance=self)
 
         goal_sound = get_goal_sound(self.map_data['GOAL_SOUND'])
         if goal_sound is not None:
@@ -157,8 +161,8 @@ class ScoreGameNoPropKill(ScoreGameBase):
         for player in self._players:
             p_player = protected_player_manager[player.index]
 
-            self._counters[player.userid] = p_player.new_counter()
-            self._counters[player.userid].hook_hurt = get_hook('')
+            self._counters[player.index] = p_player.new_counter()
+            self._counters[player.index].hook_hurt = get_hook('')
 
             p_player.set_protected()
 
@@ -166,7 +170,7 @@ class ScoreGameNoPropKill(ScoreGameBase):
     def stage_undo_scoregame_equip_damage_hooks(self):
         for player in self._players_all:
             p_player = protected_player_manager[player.index]
-            p_player.delete_counter(self._counters[player.userid])
+            p_player.delete_counter(self._counters[player.index])
             p_player.unset_protected()
 
 add_available_game(ScoreGameNoPropKill)

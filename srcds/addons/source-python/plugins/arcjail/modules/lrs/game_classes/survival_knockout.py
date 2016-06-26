@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ...equipment_switcher import saved_player_manager
+from ....arcjail import InternalEvent
 
 from ...damage_hook import is_world, protected_player_manager
 
@@ -36,7 +36,7 @@ def build_survival_knockout_base(*parent_classes):
         def stage_survival_equip_damage_hooks(self):
             for player in self._players:
                 p_player = protected_player_manager[player.index]
-                self._counters[player.userid] = []
+                self._counters[player.index] = []
 
                 def hook_game_player(counter, info, player=player):
                     if (info.attacker == player.index or
@@ -46,7 +46,11 @@ def build_survival_knockout_base(*parent_classes):
 
                     attacker = main_player_manager[info.attacker]
                     if attacker in self._players:
-                        self._flawless[player.userid] = False
+                        self._flawless[player.index] = False
+
+                        InternalEvent.fire('jail_stop_accepting_bets',
+                                           instance=self)
+
                         show_damage(attacker, info.damage)
                         push_by_damage_info(
                             player, attacker, info, self.map_data)
@@ -67,8 +71,8 @@ def build_survival_knockout_base(*parent_classes):
                 counter2.hook_hurt = hook_w_min_damage
                 counter2.health = self.map_data['INITIAL_HEALTH']
 
-                self._counters[player.userid].append(counter1)
-                self._counters[player.userid].append(counter2)
+                self._counters[player.index].append(counter1)
+                self._counters[player.index].append(counter2)
 
                 p_player.set_protected()
 

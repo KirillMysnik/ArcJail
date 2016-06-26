@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
+from ....arcjail import InternalEvent
+
 from ...games.base_classes.base_game import BaseGame
 
 from .. import GameLauncher, remove_instance, stage
@@ -57,6 +59,8 @@ class BaseGame(BaseGame):
         self.undo_stages()
         self._lock_stage_queue = True
         remove_instance(self)
+
+        InternalEvent.fire('jail_lr_destroyed', game_instance=self)
 
     @property
     def guard(self):

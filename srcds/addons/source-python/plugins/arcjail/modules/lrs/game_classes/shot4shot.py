@@ -17,6 +17,8 @@ from entities.constants import DamageTypes
 from events import event_manager
 from listeners.tick import Delay
 
+from ....arcjail import InternalEvent
+
 from ....resource.strings import build_module_strings
 
 from ...damage_hook import (
@@ -136,6 +138,9 @@ class Shot4Shot(CombatGame):
                         self._flawless[player.userid] = False
                         self._score[info.attacker] += 1
 
+                        InternalEvent.fire('jail_stop_accepting_bets',
+                                           instance=self)
+
                         show_damage(opponent, self._settings['health'])
 
                     return False
@@ -152,6 +157,9 @@ class Shot4Shot(CombatGame):
                             return False
 
                     self._flawless[player.userid] = False
+
+                    InternalEvent.fire('jail_stop_accepting_bets',
+                                       instance=self)
 
                     show_damage(opponent, info.damage)
 

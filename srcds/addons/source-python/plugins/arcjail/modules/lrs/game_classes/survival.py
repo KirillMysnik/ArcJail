@@ -17,6 +17,8 @@ from warnings import warn
 
 from cvars import ConVar
 
+from ....arcjail import InternalEvent
+
 from ...damage_hook import (
     get_hook, is_world, protected_player_manager,
     strings_module as strings_damage_hook)
@@ -78,8 +80,8 @@ def build_survival_base(*parent_classes):
 
             self._counters = {}
             self._flawless = {
-                self.prisoner.userid: True,
-                self.guard.userid: True,
+                self.prisoner.index: True,
+                self.guard.index: True,
             }
 
         @stage('survival-equip-damage-hooks')
@@ -88,7 +90,11 @@ def build_survival_base(*parent_classes):
                 min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
 
                 if info.damage >= min_damage:
-                    self._flawless[self.prisoner.userid] = False
+                    self._flawless[self.prisoner.index] = False
+
+                    InternalEvent.fire('jail_stop_accepting_bets',
+                                       instance=self)
+
                     return True
 
                 return False
@@ -97,7 +103,11 @@ def build_survival_base(*parent_classes):
                 min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
 
                 if info.damage >= min_damage:
-                    self._flawless[self.guard.userid] = False
+                    self._flawless[self.guard.index] = False
+
+                    InternalEvent.fire('jail_stop_accepting_bets',
+                                       instance=self)
+
                     return True
 
                 return False
@@ -124,7 +134,7 @@ def build_survival_base(*parent_classes):
 
                 counter.health = self.map_data['INITIAL_HEALTH']
 
-                self._counters[player.userid] = [counter, ]
+                self._counters[player.index] = [counter, ]
 
                 p_player.set_protected()
 
@@ -132,7 +142,7 @@ def build_survival_base(*parent_classes):
         def stage_undo_survival_equip_damage_hooks(self):
             for player in self._players_all:
                 p_player = protected_player_manager[player.index]
-                for counter in self._counters[player.userid]:
+                for counter in self._counters[player.index]:
                     p_player.delete_counter(counter)
 
                 p_player.unset_protected()
@@ -152,7 +162,7 @@ def build_survival_base(*parent_classes):
             else:
                 winner, loser = self.prisoner, self.guard
 
-            if self._flawless[winner.userid]:
+            if self._flawless[winner.index]:
                 play_flawless_effects(self._players)
 
             self._results['winner'] = winner
@@ -231,7 +241,11 @@ def build_survival_friendlyfire_base(*parent_classes):
                     min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
 
                     if info.damage >= min_damage:
-                        self._flawless[player.userid] = False
+                        self._flawless[player.index] = False
+
+                        InternalEvent.fire('jail_stop_accepting_bets',
+                                           instance=self)
+
                         return True
 
                     return False
@@ -272,7 +286,7 @@ def build_survival_friendlyfire_base(*parent_classes):
 
                 counter.health = self.map_data['INITIAL_HEALTH']
 
-                self._counters[player.userid] = [counter, ]
+                self._counters[player.index] = [counter, ]
                 p_player.set_protected()
 
     return SurvivalFriendlyFireBase

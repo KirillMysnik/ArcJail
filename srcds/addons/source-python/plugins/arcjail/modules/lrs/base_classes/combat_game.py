@@ -18,6 +18,8 @@ from random import shuffle
 
 from entities.helpers import edict_from_index
 
+from ....arcjail import InternalEvent
+
 from ...damage_hook import (
     protected_player_manager, strings_module as strings_damage_hook)
 
@@ -73,8 +75,8 @@ class CombatGame(PrepareTime):
                 self.map_data = lrs[0]
 
         self._flawless = {
-            self.prisoner.userid: True,
-            self.guard.userid: True,
+            self.prisoner.index: True,
+            self.guard.index: True,
         }
         self._counters = {}
         self._delays = []
@@ -178,9 +180,11 @@ class CombatGame(PrepareTime):
             if info.attacker != self.guard.index:
                 return False
 
-            self._flawless[self.prisoner.userid] = False
+            self._flawless[self.prisoner.index] = False
 
             show_damage(self.guard, info.damage)
+
+            InternalEvent.fire('jail_stop_accepting_bets', instance=self)
 
             return True
 
@@ -188,7 +192,9 @@ class CombatGame(PrepareTime):
             if info.attacker != self.prisoner.index:
                 return False
 
-            self._flawless[self.guard.userid] = False
+            self._flawless[self.guard.index] = False
+
+            InternalEvent.fire('jail_stop_accepting_bets', instance=self)
 
             show_damage(self.prisoner, info.damage)
 
@@ -196,8 +202,7 @@ class CombatGame(PrepareTime):
 
         for hook_hurt, player in zip(
                 (hook_hurt_for_prisoner, hook_hurt_for_guard),
-                self._players
-        ):
+                self._players):
 
             p_player = protected_player_manager[player.index]
 
@@ -232,7 +237,7 @@ class CombatGame(PrepareTime):
         else:
             winner, loser = self.prisoner, self.guard
 
-        if self._flawless[winner.userid]:
+        if self._flawless[winner.index]:
             play_flawless_effects(self._players)
         
         self._results['winner'] = winner

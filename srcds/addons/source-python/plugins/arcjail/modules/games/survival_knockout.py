@@ -104,7 +104,7 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
                 continue
 
             p_player = protected_player_manager[player.index]
-            self._counters[player.userid] = []
+            self._counters[player.index] = []
             if player in self._players:
                 counter1 = p_player.new_counter(
                     display=strings_damage_hook['health against_guards'])
@@ -118,9 +118,9 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
                 counter3.hook_hurt = hook_w_min_damage
                 counter3.health = self.map_data['INITIAL_HEALTH']
 
-                self._counters[player.userid].append(counter1)
-                self._counters[player.userid].append(counter2)
-                self._counters[player.userid].append(counter3)
+                self._counters[player.index].append(counter1)
+                self._counters[player.index].append(counter2)
+                self._counters[player.index].append(counter3)
 
             elif player.team == GUARDS_TEAM:
                 counter = p_player.new_counter()
@@ -133,7 +133,7 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
                     counter.hook_hurt = get_hook('SW')
                     counter.display = strings_damage_hook['health general']
 
-                self._counters[player.userid].append(counter)
+                self._counters[player.index].append(counter)
 
             p_player.set_protected()
 
@@ -205,7 +205,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                 continue
 
             p_player = protected_player_manager[player.index]
-            self._counters[player.userid] = []
+            self._counters[player.index] = []
             if player in self._players:
                 counter1 = p_player.new_counter(
                     display=strings_damage_hook['health against_guards'])
@@ -219,9 +219,9 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                 counter3.hook_hurt = hook_w_min_damage
                 counter3.health = self.map_data['INITIAL_HEALTH']
 
-                self._counters[player.userid].append(counter1)
-                self._counters[player.userid].append(counter2)
-                self._counters[player.userid].append(counter3)
+                self._counters[player.index].append(counter1)
+                self._counters[player.index].append(counter2)
+                self._counters[player.index].append(counter3)
 
             elif player.team == GUARDS_TEAM:
                 counter = p_player.new_counter()
@@ -234,7 +234,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                     counter.hook_hurt = get_hook('SW')
                     counter.display = strings_damage_hook['health general']
 
-                self._counters[player.userid].append(counter)
+                self._counters[player.index].append(counter)
 
             p_player.set_protected()
 

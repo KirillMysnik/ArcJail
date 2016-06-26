@@ -110,6 +110,9 @@ def send_page(player):
                 if not item_instance.manual_activation:
                     return {'error': "APPERR_NO_MANUAL_ACTIVATION"}
 
+                if player.dead and item_instance.use_only_when_alive:
+                    return {'error': "APPERR_DEAD"}
+
                 if player.team not in item_instance.use_team_restriction:
                     return {'error': "APPERR_WRONG_TEAM"}
 
@@ -210,6 +213,11 @@ def send_page(player):
                     strings_inventory[
                         'cannot_use no_manual_activation'].get_string(
                             language)
+
+            # Is the player dead and item only allows activation by the alive?
+            if player.dead and item.class_.use_only_when_alive:
+                item_json['cannot_use_reason'] = \
+                    strings_inventory['cannot_use dead'].get_string(language)
 
             # Get stat values
             for stat_name in ('stat_max_per_slot',

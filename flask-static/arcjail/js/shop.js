@@ -25,7 +25,7 @@ APP['shop'] = function (motdPlayer) {
                 if (activeCategoryShop != "all" && item['category_id'] != activeCategoryShop)
                     return;
 
-                if ((i + 1) % 9 == 0) {
+                if ((i + 1) % 10 == 0) {
                     var div = nodes['items-container'].appendChild(document.createElement('div'));
                     div.classList.add('clear');
                 }
@@ -133,7 +133,7 @@ APP['shop'] = function (motdPlayer) {
                 if (activeCategoryInventory != "all" && item['category_id'] != activeCategoryInventory)
                     return;
 
-                if ((i + 1) % 9 == 0) {
+                if ((i + 1) % 10 == 0) {
                     var div = nodes['inventory-container'].appendChild(document.createElement('div'));
                     div.classList.add('clear');
                 }

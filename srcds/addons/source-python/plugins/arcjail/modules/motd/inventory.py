@@ -34,7 +34,8 @@ def send_page(player):
         pass
 
     def json_inventory_callback(data, error):
-        from ..inventory import strings_module as strings_inventory
+        from ..inventory import (
+            inventory_ad_lines_ids, strings_module as strings_inventory)
 
         if error is not None:
             return
@@ -54,6 +55,9 @@ def send_page(player):
 
             if not item_instance.manual_activation:
                 return {'error': "APPERR_NO_MANUAL_ACTIVATION"}
+
+            if player.dead and item_instance.use_only_when_alive:
+                return {'error': "APPERR_DEAD"}
 
             if player.team not in item_instance.use_team_restriction:
                 return {'error': "APPERR_WRONG_TEAM"}
@@ -104,6 +108,12 @@ def send_page(player):
                     strings_inventory[
                         'cannot_use no_manual_activation'].get_string(language)
 
+            # Is the player dead and item only allows activation by the alive?
+            if player.dead and item.class_.use_only_when_alive:
+                item_json['cannot_use_reason'] = \
+                    strings_inventory['cannot_use dead'].get_string(
+                        language)
+
             # Get stat values
             for stat_name in ('stat_max_per_slot',
                               'stat_team_restriction',
@@ -130,6 +140,11 @@ def send_page(player):
                     language),
             })
 
+        inventory_ad_lines = []
+        for inventory_ad_lines_id in inventory_ad_lines_ids:
+            inventory_ad_lines.append(
+                strings_inventory[inventory_ad_lines_id].get_string(language))
+
         if popup_notify is not None:
             popup_notify = popup_notify.get_string(language)
 
@@ -143,6 +158,7 @@ def send_page(player):
             'popup_notify': popup_notify,
             'popup_error': popup_error,
             'categories': categories,
+            'inventory_ad_lines': inventory_ad_lines,
         }
 
     def inventory_retargeting_callback(new_page_id):

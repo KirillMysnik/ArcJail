@@ -2,6 +2,7 @@ APP['inventory'] = function (motdPlayer) {
     var inventory = this;
     var nodes = {};
     nodes['current-account'] = document.getElementById('current-account');
+    nodes['inventory-ad'] = document.getElementById('inventory-ad');
     nodes['inventory-container'] = document.getElementById('inventory-container');
     nodes['categories-inventory'] = document.getElementById('categories-inventory');
     nodes['item-stats'] = document.getElementById('item-stats');
@@ -15,6 +16,19 @@ APP['inventory'] = function (motdPlayer) {
         nodes['current-account'].appendChild(document.createTextNode(accountFormatted + "c"));
     };
 
+    var renderInventoryAd = function (inventoryAd) {
+        clearNode(nodes['inventory-ad']);
+
+        var ul = nodes['inventory-ad'].appendChild(document.createElement('ul'));
+
+        for (var i = 0; i < inventoryAd.length; i++) {
+            (function (line) {
+                var li = ul.appendChild(document.createElement('li'));
+                li.appendChild(document.createTextNode(line));
+            })(inventoryAd[i]);
+        }
+    };
+
     var renderInventoryItems = function () {
         clearNode(nodes['inventory-container']);
         for (var i = 0; i < inventoryItems.length; i++) {
@@ -22,7 +36,7 @@ APP['inventory'] = function (motdPlayer) {
                 if (activeCategoryInventory != "all" && item['category_id'] != activeCategoryInventory)
                     return;
 
-                if ((i + 1) % 9 == 0) {
+                if ((i + 1) % 10 == 0) {
                     var div = nodes['inventory-container'].appendChild(document.createElement('div'));
                     div.classList.add('clear');
                 }
@@ -152,6 +166,7 @@ APP['inventory'] = function (motdPlayer) {
         categories = data['categories'];
         inventoryItems = data['inventory_items'];
 
+        renderInventoryAd(data['inventory_ad_lines']);
         renderCategories();
         renderInventoryItems();
         renderCurrentAccount(data['account_formatted']);

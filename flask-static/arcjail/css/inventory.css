@@ -6,9 +6,21 @@
     float: right;
 }
 
+#inventory-ad {
+    float: left;
+    width: 450px;
+    margin: 0 15px;
+    text-align: justify;
+    font-size: 10pt;
+}
+
+#inventory-ad li {
+    margin-bottom: 15px;
+}
+
 .items-container {
     width: 450px;
-    min-height: 350px;
+    min-height: 300px;
     margin: 0 15px;
     background-color: #262626;
 }

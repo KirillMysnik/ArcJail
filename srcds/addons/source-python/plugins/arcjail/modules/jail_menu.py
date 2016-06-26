@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from commands.client import ClientCommand
-from commands.say import SayCommand
+from spam_proof_commands.client import ClientCommand
+from spam_proof_commands.say import SayCommand
 from events import Event
 from menus import PagedMenu, PagedOption
 
@@ -23,6 +23,9 @@ from ..arcjail import InternalEvent
 from ..resource.strings import build_module_strings
 
 from .players import main_player_manager, tell
+
+
+ANTI_SPAM_TIMEOUT = 2
 
 
 strings_module = build_module_strings('jail_menu')
@@ -120,11 +123,11 @@ def on_unload(event_var):
     _popups.clear()
 
 
-@SayCommand('!jmenu')
+@SayCommand(ANTI_SPAM_TIMEOUT, '!jmenu')
 def chat_on_jmenu(command, index, team_only):
     send_popup(main_player_manager[index])
 
 
-@ClientCommand('jmenu')
+@ClientCommand(ANTI_SPAM_TIMEOUT, 'jmenu')
 def cmd_on_jmenu(command, index):
     send_popup(main_player_manager[index])

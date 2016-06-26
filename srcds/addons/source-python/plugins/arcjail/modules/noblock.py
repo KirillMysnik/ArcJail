@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from commands.say import SayCommand
+from spam_proof_commands.say import SayCommand
 from events import Event
 from filters.players import PlayerIter
 from listeners.tick import Delay
@@ -27,6 +27,9 @@ from .players import main_player_manager, tell
 from .teams import PRISONERS_TEAM
 
 from . import build_module_config
+
+
+ANTI_SPAM_TIMEOUT = 2
 
 
 strings_module = build_module_strings('noblock')
@@ -105,8 +108,7 @@ def on_round_start(game_event):
         set_default(player)
 
 
-@SayCommand('!block')
-@SayCommand('!noblock')
+@SayCommand(ANTI_SPAM_TIMEOUT, ['!block', '!noblock'])
 def say_noblock(command, index, team_only):
     player = main_player_manager[index]
     reason = get_noblock_denial_reason(player)

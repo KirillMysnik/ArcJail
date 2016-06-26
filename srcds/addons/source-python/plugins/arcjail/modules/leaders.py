@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from commands.say import SayCommand
+from spam_proof_commands.say import SayCommand
 from events import Event
 
 from controlled_cvars import InvalidValue
@@ -36,6 +36,7 @@ from .teams import GUARDS_TEAM
 from . import build_module_config
 
 
+ANTI_SPAM_TIMEOUT = 2
 DEFAULT_GAME_HP_AMOUNT = 100
 
 
@@ -160,7 +161,7 @@ def on_round_end(game_event):
     _round_end = True
 
 
-@SayCommand('!lead')
+@SayCommand(ANTI_SPAM_TIMEOUT, '!lead')
 def chat_on_lead(command, index, team_only):
     player = main_player_manager[index]
     if _leader is not None and _leader == player:
@@ -178,7 +179,7 @@ def chat_on_lead(command, index, team_only):
             tell(player, reason)
 
 
-@SayCommand('!leaders')
+@SayCommand(ANTI_SPAM_TIMEOUT, '!leaders')
 def chat_on_leaders(command, index, team_only):
     player = main_player_manager[index]
 

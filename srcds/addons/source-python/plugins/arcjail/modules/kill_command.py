@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from commands.say import SayCommand
+from spam_proof_commands.say import SayCommand
 
 from controlled_cvars.handlers import bool_handler, float_handler
 
@@ -24,6 +24,9 @@ from .players import broadcast, main_player_manager, tell
 from .teams import GUARDS_TEAM, PRISONERS_TEAM
 
 from . import build_module_config
+
+
+ANTI_SPAM_TIMEOUT = 1
 
 
 strings_module = build_module_strings('kill_command')
@@ -56,8 +59,7 @@ def get_kill_denial_reason(player):
     return None
 
 
-@SayCommand("!suicide")
-@SayCommand("!kill")
+@SayCommand(ANTI_SPAM_TIMEOUT, ["!suicide", "!kill"])
 def say_kill(command, index, team_only):
     player = main_player_manager[index]
 

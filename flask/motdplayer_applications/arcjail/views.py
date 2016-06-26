@@ -71,3 +71,34 @@ def route_json_shop(data_exchanger, json_data):
         })
 
     return None
+
+
+@app.route(plugin_instance.get_base_authed_route('inventory'))
+def route_inventory(steamid, auth_method, auth_token, session_id):
+    context = {
+        'server_id': plugin_instance.server_id,
+        'stylesheets': ('main', 'inventory', 'notifications'),
+        'scripts': ('dom', 'inventory', 'notifications'),
+        'steamid': steamid,
+        'auth_method': auth_method,
+        'auth_token': auth_token,
+        'session_id': session_id,
+    }
+    return render_template('arcjail/route_inventory.html', **context)
+
+
+@plugin_instance.json_authed_request('json-inventory')
+def route_json_inventory(data_exchanger, json_data):
+    if json_data['action'] == "update":
+        return data_exchanger.exchange({
+            'action': "update",
+        })
+
+    if json_data['action'] == "use":
+        return data_exchanger.exchange({
+            'action': json_data['action'],
+            'class_id': json_data['class_id'],
+            'instance_id': json_data['instance_id'],
+        })
+
+    return None

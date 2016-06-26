@@ -64,7 +64,9 @@ def send_page(player):
             if item is None:
                 return {'error': "APPERR_DOES_NOT_BELONG_TO_PLAYER"}
 
-            reason = item_instance.try_activate(player, item.amount - 1)
+            reason = item_instance.try_activate(
+                player, item.amount - 1, async=False)
+
             if reason is not None:
                 popup_error = reason
 

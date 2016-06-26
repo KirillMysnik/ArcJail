@@ -28,6 +28,12 @@
     "position": 5,
     "class_ids": []
   },
+  "exclusive": {
+    "caption": "category exclusive",
+    "position": 6,
+    "class_ids": ["gift"],
+    "hide_from_shop": true
+  },
   "other": {
     "caption": "category other",
     "position": 100,

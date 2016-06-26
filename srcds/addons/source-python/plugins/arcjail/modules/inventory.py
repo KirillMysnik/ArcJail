@@ -44,7 +44,7 @@ def popup_select_callback(popup, player_index, option):
         tell(player, strings_module['fail game_busy'])
         return
 
-    reason = item.class_.try_activate(player, item.amount - 1)
+    reason = item.class_.try_activate(player, item.amount - 1, async=True)
     if reason is not None:
         tell(player, strings_module['chat_popup_error'].tokenize(text=reason))
 

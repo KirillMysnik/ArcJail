@@ -15,8 +15,6 @@
 
 from json import dumps, loads
 
-from commands.server import ServerCommand
-from core import echo_console
 from events import Event
 from listeners.tick import GameThread
 
@@ -230,37 +228,3 @@ def on_round_end(game_event):
 def on_unload(event_var):
     for arcjail_user in arcjail_user_manager.values():
         GameThread(target=arcjail_user.save_to_database).start()
-
-
-@ServerCommand('arcjail_add_credits')
-def server_arcjail_add_credits(command):
-    try:
-        userid = command[1]
-        credits = command[2]
-    except IndexError:
-        echo_console("Usage: arcjail_add_credits <userid> <credits>")
-        return
-
-    try:
-        userid = int(userid)
-    except ValueError:
-        echo_console("Error: userid should be an integer")
-        return
-
-    try:
-        credits = int(credits)
-    except ValueError:
-        echo_console("Error: credits should be an integer")
-        return
-
-    try:
-        arcjail_user = arcjail_user_manager.get_by_userid(userid)
-        if arcjail_user is None:
-            raise KeyError
-    except (KeyError, OverflowError, ValueError):
-        echo_console("Couldn't find ArcjailUser (userid={})".format(userid))
-        return
-
-    arcjail_user.account += credits
-    echo_console("Added {} credits to {}'s account".format(
-        credits, arcjail_user.player.name))

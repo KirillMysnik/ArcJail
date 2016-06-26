@@ -235,18 +235,22 @@ APP['shop'] = function (motdPlayer) {
 
         for (var i = 0; i < categories.length; i++) {
             (function (category) {
-                var input = nodes['categories-shop'].appendChild(document.createElement('input'));
-                input.type = "button";
-                input.value = category['caption'];
-                input.classList.add('category-button');
-                if (category['id'] == activeCategoryShop)
-                    input.classList.add('active');
+                var input;
 
-                input.addEventListener('click', function (e) {
-                    activeCategoryShop = category['id'];
-                    renderCategories();
-                    renderShopItems();
-                });
+                if (!category['hide_from_shop']) {
+                    input = nodes['categories-shop'].appendChild(document.createElement('input'));
+                    input.type = "button";
+                    input.value = category['caption'];
+                    input.classList.add('category-button');
+                    if (category['id'] == activeCategoryShop)
+                        input.classList.add('active');
+
+                    input.addEventListener('click', function (e) {
+                        activeCategoryShop = category['id'];
+                        renderCategories();
+                        renderShopItems();
+                    });
+                }
 
                 input = nodes['categories-inventory'].appendChild(document.createElement('input'));
                 input.type = "button";

@@ -89,7 +89,7 @@ class BaseItemInstance(dict):
     def get_purchase_denial_reason(self, player, amount):
         return None
 
-    def try_activate(self, player, amount):
+    def try_activate(self, player, amount, async=True):
         tell(player, strings_module['activated'].tokenize(
             item=self.caption, left=amount))
 

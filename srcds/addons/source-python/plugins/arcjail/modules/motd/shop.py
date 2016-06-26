@@ -97,7 +97,9 @@ def send_page(player):
                         config_manager['checkout_sound'].play(player.index)
 
                     if item_instance.auto_activation:
-                        item_instance.try_activate(player, item.amount - 1)
+                        item_instance.try_activate(
+                            player, item.amount - 1, async=False)
+
                         arcjail_user.take_item(item, amount=1, async=False)
 
                     popup_notify = strings_shop[
@@ -117,7 +119,9 @@ def send_page(player):
                 if item is None:
                     return {'error': "APPERR_DOES_NOT_BELONG_TO_PLAYER"}
 
-                reason = item_instance.try_activate(player, item.amount - 1)
+                reason = item_instance.try_activate(
+                    player, item.amount - 1, async=False)
+
                 if reason is not None:
                     popup_error = reason
 
@@ -133,6 +137,9 @@ def send_page(player):
 
         # Shop
         for item_instance in iter_item_instance_classes():
+            if item_instance.get('hide_from_shop', False):
+                continue
+
             item_json = {
                 'class_id': item_instance.class_id,
                 'instance_id': item_instance.instance_id,
@@ -229,6 +236,7 @@ def send_page(player):
                 'id': category_id,
                 'caption': strings_inventory[category['caption']].get_string(
                     language),
+                'hide_from_shop': category.get('hide_from_shop', False)
             })
 
         if popup_notify is not None:

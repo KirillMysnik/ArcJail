@@ -25,6 +25,9 @@ class ArcjailUser(Base):
     id = Column(Integer, primary_key=True)
     steamid = Column(String(32))
 
+    last_seen = Column(Integer)
+    last_used_name = Column(String(32))
+    last_online_reward = Column(Integer)
     account = Column(Integer)
     slot_data = Column(Text)
 

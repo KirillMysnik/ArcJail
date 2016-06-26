@@ -30,8 +30,8 @@ class Item:
     def __init__(self, id_):
         self.id = id_
         self._current_owner = ""
-        self.class_id = -1
-        self.instance_id = -1
+        self.class_id = None
+        self.instance_id = None
         self.amount = 0
 
         self._loaded = False
@@ -65,7 +65,7 @@ class Item:
         if db_item is None:
             db_session.close()
 
-            msg = "Item {} does not exist in the database".format(self)
+            msg = "Item (id={}) does not exist in the database".format(self.id)
             logger.log_warning(msg)
             raise KeyError(msg)
 
@@ -110,7 +110,7 @@ class Item:
         if db_item is None:
             db_session.close()
 
-            msg = "Item {} does not exist in the database".format(self)
+            msg = "Item (id={}) does not exist in the database".format(self.id)
             logger.log_warning(msg)
             raise KeyError(msg)
 

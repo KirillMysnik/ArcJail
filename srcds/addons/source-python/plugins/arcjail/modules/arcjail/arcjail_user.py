@@ -38,6 +38,10 @@ class ArcjailUser:
     def __init__(self, player):
         self.player = player
 
+        # We're saving to database asynchronously, and player.steamid will
+        # be unavailable
+        self._steamid = player.steamid
+
         self.last_online_reward = time()
         self.account = 0
         self.slot_data = []
@@ -49,13 +53,13 @@ class ArcjailUser:
         return self._loaded
 
     def load_from_database(self):
-        if self.player.steamid == "BOT":
+        if self._steamid == "BOT":
             return
 
         db_session = Session()
 
         db_arcjail_user = db_session.query(DB_ArcjailUser).filter_by(
-            steamid=self.player.steamid).first()
+            steamid=self._steamid).first()
 
         if db_arcjail_user is not None:
             self.account = db_arcjail_user.account
@@ -70,7 +74,7 @@ class ArcjailUser:
         list(self.iter_all_items())
 
     def save_to_database(self):
-        if self.player.steamid == "BOT":
+        if self._steamid == "BOT":
             return
 
         if not self._loaded:
@@ -79,11 +83,11 @@ class ArcjailUser:
         db_session = Session()
 
         db_arcjail_user = db_session.query(DB_ArcjailUser).filter_by(
-            steamid=self.player.steamid).first()
+            steamid=self._steamid).first()
 
         if db_arcjail_user is None:
             db_arcjail_user = DB_ArcjailUser()
-            db_arcjail_user.steamid = self.player.steamid
+            db_arcjail_user.steamid = self._steamid
             db_session.add(db_arcjail_user)
 
         db_arcjail_user.last_seen = time()

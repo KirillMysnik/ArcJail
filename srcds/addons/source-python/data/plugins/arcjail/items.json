@@ -110,8 +110,49 @@
           "class_id": "gift",
           "instance_id": "5000c",
           "amount": 1
+        },
+        {
+          "class_id": "healthkit",
+          "instance_id": "standard",
+          "amount": 3
+        },
+        {
+          "class_id": "healthkit",
+          "instance_id": "shot",
+          "amount": 3
         }
       ]
+    }
+  },
+  "healthkit": {
+    "standard": {
+      "caption": "title standard",
+      "description": "description standard",
+      "icon": "healthkit.png",
+      "max_per_slot": 5,
+      "price": 1500,
+      "health_restored": 100,
+      "health_mode": "set"
+    },
+    "shot": {
+      "caption": "title shot",
+      "description": "description shot",
+      "icon": "healthshot.png",
+      "max_per_slot": 1,
+      "price": 1500,
+      "health_restored": 25,
+      "health_mode": "add"
+    }
+  },
+  "party_for_everybody": {
+    "party_for_everybody": {
+      "caption": "title party_for_everybody",
+      "description": "description party_for_everybody",
+      "icon": "party_for_everybody.png",
+      "max_per_slot": 1,
+      "price": 50000,
+      "entity_to_give": "weapon_m249",
+      "delay": 4.0
     }
   }
 }

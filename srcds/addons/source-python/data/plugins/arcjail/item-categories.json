@@ -21,7 +21,7 @@
   "support": {
     "caption": "category support",
     "position": 4,
-    "class_ids": []
+    "class_ids": ["healthkit"]
   },
   "map-specific": {
     "caption": "category map_specific",
@@ -37,6 +37,6 @@
   "other": {
     "caption": "category other",
     "position": 100,
-    "class_ids": []
+    "class_ids": ["party_for_everybody"]
   }
 }

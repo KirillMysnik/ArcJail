@@ -25,6 +25,8 @@ from ...classes.base_player_manager import BasePlayerManager
 
 from ...models.arcjail_user import ArcjailUser as DB_ArcjailUser
 
+from ...resource.logger import logger
+
 from ...resource.sqlalchemy import Session
 
 from .global_inventory import global_inventory
@@ -143,9 +145,17 @@ class ArcjailUser:
     def give_item(self, *args, amount=1, async=True):
         if isinstance(args[0], Item):
             item = args[0]
+            logger.log_debug(
+                "ArcjailUser.give_item: Giving item {} to (SteamID={}) "
+                "(async={})".format(item, self.player.steamid, async))
 
         else:
             class_id, instance_id = args[:2]
+            logger.log_debug(
+                "ArcjailUser.give_item: Giving item (class_id={}, "
+                "instance_id={}) to (SteamID={}) (async={})".format(
+                    class_id, instance_id, self.player.steamid, async))
+
             item = self.get_item_by_instance_id(class_id, instance_id)
 
         if item is None:
@@ -155,6 +165,15 @@ class ArcjailUser:
                                        amount, async=False)
 
                     self.slot_data.append(item.id)
+                    logger.log_debug(
+                        "ArcjailUser.give_item: ... finished creating new "
+                        "item {} (async=True) "
+                        "-- ID added to slot data".format(item))
+
+                logger.log_debug(
+                    "ArcjailUser.give_item: Creating new item (class_id={}, "
+                    "instance_id={}) to (SteamID={}) (async=True)...".format(
+                        class_id, instance_id, self.player.steamid))
 
                 GameThread(target=create_item).start()
                 return None
@@ -164,6 +183,13 @@ class ArcjailUser:
                     class_id, instance_id, self.player, amount, async=False)
 
                 self.slot_data.append(item.id)
+
+                logger.log_debug(
+                    "ArcjailUser.give_item: Created new item {} to "
+                    "(SteamID={}) (async=False) "
+                    "-- ID added to slot data".format(
+                        item, self.player.steamid))
+
                 return item
 
         item.give(amount, async)
@@ -172,18 +198,30 @@ class ArcjailUser:
     def take_item(self, *args, amount=1, async=True):
         if isinstance(args[0], Item):
             item = args[0]
+            logger.log_debug(
+                "ArcjailUser.take_item: Taking item {} from (SteamID={}) "
+                "(async={})".format(item, self.player.steamid, async))
 
         else:
             class_id, instance_id = args[:2]
+            logger.log_debug(
+                "ArcjailUser.take_item: Taking item (class_id={}, "
+                "instance_id={}) from (SteamID={}) (async={})".format(
+                    class_id, instance_id, self.player.steamid, async))
+
             item = self.get_item_by_instance_id(class_id, instance_id)
 
         if item is None:
-            raise ValueError(
-                "Player {} doesn't have item (class_id={}, "
-                "instance_id={})".format(self, class_id, instance_id))
+            msg = ("Player {} doesn't have item (class_id={}, "
+                   "instance_id={})".format(self, class_id, instance_id))
+
+            logger.log_warning(msg)
+            raise ValueError(msg)
 
         if item.amount - amount <= 0:
             self.slot_data.remove(item.id)
+            logger.log_debug("ArcjailUser.take_item: "
+                             "-- ID removed from slot data")
 
         item.take(amount, async)
         return item

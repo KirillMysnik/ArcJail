@@ -15,6 +15,8 @@
 
 from listeners.tick import GameThread
 
+from ...resource.logger import logger
+
 from .item import Item
 
 
@@ -36,6 +38,11 @@ class GlobalInventory(dict):
     def create(self, class_id, instance_id, player=None, amount=1, async=True):
         from .arcjail_user import ArcjailUser
 
+        logger.log_debug(
+            "GlobalInventory.create: creating item of (class_id={}, "
+            "instance_id={}) (amount={}) (async={})".format(
+                class_id, instance_id, amount, async))
+
         item = Item(None)
         item.class_id = class_id
         item.instance_id = instance_id
@@ -45,11 +52,20 @@ class GlobalInventory(dict):
 
         if async:
             def save_to_database():
+                logger.log_debug(
+                    "GlobalInventory.create: Saving created item {} "
+                    "to database (async=True)".format(item))
+
                 item.save_to_database()
 
                 try:
                     item.get_player()
                 except ValueError:
+                    logger.log_debug(
+                        "GlobalInventory.create: Player (SteamID={}) has "
+                        "already disconnected', saving temp item {}".format(
+                            item._current_owner, item))
+
                     ArcjailUser.save_temp_item(item._current_owner, item)
 
                 self._temp_items.remove(item)
@@ -60,12 +76,18 @@ class GlobalInventory(dict):
             GameThread(target=save_to_database).start()
 
         else:
+            logger.log_debug("GlobalInventory.create: Saving created item {} "
+                             "to database (async=False)".format(item))
+
             item.save_to_database()
             self[item.id] = item
 
         return item
 
     def delete(self, item, async=True):
+        logger.log_debug("GlobalInventory.delete: deleting {} "
+                         "(async={})".format(item, async))
+
         del self[item.id]
 
         if async:
@@ -75,6 +97,9 @@ class GlobalInventory(dict):
 
     @staticmethod
     def save(item, async=True):
+        logger.log_debug("GlobalInventory.save: saving {} "
+                         "(async={})".format(item, async))
+
         if async:
             GameThread(target=item.save_to_database).start()
         else:

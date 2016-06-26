@@ -17,6 +17,8 @@ from players.helpers import index_from_steamid
 
 from ...models.item import Item as DB_Item
 
+from ...resource.logger import logger
+
 from ...resource.sqlalchemy import Session
 
 from ..players import main_player_manager
@@ -62,8 +64,10 @@ class Item:
         db_item = db_session.query(DB_Item).filter_by(id=self.id).first()
         if db_item is None:
             db_session.close()
-            raise KeyError("Item {} does not exist in "
-                           "the database".format(self.id))
+
+            msg = "Item {} does not exist in the database".format(self)
+            logger.log_warning(msg)
+            raise KeyError(msg)
 
         self._current_owner = db_item.current_owner
         self.class_id = db_item.class_id
@@ -76,7 +80,9 @@ class Item:
 
     def save_to_database(self):
         if not self._loaded:
-            raise RuntimeError("Item couldn't be synced with database")
+            msg = "Item {} couldn't be synced with database".format(self)
+            logger.log_warning(msg)
+            raise RuntimeError(msg)
 
         db_session = Session()
 
@@ -103,8 +109,10 @@ class Item:
         db_item = db_session.query(DB_Item).filter_by(id=self.id).first()
         if db_item is None:
             db_session.close()
-            raise KeyError("Item {} does not exist in "
-                           "the database".format(self.id))
+
+            msg = "Item {} does not exist in the database".format(self)
+            logger.log_warning(msg)
+            raise KeyError(msg)
 
         db_session.delete(db_item)
 
@@ -129,8 +137,11 @@ class Item:
 
     def take(self, amount, async=True):
         if amount > self.amount:
-            raise ValueError("Can't take {} pieces of item {}: player only "
-                             "has {}".format(amount, self, self.amount))
+            msg = ("Can't take {} pieces of item {}: player only "
+                   "has {}".format(amount, self, self.amount))
+
+            logger.log_warning(msg)
+            raise ValueError(msg)
 
         self.amount -= amount
 

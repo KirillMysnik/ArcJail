@@ -73,4 +73,11 @@ class GlobalInventory(dict):
         else:
             item.delete_from_database()
 
+    @staticmethod
+    def save(item, async=True):
+        if async:
+            GameThread(target=item.save_to_database).start()
+        else:
+            item.save_to_database()
+
 global_inventory = GlobalInventory()

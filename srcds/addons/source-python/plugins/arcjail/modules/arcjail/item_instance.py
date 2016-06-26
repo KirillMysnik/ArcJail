@@ -28,6 +28,7 @@ class BaseItemInstance(dict):
     auto_activation = False
     team_restriction = (GUARDS_TEAM, PRISONERS_TEAM)
     use_team_restriction = (GUARDS_TEAM, PRISONERS_TEAM)
+    use_only_when_alive = True
 
     def __init__(self, class_id, instance_id, instance_config, category_id):
         super().__init__()

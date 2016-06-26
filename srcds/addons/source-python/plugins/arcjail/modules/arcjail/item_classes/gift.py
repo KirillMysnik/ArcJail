@@ -29,6 +29,7 @@ strings_module = build_module_strings('arcjail/items/gift')
 
 class Gift(BaseItemInstance):
     manual_activation = True
+    use_only_when_alive = False
 
     def get_purchase_denial_reason(self, player, amount):
         reason = super().get_purchase_denial_reason(player, amount)

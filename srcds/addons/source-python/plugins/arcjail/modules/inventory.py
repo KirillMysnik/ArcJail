@@ -13,11 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
+from json import load
+
 from spam_proof_commands.client import ClientCommand
 from spam_proof_commands.say import SayCommand
 
 from menus import PagedMenu, PagedOption
 from players.entity import Player
+
+from ..resource.paths import ARCJAIL_DATA_PATH
 
 from ..resource.strings import build_module_strings
 
@@ -34,6 +38,8 @@ ANTI_SPAM_TIMEOUT = 2
 
 
 strings_module = build_module_strings('inventory')
+with open(ARCJAIL_DATA_PATH / 'inventory-ad-lines.json') as f:
+    inventory_ad_lines_ids = load(f)
 
 
 def popup_select_callback(popup, player_index, option):
@@ -51,14 +57,6 @@ def popup_select_callback(popup, player_index, option):
     else:
         arcjail_user = arcjail_user_manager[player.index]
         arcjail_user.take_item(item, amount=1, async=True)
-
-        tell(
-            player, strings_module['chat_popup_notify'].tokenize(
-                text=strings_module['popup_notify activated'].tokenize(
-                    caption=item.class_.caption
-                )
-            )
-        )
 
     send_popup(player)
 

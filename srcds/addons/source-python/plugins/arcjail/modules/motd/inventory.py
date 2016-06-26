@@ -34,7 +34,7 @@ def send_page(player):
         pass
 
     def json_inventory_callback(data, error):
-        from ..shop import config_manager, strings_module as strings_shop
+        from ..inventory import strings_module as strings_inventory
 
         if error is not None:
             return
@@ -71,7 +71,7 @@ def send_page(player):
             else:
                 arcjail_user.take_item(item, amount=1, async=False)
 
-                popup_notify = strings_shop[
+                popup_notify = strings_inventory[
                     'popup_notify activated'].tokenize(
                         caption=item.class_.caption)
 
@@ -90,16 +90,16 @@ def send_page(player):
             }
 
             # Does player's team fit requirements?
-            if player.team not in item.class_.team_restriction:
+            if player.team not in item.class_.use_team_restriction:
                 item_json['cannot_use_reason'] = \
-                    strings_shop['cannot_buy team_restriction'].get_string(
-                        language)
+                    strings_inventory[
+                        'cannot_use team_restriction'].get_string(language)
 
             # Does this item allow manual activation?
             if not item.class_.manual_activation:
                 item_json['cannot_use_reason'] = \
-                    strings_shop['cannot_use no_manual_activation'].get_string(
-                        language)
+                    strings_inventory[
+                        'cannot_use no_manual_activation'].get_string(language)
 
             # Get stat values
             for stat_name in ('stat_max_per_slot',

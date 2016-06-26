@@ -1,7 +1,15 @@
+#inventory-container {
+    float: right;
+}
+
+#categories-inventory {
+    float: right;
+}
+
 .items-container {
     width: 450px;
     min-height: 350px;
-    margin: 15px;
+    margin: 0 15px;
     background-color: #262626;
 }
 

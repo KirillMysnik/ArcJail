@@ -46,7 +46,8 @@ def route_json_account(data_exchanger, json_data):
 def route_shop(steamid, auth_method, auth_token, session_id):
     context = {
         'server_id': plugin_instance.server_id,
-        'stylesheets': ('main', 'inventory', 'shop', 'notifications'),
+        'stylesheets': (
+            'main', 'inventory', 'shop', 'notifications', 'categories'),
         'scripts': ('dom', 'shop', 'notifications'),
         'steamid': steamid,
         'auth_method': auth_method,
@@ -77,7 +78,7 @@ def route_json_shop(data_exchanger, json_data):
 def route_inventory(steamid, auth_method, auth_token, session_id):
     context = {
         'server_id': plugin_instance.server_id,
-        'stylesheets': ('main', 'inventory', 'notifications'),
+        'stylesheets': ('main', 'inventory', 'notifications', 'categories'),
         'scripts': ('dom', 'inventory', 'notifications'),
         'steamid': steamid,
         'auth_method': auth_method,

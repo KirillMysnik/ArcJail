@@ -2,21 +2,29 @@ APP['shop'] = function (motdPlayer) {
     var shop = this;
     var nodes = {};
     nodes['current-account'] = document.getElementById('current-account');
+    nodes['categories-shop'] = document.getElementById('categories-shop');
+    nodes['categories-inventory'] = document.getElementById('categories-inventory');
     nodes['items-container'] = document.getElementById('items-container');
     nodes['inventory-container'] = document.getElementById('inventory-container');
     nodes['item-stats'] = document.getElementById('item-stats');
 
     var currentAccount = 0;
+    var categories;
+    var shopItems, inventoryItems;
+    var activeCategoryShop = "all", activeCategoryInventory = "all";
 
     var renderCurrentAccount = function (accountFormatted) {
         clearNode(nodes['current-account']);
         nodes['current-account'].appendChild(document.createTextNode(accountFormatted + "c"));
     };
 
-    var renderShopItems = function (items) {
+    var renderShopItems = function () {
         clearNode(nodes['items-container']);
-        for (var i = 0; i < items.length; i++) {
+        for (var i = 0; i < shopItems.length; i++) {
             (function (item) {
+                if (activeCategoryShop != "all" && item['category_id'] != activeCategoryShop)
+                    return;
+
                 if ((i + 1) % 9 == 0) {
                     var div = nodes['items-container'].appendChild(document.createElement('div'));
                     div.classList.add('clear');
@@ -111,17 +119,20 @@ APP['shop'] = function (motdPlayer) {
                     nodes['item-stats'].classList.remove('visible');
                 });
 
-            })(items[i]);
+            })(shopItems[i]);
         }
 
         var div = nodes['items-container'].appendChild(document.createElement('div'));
         div.classList.add('clear');
     };
 
-    var renderInventoryItems = function (items) {
+    var renderInventoryItems = function () {
         clearNode(nodes['inventory-container']);
-        for (var i = 0; i < items.length; i++) {
+        for (var i = 0; i < inventoryItems.length; i++) {
             (function (item) {
+                if (activeCategoryInventory != "all" && item['category_id'] != activeCategoryInventory)
+                    return;
+
                 if ((i + 1) % 9 == 0) {
                     var div = nodes['inventory-container'].appendChild(document.createElement('div'));
                     div.classList.add('clear');
@@ -211,11 +222,47 @@ APP['shop'] = function (motdPlayer) {
                     nodes['item-stats'].classList.remove('visible');
                 });
 
-            })(items[i]);
+            })(inventoryItems[i]);
         }
 
         var div = nodes['inventory-container'].appendChild(document.createElement('div'));
         div.classList.add('clear');
+    };
+
+    var renderCategories = function () {
+        clearNode(nodes['categories-shop']);
+        clearNode(nodes['categories-inventory']);
+
+        for (var i = 0; i < categories.length; i++) {
+            (function (category) {
+                var input = nodes['categories-shop'].appendChild(document.createElement('input'));
+                input.type = "button";
+                input.value = category['caption'];
+                input.classList.add('category-button');
+                if (category['id'] == activeCategoryShop)
+                    input.classList.add('active');
+
+                input.addEventListener('click', function (e) {
+                    activeCategoryShop = category['id'];
+                    renderCategories();
+                    renderShopItems();
+                });
+
+                input = nodes['categories-inventory'].appendChild(document.createElement('input'));
+                input.type = "button";
+                input.value = category['caption'];
+                input.classList.add('category-button');
+                if (category['id'] == activeCategoryInventory)
+                    input.classList.add('active');
+
+                input.addEventListener('click', function (e) {
+                    activeCategoryInventory = category['id'];
+                    renderCategories();
+                    renderInventoryItems();
+                });
+
+            })(categories[i]);
+        }
     };
 
     var handleResponseData = function (data) {
@@ -226,8 +273,14 @@ APP['shop'] = function (motdPlayer) {
             popupError(data['popup_error']);
 
         currentAccount = data['account'];
-        renderShopItems(data['shop_items']);
-        renderInventoryItems(data['inventory_items']);
+
+        categories = data['categories'];
+        shopItems = data['shop_items'];
+        inventoryItems = data['inventory_items'];
+
+        renderCategories();
+        renderShopItems();
+        renderInventoryItems();
         renderCurrentAccount(data['account_formatted']);
     };
 

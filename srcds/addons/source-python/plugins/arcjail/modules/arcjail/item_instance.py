@@ -29,7 +29,7 @@ class BaseItemInstance(dict):
     team_restriction = (GUARDS_TEAM, PRISONERS_TEAM)
     use_team_restriction = (GUARDS_TEAM, PRISONERS_TEAM)
 
-    def __init__(self, class_id, instance_id, instance_config):
+    def __init__(self, class_id, instance_id, instance_config, category_id):
         super().__init__()
 
         self._strings_class = build_module_strings(
@@ -37,8 +37,8 @@ class BaseItemInstance(dict):
 
         self.class_id = class_id
         self.instance_id = instance_id
-
         self.update(instance_config)
+        self.category_id = category_id
 
     @property
     def caption(self):

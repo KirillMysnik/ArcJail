@@ -21,7 +21,7 @@ info = PluginInfo()
 info.name = "ArcJail"
 info.basename = 'arcjail'
 info.author = 'Kirill "iPlayer" Mysnik'
-info.version = '0.1'
+info.version = '1.0'
 info.variable = '{}_version'.format(info.basename)
 info.convar = PublicConVar(
     info.variable, info.version, "{} version".format(info.name))

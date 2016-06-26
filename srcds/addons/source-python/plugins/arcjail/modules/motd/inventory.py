@@ -17,7 +17,7 @@ from players.helpers import get_client_language
 
 from ..arcjail import strings_module as strings_arcjail
 from ..arcjail.arcjail_user import arcjail_user_manager
-from ..arcjail.item_classes import get_item_instance
+from ..arcjail.item_classes import get_item_instance, item_categories_json
 
 from ..players import tell
 
@@ -82,6 +82,7 @@ def send_page(player):
             item_json = {
                 'class_id': item.class_.class_id,
                 'instance_id': item.class_.instance_id,
+                'category_id': item.class_.category_id,
                 'caption': item.class_.caption.get_string(language),
                 'description': item.class_.description.get_string(language),
                 'icon': item.class_['icon'],
@@ -117,6 +118,16 @@ def send_page(player):
 
             inventory_items.append(item_json)
 
+        categories = []
+        for category_id, category in sorted(
+                item_categories_json.items(),
+                key=lambda items: items[1]['position']):
+            categories.append({
+                'id': category_id,
+                'caption': strings_inventory[category['caption']].get_string(
+                    language),
+            })
+
         if popup_notify is not None:
             popup_notify = popup_notify.get_string(language)
 
@@ -129,6 +140,7 @@ def send_page(player):
             'inventory_items': inventory_items,
             'popup_notify': popup_notify,
             'popup_error': popup_error,
+            'categories': categories,
         }
 
     def inventory_retargeting_callback(new_page_id):

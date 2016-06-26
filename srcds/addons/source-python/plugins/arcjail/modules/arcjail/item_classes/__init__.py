@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
 from json import load
 
 from ....resource.paths import ARCJAIL_DATA_PATH
@@ -22,6 +23,9 @@ registered_item_instance_classes = {}
 
 with open(ARCJAIL_DATA_PATH / 'items.json') as f:
     items_json = load(f)
+
+with open(ARCJAIL_DATA_PATH / 'item-categories.json') as f:
+    item_categories_json = load(f)
 
 
 def register_item_instance_class(class_id, item_instance_class):
@@ -43,13 +47,23 @@ __all__ = parse_modules(current_dir)
 from . import *
 
 
-item_classes = {}
-for class_id, class_config in items_json.items():
-    item_classes[class_id] = {}
-    item_instance_class = registered_item_instance_classes[class_id]
-    for instance_id, instance_config in class_config.items():
-        item_classes[class_id][instance_id] = item_instance_class(
-            class_id, instance_id, instance_config)
+item_classes = OrderedDict()
+for category_id, category in sorted(
+        item_categories_json.items(), key=lambda items: items[1]['position']):
+
+    if category_id == "all":
+        continue
+
+    for class_id in category['class_ids']:
+        if class_id in item_classes:
+            continue
+
+        class_config = items_json[class_id]
+        item_classes[class_id] = {}
+        item_instance_class = registered_item_instance_classes[class_id]
+        for instance_id, instance_config in class_config.items():
+            item_classes[class_id][instance_id] = item_instance_class(
+                class_id, instance_id, instance_config, category_id)
 
 
 def get_item_instance(class_id, instance_id):

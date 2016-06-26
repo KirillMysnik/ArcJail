@@ -5,3 +5,11 @@
 #inventory-container {
     float: right;
 }
+
+#categories-shop {
+    float: left;
+}
+
+#categories-inventory {
+    float: right;
+}

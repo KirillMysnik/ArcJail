@@ -23,6 +23,8 @@ from ..resource.strings import build_module_strings
 
 from .arcjail.arcjail_user import arcjail_user_manager
 
+from .game_status import GameStatus, get_status
+
 from .motd.inventory import send_page
 
 from .players import tell
@@ -37,6 +39,10 @@ strings_module = build_module_strings('inventory')
 def popup_select_callback(popup, player_index, option):
     item = option.value
     player = item.player
+
+    if get_status() == GameStatus.BUSY:
+        tell(player, strings_module['fail game_busy'])
+        return
 
     reason = item.class_.try_activate(player, item.amount - 1)
     if reason is not None:
@@ -58,6 +64,10 @@ def popup_select_callback(popup, player_index, option):
 
 
 def send_popup(player):
+    if get_status() == GameStatus.BUSY:
+        tell(player, strings_module['fail game_busy'])
+        return
+
     arcjail_user = arcjail_user_manager[player.index]
 
     popup = PagedMenu(select_callback=popup_select_callback,

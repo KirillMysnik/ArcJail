@@ -1,0 +1,36 @@
+{
+  "all": {
+    "caption": "category all",
+    "position": 1,
+    "class_ids": [
+      "disposable_prop",
+      "weapon_instant",
+      "weapon_with_delivery"
+    ]
+  },
+  "props": {
+    "caption": "category props",
+    "position": 2,
+    "class_ids": ["disposable_prop"]
+  },
+  "equipment": {
+    "caption": "category equipment",
+    "position": 3,
+    "class_ids": ["weapon_instant", "weapon_with_delivery"]
+  },
+  "support": {
+    "caption": "category support",
+    "position": 4,
+    "class_ids": []
+  },
+  "map-specific": {
+    "caption": "category map_specific",
+    "position": 5,
+    "class_ids": []
+  },
+  "other": {
+    "caption": "category other",
+    "position": 100,
+    "class_ids": []
+  }
+}

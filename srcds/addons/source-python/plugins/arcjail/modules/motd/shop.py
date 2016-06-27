@@ -97,8 +97,11 @@ def send_page(player):
                         config_manager['checkout_sound'].play(player.index)
 
                     if item_instance.auto_activation:
-                        item_instance.try_activate(
+                        reason = item_instance.try_activate(
                             player, item.amount - 1, async=False)
+
+                        if reason is not None:
+                            popup_error = reason
 
                         arcjail_user.take_item(item, amount=1, async=False)
 

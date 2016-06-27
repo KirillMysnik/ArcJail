@@ -39,6 +39,10 @@ class Gift(BaseItemInstance):
         return strings_module['purchase_fail impossible']
 
     def try_activate(self, player, amount, async=True):
+        reason = super().try_activate(player, amount, async)
+        if reason is not None:
+            return reason
+
         if self['gift_type'] == "credits":
             from ...credits import earn_credits
             
@@ -61,6 +65,6 @@ class Gift(BaseItemInstance):
             tell(player, strings_module['item_received'],
                  caption=item_instance.caption, amount=item_json['amount'])
 
-        return super().try_activate(player, amount, async)
+        return None
 
 register_item_instance_class('gift', Gift)

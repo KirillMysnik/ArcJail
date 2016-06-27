@@ -42,6 +42,10 @@ class DisposableProp(BaseItemInstance):
     manual_activation = True
 
     def try_activate(self, player, amount, async=True):
+        reason = super().try_activate(player, amount, async)
+        if reason is not None:
+            return reason
+
         global props_disposed
 
         if props_disposed >= MAX_DISPOSED_PROPS_PER_ROUND:
@@ -71,7 +75,7 @@ class DisposableProp(BaseItemInstance):
         Sound(SPAWN_SOUND_PATH, index=entity.index,
               attenuation=Attenuation.STATIC).play()
 
-        return super().try_activate(player, amount, async)
+        return None
 
 register_item_instance_class('disposable_prop', DisposableProp)
 

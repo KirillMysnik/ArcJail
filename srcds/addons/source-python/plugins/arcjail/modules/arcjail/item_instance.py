@@ -15,6 +15,8 @@
 
 from ...resource.strings import build_module_strings
 
+from ..game_status import get_status, GameStatus
+
 from ..players import tell
 
 from ..teams import GUARDS_TEAM, PRISONERS_TEAM
@@ -91,7 +93,11 @@ class BaseItemInstance(dict):
         return None
 
     def try_activate(self, player, amount, async=True):
-        tell(player, strings_module['activated'].tokenize(
-            item=self.caption, left=amount))
+        if get_status() == GameStatus.BUSY:
+            return strings_module['fail game_busy']
 
         return None
+
+    def activated_message(self, player, amount):
+        tell(player, strings_module['activated'].tokenize(
+            item=self.caption, left=amount))

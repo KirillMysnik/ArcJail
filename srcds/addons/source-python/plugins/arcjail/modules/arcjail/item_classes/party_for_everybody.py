@@ -44,6 +44,10 @@ class PartyForEverybody(BaseItemInstance):
     manual_activation = True
 
     def try_activate(self, player, amount, async=True):
+        reason = super().try_activate(player, amount, async)
+        if reason is not None:
+            return reason
+
         broadcast(strings_module['announcement'].tokenize(
             player=player.name,
             caption=self.caption,
@@ -57,6 +61,6 @@ class PartyForEverybody(BaseItemInstance):
 
         Delay(self.get('delay', 0), party)
 
-        return super().try_activate(player, amount, async)
+        return None
 
 register_item_instance_class('party_for_everybody', PartyForEverybody)

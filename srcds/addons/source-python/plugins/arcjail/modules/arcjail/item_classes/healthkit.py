@@ -27,6 +27,10 @@ class Healthkit(BaseItemInstance):
     manual_activation = True
 
     def try_activate(self, player, amount, async=True):
+        reason = super().try_activate(player, amount, async)
+        if reason is not None:
+            return reason
+
         if self['health_mode'] == "set":
             if player.health >= self['health_restored']:
                 return strings_module['fail youre_full_health']
@@ -36,6 +40,6 @@ class Healthkit(BaseItemInstance):
         elif self['health_mode'] == "add":
             player.health += self['health_restored']
 
-        return super().try_activate(player, amount, async)
+        return None
 
 register_item_instance_class('healthkit', Healthkit)

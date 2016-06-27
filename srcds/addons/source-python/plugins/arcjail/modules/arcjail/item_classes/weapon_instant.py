@@ -49,10 +49,14 @@ class WeaponInstant(BaseItemInstance):
         return None
 
     def try_activate(self, player, amount, async=True):
+        reason = super().try_activate(player, amount, async)
+        if reason is not None:
+            return reason
+
         sold_weapons[player.index] = sold_weapons.get(player.index, 0) + 1
 
         player.give_named_item(self['entity_to_give'], 0)
-        return super().try_activate(player, amount, async)
+        return None
 
 register_item_instance_class('weapon_instant', WeaponInstant)
 

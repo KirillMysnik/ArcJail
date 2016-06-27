@@ -588,7 +588,7 @@ if section is not None:
     games_section.add_child(
         PrintAvailableGames,
         strings_module['arcadmin option dump_available_games'],
-        'jail.games.debug', 'available-games-list'
+        'jail.debug', 'available-games-list'
     )
 
 

@@ -31,15 +31,18 @@ APP['inventory'] = function (motdPlayer) {
 
     var renderInventoryItems = function () {
         clearNode(nodes['inventory-container']);
+        var insertedItems = 0;
         for (var i = 0; i < inventoryItems.length; i++) {
             (function (item) {
                 if (activeCategoryInventory != "all" && item['category_id'] != activeCategoryInventory)
                     return;
 
-                if ((i + 1) % 10 == 0) {
+                if ((insertedItems + 1) % 10 == 0) {
                     var div = nodes['inventory-container'].appendChild(document.createElement('div'));
                     div.classList.add('clear');
                 }
+
+                insertedItems++;
 
                 var itemContainer = nodes['inventory-container'].appendChild(document.createElement('div'));
                 itemContainer.classList.add('item-container');

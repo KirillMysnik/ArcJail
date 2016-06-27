@@ -15,6 +15,14 @@
       "max_per_slot": 1,
       "price": 2500,
       "entity_to_give": "weapon_hegrenade"
+    },
+    "smokegrenade": {
+      "caption": "title smokegrenade",
+      "description": "description smokegrenade",
+      "icon": "smokegrenade-delivered.png",
+      "max_per_slot": 1,
+      "price": 1000,
+      "entity_to_give": "weapon_smokegrenade"
     }
   },
   "weapon_instant": {

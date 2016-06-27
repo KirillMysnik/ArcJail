@@ -6,3 +6,5 @@ respawn
 heal
 cells-open
 cells-close
+inventory
+inventory-text

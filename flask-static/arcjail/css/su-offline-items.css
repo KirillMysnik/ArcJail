@@ -1,0 +1,9 @@
+fieldset {
+    margin: 0 15px;
+    padding: 20px;
+    font-size: 10pt;
+}
+
+td {
+    width: 140px;
+}

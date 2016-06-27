@@ -1,0 +1,15 @@
+{% extends "arcjail/main.html" %}
+
+{% block main %}
+    <h1>JAIL SUPERUSER PAGE</h1>
+    <div class="content">
+        <a data-motdplayer-goto="su-offline-items">Offline items management</a><br />
+        <a data-motdplayer-goto="su-online-items">Online items management</a>
+    </div>
+{% endblock %}
+
+{% block footer_js %}
+    <script type="text/javascript">
+        var motdPlayer = new MOTDPlayer("{{ server_id }}", "arcjail", "su", STEAMID, AUTH_TOKEN, SESSION_ID);
+    </script>
+{% endblock %}

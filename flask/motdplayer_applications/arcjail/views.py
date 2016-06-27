@@ -103,3 +103,59 @@ def route_json_inventory(data_exchanger, json_data):
         })
 
     return None
+
+
+@app.route(plugin_instance.get_base_authed_route('su'))
+def route_su(steamid, auth_method, auth_token, session_id):
+    context = {
+        'server_id': plugin_instance.server_id,
+        'stylesheets': ('main', 'su'),
+        'scripts': (),
+        'steamid': steamid,
+        'auth_method': auth_method,
+        'auth_token': auth_token,
+        'session_id': session_id,
+    }
+    return render_template('arcjail/route_su.html', **context)
+
+
+@app.route(plugin_instance.get_base_authed_route('su-offline-items'))
+def route_su_offline_items(steamid, auth_method, auth_token, session_id):
+    context = {
+        'server_id': plugin_instance.server_id,
+        'stylesheets': (
+            'main', 'su', 'su-offline-items', 'inventory', 'notifications'),
+        'scripts': ('dom', 'su-offline-items', 'notifications'),
+        'steamid': steamid,
+        'auth_method': auth_method,
+        'auth_token': auth_token,
+        'session_id': session_id,
+    }
+    return render_template('arcjail/route_su_offline_items.html', **context)
+
+
+@plugin_instance.json_authed_request('ajax-su-offline-items')
+def route_ajax_su_offline_items(data_exchanger, json_data):
+    if json_data['action'] == "view-inventory":
+        return data_exchanger.exchange({
+            'action': "view-inventory",
+            'steamid': json_data['steamid'],
+        })
+
+    if json_data['action'] == "give-item":
+        try:
+            amount = int(json_data['amount'])
+            if amount <= 0:
+                raise ValueError
+        except ValueError:
+            return {}
+
+        return data_exchanger.exchange({
+            'action': 'give-item',
+            'steamid': json_data['steamid'],
+            'class_id': json_data['class_id'],
+            'instance_id': json_data['instance_id'],
+            'amount': amount,
+        })
+
+    return None

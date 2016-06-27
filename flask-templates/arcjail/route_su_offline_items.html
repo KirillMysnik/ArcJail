@@ -1,0 +1,51 @@
+{% extends "arcjail/main.html" %}
+
+{% block main %}
+    <div id="item-stats" class="item-stats"></div>
+    <h1>JAIL SUPERUSER PAGE</h1>
+    <div class="content">
+        <a data-motdplayer-goto="su">Back</a><br />
+        <fieldset>
+            <legend>Search & view intentory by SteamID</legend>
+            <table>
+                <tr>
+                    <td>SteamID: </td><td><input type="text" id="view-inventory-steamid" placeholder="Type SteamID here..." /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="button" id="view-inventory-submit" value="Search & View" /></td>
+                </tr>
+            </table>
+        </fieldset>
+        <fieldset>
+            <legend>Give item</legend>
+            <table>
+                <tr>
+                    <td>SteamID: </td><td><input type="text" id="give-item-steamid" placeholder="Type SteamID here..." /></td>
+                </tr>
+                <tr>
+                    <td>class_id: </td><td><input type="text" id="give-item-classid" /></td>
+                </tr>
+                <tr>
+                    <td>instance_id: </td><td><input type="text" id="give-item-instanceid" /></td>
+                </tr>
+                <tr>
+                    <td>Amount: </td><td><input type="text" id="give-item-amount" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="button" id="give-item-submit" value="Give Item" /></td>
+                </tr>
+            </table>
+        </fieldset>
+        <div id="inventory-container" class="items-container">
+
+        </div>
+        <div class="clear"></div>
+    </div>
+{% endblock %}
+
+{% block footer_js %}
+    <script type="text/javascript">
+        var motdPlayer = new MOTDPlayer("{{ server_id }}", "arcjail", "su-offline-items", STEAMID, AUTH_TOKEN, SESSION_ID);
+        var main = new APP['su-offline-items'](motdPlayer);
+    </script>
+{% endblock %}

@@ -29,6 +29,8 @@ from .arcjail.arcjail_user import arcjail_user_manager
 
 from .game_status import GameStatus, get_status
 
+from .jail_menu import new_available_option
+
 from .motd.inventory import send_page
 
 from .players import tell
@@ -100,3 +102,23 @@ def command_inventory(command, index, team_only=None):
 @SayCommand(ANTI_SPAM_TIMEOUT, ['!inventory_text', '!inv_text'])
 def command_inventory_text(command, index, team_only=None):
     send_popup(Player(index))
+
+
+# =============================================================================
+# >> JAIL MENU ENTRIES
+# =============================================================================
+new_available_option(
+    'inventory',
+    strings_module['jailmenu_entry_inventory'],
+    send_page,
+    lambda player: True,
+    lambda player: True,
+)
+
+new_available_option(
+    'inventory-text',
+    strings_module['jailmenu_entry_inventory_text'],
+    send_popup,
+    lambda player: True,
+    lambda player: True,
+)

@@ -28,9 +28,11 @@ from ..resource.strings import build_module_strings
 
 from .game_status import GameStatus, set_status
 
+from .guards_license import guards_licenses_manager
+
 from .teams import PRISONERS_TEAM, GUARDS_TEAM
 
-from .players import broadcast, main_player_manager
+from .players import broadcast, main_player_manager, tell
 
 from . import build_module_config
 
@@ -180,6 +182,19 @@ def on_round_start(game_event):
     reset_cvars()
 
 
+@Event('player_spawn')
+def on_player_spawn(game_event):
+    player = main_player_manager.get_by_userid(game_event['userid'])
+    if player.team != GUARDS_TEAM:
+        return
+
+    if guards_licenses_manager.has_license(player):
+        return
+
+    player.team = PRISONERS_TEAM
+    tell(player, strings_module['swapped_no_license'])
+
+
 @InternalEvent('jail_game_status_reset')
 def on_jail_game_status_reset(event_var):
     if check_teams(*count_teams()) == ImbalanceCase.BALANCED:
@@ -236,7 +251,7 @@ def cl_jointeam(command, index):
         can_go_guards = check_swap(
             num_prisoners, num_guards + 1, SwapDirection.MORE_GUARDS)
 
-        if can_go_guards:
+        if can_go_guards and guards_licenses_manager.has_license(player):
             if player.team != GUARDS_TEAM:
                 player.team = GUARDS_TEAM
         else:
@@ -265,7 +280,7 @@ def cl_jointeam(command, index):
         can_go_guards = check_swap(
             num_prisoners, num_guards + 1, SwapDirection.MORE_GUARDS)
 
-        if can_go_guards:
+        if can_go_guards and guards_licenses_manager.has_license(player):
             return True
 
         deny(player)

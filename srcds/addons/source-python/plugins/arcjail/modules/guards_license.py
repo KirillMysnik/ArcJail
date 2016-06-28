@@ -162,8 +162,8 @@ if section is not None:
         base_filter = 'human'
         include_equal_priorities = True
 
-        def filter(self, player):
-            if not super().filter(player):
+        def filter(self, admin, player):
+            if not super().filter(admin, player):
                 return False
 
             return guards_licenses_manager.has_license(player)
@@ -193,8 +193,8 @@ if section is not None:
         base_filter = 'human'
         include_equal_priorities = True
 
-        def filter(self, player):
-            if not super().filter(player):
+        def filter(self, admin, player):
+            if not super().filter(admin, player):
                 return False
 
             return not guards_licenses_manager.has_license(player)
@@ -218,8 +218,8 @@ if section is not None:
         base_filter = 'human'
         include_equal_priorities = False
 
-        def filter(self, player):
-            if not super().filter(player):
+        def filter(self, admin, player):
+            if not super().filter(admin, player):
                 return False
 
             if not guards_licenses_manager.has_license(player):

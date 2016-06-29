@@ -19,37 +19,37 @@ from cvars import ConVar
 
 from controlled_cvars.handlers import bool_handler, int_handler
 
-from ...resource.strings import build_module_strings
+from ....resource.strings import build_module_strings
 
-from ..damage_hook import (
+from ...damage_hook import (
     get_hook, is_world, protected_player_manager,
     strings_module as strings_damage_hook)
 
-from ..equipment_switcher import saved_player_manager
+from ...equipment_switcher import saved_player_manager
 
-from ..falldmg_protector import protect as falldmg_protect
+from ...falldmg_protector import protect as falldmg_protect
 
-from ..no_ff_spam import (
+from ...no_ff_spam import (
     disable as no_ff_spam_disable, enable as no_ff_spam_enable)
 
-from ..players import broadcast, main_player_manager
+from ...players import broadcast, main_player_manager
 
-from ..rebels import register_rebel_filter, unregister_rebel_filter
+from ...rebels import register_rebel_filter, unregister_rebel_filter
 
-from ..show_damage import show_damage
+from ...show_damage import show_damage
 
-from ..silent_cvars import silent_set
+from ...silent_cvars import silent_set
 
-from ..teams import GUARDS_TEAM
+from ...teams import GUARDS_TEAM
 
-from .. import build_module_config
+from ... import build_module_config
 
-from .base_classes.map_game import MapGame
-from .base_classes.map_game_team_based import MapGameTeamBased
+from ..base_classes.map_game import MapGame
+from ..base_classes.map_game_team_based import MapGameTeamBased
 
-from . import (
+from .. import (
     add_available_game, config_manager as config_manager_common,
-    game_event_handler, helper_set_loser, helper_set_winner, push, stage,
+    game_event_handler, helper_set_loser, push, stage,
     strings_module as strings_common)
 
 

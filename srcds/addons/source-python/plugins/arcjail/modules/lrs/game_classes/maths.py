@@ -15,7 +15,7 @@
 
 from random import randint
 
-from ...games.maths import strings_module as strings_games
+from ...games.game_classes.maths import strings_module as strings_games
 
 from ..base_classes.chat_game import ChatGame
 

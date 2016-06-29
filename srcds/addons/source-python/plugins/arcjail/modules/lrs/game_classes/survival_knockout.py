@@ -17,7 +17,7 @@ from ....arcjail import InternalEvent
 
 from ...damage_hook import is_world, protected_player_manager
 
-from ...games.survival_knockout import (
+from ...games.game_classes.survival_knockout import (
     push_by_damage_info, strings_module as strings_games)
 
 from ...players import main_player_manager

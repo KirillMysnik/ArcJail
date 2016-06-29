@@ -17,18 +17,13 @@ from random import choice
 
 from listeners.tick import Delay
 
-from ...resource.strings import build_module_strings
+from ....resource.strings import build_module_strings
 
-from ..jail_map import get_players_in_area
+from ...jail_map import get_players_in_area
 
-from ..players import broadcast
+from ..base_classes.map_game import MapGame
 
-from .base_classes.map_game import MapGame
-
-from . import (
-    add_available_game,  helper_set_loser,
-    helper_set_neutral, helper_set_winner, push, stage,
-    strings_module as strings_games)
+from .. import add_available_game, push, stage
 
 
 RECOLLECT_PLAYERS_INTERVAL = 0.25

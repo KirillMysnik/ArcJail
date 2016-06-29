@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ...resource.strings import build_module_strings
+from ....resource.strings import build_module_strings
 
 
 strings_module = build_module_strings('games/maths')

@@ -21,18 +21,17 @@ from listeners.tick import on_tick_listener_manager
 
 from controlled_cvars.handlers import bool_handler, int_handler
 
-from ...arcjail import InternalEvent, load_downloadables
+from ....arcjail import InternalEvent, load_downloadables
 
-from ...resource.strings import build_module_strings
+from ....resource.strings import build_module_strings
 
-from ..players import broadcast, main_player_manager
+from ...players import broadcast, main_player_manager
 
-from .. import build_module_config
+from ... import build_module_config
 
-from .base_classes.jail_game import JailGame
-from .base_classes.prepare_time import PrepareTime
+from ..base_classes.prepare_time import PrepareTime
 
-from . import (
+from .. import (
     add_available_game, game_event_handler, helper_set_loser,
     helper_set_winner, stage)
 

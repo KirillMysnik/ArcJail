@@ -17,7 +17,7 @@ from random import choice
 
 from listeners.tick import Delay
 
-from ...games.race import (
+from ...games.game_classes.race import (
     MAX_RECOLLECT_ITERATIONS, RECOLLECT_PLAYERS_INTERVAL,
     strings_module as strings_games)
 

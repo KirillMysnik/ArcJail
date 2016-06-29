@@ -17,34 +17,30 @@ from entities.entity import Entity
 
 from mathlib import Vector
 
-from ...resource.strings import build_module_strings
+from ....resource.strings import build_module_strings
 
-from ..damage_hook import (
+from ...damage_hook import (
     get_hook, is_world, protected_player_manager,
     strings_module as strings_damage_hook)
 
-from ..equipment_switcher import saved_player_manager
+from ...players import main_player_manager
 
-from ..players import main_player_manager
+from ...rebels import register_rebel_filter
 
-from ..rebels import register_rebel_filter
+from ...show_damage import show_damage
 
-from ..show_damage import show_damage
+from ...teams import GUARDS_TEAM
 
-from ..teams import GUARDS_TEAM
+from .. import add_available_game, stage
 
 from .survival import SurvivalPlayerBasedFriendlyFire
 from .survival import SurvivalTeamBasedFriendlyFire
-
-from . import (
-    add_available_game, stage)
 
 
 strings_module = build_module_strings('games/survival_knockout')
 
 
 def push_by_damage_info(victim, attacker, info, map_data):
-    # TODO: When damage_hook module is refactored, use TakeDamageInfo instead
     inflictor = Entity(info.inflictor)
     d = victim.origin - inflictor.origin
 

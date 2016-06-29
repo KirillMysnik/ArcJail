@@ -27,7 +27,7 @@ from ...equipment_switcher import saved_player_manager
 
 from ...falldmg_protector import protect as falldmg_protect
 
-from ...games.survival import (
+from ...games.game_classes.survival import (
     PossibleDeadEndWarning, strings_module as strings_games)
 
 from ...games import play_flawless_effects

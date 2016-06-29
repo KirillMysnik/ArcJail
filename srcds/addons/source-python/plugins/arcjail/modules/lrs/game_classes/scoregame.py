@@ -19,7 +19,7 @@ from ....resource.strings import build_module_strings
 
 from ...damage_hook import get_hook, protected_player_manager
 
-from ...games.scoregame import (
+from ...games.game_classes.scoregame import (
     get_goal_sound, config_manager as config_manager_games)
 
 from ...games import play_flawless_effects

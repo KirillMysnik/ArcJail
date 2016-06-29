@@ -94,6 +94,7 @@ class GuardsLicensesManager(dict):
             db_session = Session()
 
             db_guards_license = DB_GuardsLicense()
+            db_guards_license.steamid = player.steamid
             db_guards_license.issuer = issuer.steamid
             db_guards_license.valid_from = current_time
             db_guards_license.valid_through = current_time + duration

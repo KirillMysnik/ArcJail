@@ -131,6 +131,8 @@ class FlashbangBattle(CombatGame):
         temp_entity.blue  = 255
         temp_entity.alpha = 150
 
+        temp_entity.create(RecipientFilter())
+
 add_available_game(FlashbangBattle)
 
 

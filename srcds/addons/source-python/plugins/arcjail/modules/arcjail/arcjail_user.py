@@ -88,7 +88,8 @@ class ArcjailUser:
             steamid=self._steamid).first()
 
         if db_arcjail_user is None:
-            self.account = credits_config['initial_credits']['initial_credits']
+            self.account = int(
+                credits_config['initial_credits']['initial_credits'])
 
             db_arcjail_user = DB_ArcjailUser()
             db_arcjail_user.steamid = self._steamid

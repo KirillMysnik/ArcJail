@@ -5,7 +5,7 @@
       "description": "description glock",
       "icon": "pistol-delivered.png",
       "max_per_slot": 1,
-      "price": 5000,
+      "price": 4000,
       "entity_to_give": "weapon_glock"
     },
     "grenade": {
@@ -13,7 +13,7 @@
       "description": "description hegrenade",
       "icon": "grenade-delivered.png",
       "max_per_slot": 1,
-      "price": 2500,
+      "price": 2000,
       "entity_to_give": "weapon_hegrenade"
     },
     "smokegrenade": {
@@ -21,7 +21,7 @@
       "description": "description smokegrenade",
       "icon": "smokegrenade-delivered.png",
       "max_per_slot": 1,
-      "price": 1000,
+      "price": 750,
       "entity_to_give": "weapon_smokegrenade"
     }
   },
@@ -31,7 +31,7 @@
       "description": "description glock",
       "icon": "pistol.png",
       "max_per_slot": 1,
-      "price": 2500,
+      "price": 2000,
       "entity_to_give": "weapon_glock",
       "max_sold_per_round": 8
     },
@@ -40,7 +40,7 @@
       "description": "description hegrenade",
       "icon": "grenade.png",
       "max_per_slot": 1,
-      "price": 1750,
+      "price": 1500,
       "entity_to_give": "weapon_hegrenade",
       "max_sold_per_round": 8
     }

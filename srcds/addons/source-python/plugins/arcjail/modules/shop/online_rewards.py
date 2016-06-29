@@ -38,7 +38,7 @@ config_manager = build_module_config('shop/online_rewards')
 config_manager.controlled_cvar(
     int_handler,
     'timeout',
-    default=3600,
+    default=1800,
     description="Reward constantly playing players every X seconds"
 )
 

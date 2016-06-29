@@ -47,6 +47,13 @@ config_manager.controlled_cvar(
     description="Enable/Disable team balancing",
 )
 
+text_msg = {
+    'denied your_team': TextMsg(strings_module['denied your_team']),
+    'denied locked':  TextMsg(strings_module['denied locked']),
+    'denied balance': TextMsg(strings_module['denied balance']),
+    'denied no_license': TextMsg(strings_module['denied no_license']),
+}
+
 
 def ratio_handler(cvar):
     try:
@@ -191,8 +198,12 @@ def on_player_spawn(game_event):
     if guards_licenses_manager.has_license(player):
         return
 
+    # Bots will help us testing such things as LR on them
+    if player.steamid == "BOT":
+        return
+
     player.team = PRISONERS_TEAM
-    tell(player, strings_module['swapped_no_license'])
+    tell(player, strings_module['swapped no_license'])
 
 
 @InternalEvent('jail_game_status_reset')
@@ -223,7 +234,7 @@ def cl_jointeam(command, index):
     # for unassigned (team 0) players trying to use auto-assign (team 0)
     if player.team == new_team != 0:
         deny(player)
-        TextMsg(strings_module['denied_your_team']).send(index)
+        text_msg['denied your_team'].send(index)
         show_team_selection(player)
         return False
 
@@ -235,7 +246,7 @@ def cl_jointeam(command, index):
     # (e.g. Last Request in progress)
     if _locked:
         deny(player)
-        TextMsg(strings_module['denied_locked']).send(index)
+        text_msg['denied locked'].send(index)
         return False
 
     # We count team members as if player has already left their team
@@ -270,7 +281,7 @@ def cl_jointeam(command, index):
 
         if can_go_guards and not can_go_prisoners:
             deny(player)
-            TextMsg(strings_module['denied_balance']).send(index)
+            text_msg['denied balance'].send(index)
             show_team_selection(player)
             return False
 
@@ -284,7 +295,12 @@ def cl_jointeam(command, index):
             return True
 
         deny(player)
-        TextMsg(strings_module['denied_balance']).send(index)
+
+        if guards_licenses_manager.has_license(player):
+            text_msg['denied balance'].send(index)
+        else:
+            text_msg['denied no_license'].send(index)
+
         show_team_selection(player)
         return False
 

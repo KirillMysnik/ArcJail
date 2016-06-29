@@ -18,8 +18,8 @@ from ....arcjail import InternalEvent
 from ...players import broadcast, main_player_manager
 
 from .. import (
-    config_manager, game_event_handler, LastRequestGameStatus,
-    launch_win_reward, stage, strings_module)
+    config_manager, game_event_handler, game_internal_event_handler,
+    LastRequestGameStatus, launch_win_reward, stage, strings_module)
 
 from .base_game import BaseGame
 
@@ -152,10 +152,10 @@ class JailGame(BaseGame):
 
             self.set_stage_group('abort-player-out')
 
-    @game_event_handler('jailgame-player-disconnect', 'player_disconnect')
-    def event_jailgame_player_disconnect(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+    @game_internal_event_handler(
+        'jailgame-main-player-deleted', 'main_player_deleted')
+    def event_jailgame_main_player_deleted(self, event_var):
+        player = event_var['main_player']
 
         if player in self._players:
             self._players.remove(player)

@@ -51,12 +51,10 @@ class PlayerPreserving(JailGame):
         if player in self._players_all:
             self.set_stage_group('abort-player-death')
 
-    @game_event_handler(
-        'playerpreserving-player-disconnect', 'player_disconnect')
-    def event_playerpreserving_player_disconnect(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
-
+    @game_internal_event_handler(
+        'playerpreserving-main-player-deleted', 'main_player_deleted')
+    def event_playerpreserving_main_player_deleted(self, event_var):
+        player = event_var['main_player']
         if player in self._players_all:
             self.set_stage_group('abort-player-disconnect')
 

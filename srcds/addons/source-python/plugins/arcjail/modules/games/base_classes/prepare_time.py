@@ -108,7 +108,7 @@ class PrepareTime(JailGame):
             self.set_stage_group('abort-prepare-interrupted')
 
     def _prepare_event_handler_main_player_deleted(self, event_var):
-        player = event_var['player']
+        player = event_var['main_player']
         if player in self._players or player == self.leader:
             self.set_stage_group('abort-prepare-interrupted')
 

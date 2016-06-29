@@ -28,8 +28,9 @@ from ...rebels import get_rebels
 from ...skins import cancel_model_request, make_model_request
 
 from .. import (
-    config_manager, game_event_handler, helper_set_winner, helper_set_loser,
-    MIN_PLAYERS_IN_GAME, stage, strings_module)
+    config_manager, game_event_handler, game_internal_event_handler,
+    helper_set_winner, helper_set_loser, MIN_PLAYERS_IN_GAME, stage,
+    strings_module)
 
 from .map_game import MapGame
 
@@ -379,10 +380,10 @@ class MapGameTeamBased(MapGame):
             elif len(self._players) < MIN_PLAYERS_IN_GAME:
                 self.set_stage_group('abort-not-enough-players')
 
-    @game_event_handler('jailgame-player-disconnect', 'player_disconnect')
-    def event_jailgame_player_disconnect(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+    @game_internal_event_handler(
+        'jailgame-main-player-deleted', 'main_player_deleted')
+    def event_jailgame_main_player_deleted(self, event_var):
+        player = event_var['main_player']
 
         if self.leader == player:
             self.set_stage_group('abort-leader-disconnect')

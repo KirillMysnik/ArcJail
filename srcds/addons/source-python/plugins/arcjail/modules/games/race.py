@@ -87,6 +87,7 @@ class RaceSingleWinnerStandard(RaceBase):
                 )
 
         else:
+            self._results['losers'] = ()
             self._results['winners'] = (choice(tuple(winners)), )
             self.set_stage_group('game-end-players-won')
 
@@ -121,6 +122,7 @@ class RaceMultipleWinnersStandard(RaceBase):
                 )
 
         else:
+            self._results['losers'] = ()
             self._results['winners'] = winners
             self.set_stage_group('game-end-players-won')
 
@@ -156,6 +158,7 @@ class RaceSingleLoserStandard(RaceBase):
 
         else:
             self._results['losers'] = (choice(tuple(losers)), )
+            self._results['winners'] = ()
             self.set_stage_group('game-end-players-won')
 
     @push(None, 'race_player_lost')
@@ -190,6 +193,7 @@ class RaceMultipleLosersStandard(RaceBase):
 
         else:
             self._results['losers'] = losers
+            self._results['winners'] = ()
             self.set_stage_group('game-end-players-won')
 
     @push(None, 'race_players_lost')

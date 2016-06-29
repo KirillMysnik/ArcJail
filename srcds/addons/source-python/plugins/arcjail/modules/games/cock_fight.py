@@ -128,7 +128,7 @@ class CockFight(PrepareTime):
                         InternalEvent.fire(
                             'jail_game_cock_fight_winners',
                             winners=winners,
-                            starting_players_number=self._max_score,
+                            starting_player_number=self._max_score,
                         )
 
                         self.set_stage_group('destroy')

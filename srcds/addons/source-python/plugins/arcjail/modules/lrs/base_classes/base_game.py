@@ -22,7 +22,7 @@ from .. import GameLauncher, remove_instance, stage
 
 class BaseGame(BaseGame):
     settings = {}
-    caption = None
+    _caption = None
     module = None
 
     class GameLauncher(GameLauncher):
@@ -51,8 +51,8 @@ class BaseGame(BaseGame):
             game_internal_event_handler_.game_instance = self
 
     @property
-    def full_caption(self):
-        return self.caption
+    def caption(self):
+        return self._caption
 
     @stage('destroy')
     def stage_destroy(self):

@@ -82,7 +82,7 @@ def build_survival_knockout_base(*parent_classes):
 class SurvivalKnockoutPlayerBased(
         build_survival_knockout_base(SurvivalPlayerBasedFriendlyFire)):
 
-    caption = strings_games['title knockout_playerbased']
+    _caption = strings_games['title knockout_playerbased']
     module = 'survival_knockout_playerbased'
 
 add_available_game(SurvivalKnockoutPlayerBased)
@@ -91,7 +91,7 @@ add_available_game(SurvivalKnockoutPlayerBased)
 class SurvivalKnockoutTeamBased(
         build_survival_knockout_base(SurvivalTeamBasedFriendlyFire)):
 
-    caption = strings_games['title knockout_teambased']
+    _caption = strings_games['title knockout_teambased']
     module = 'survival_knockout_teambased'
 
 add_available_game(SurvivalKnockoutTeamBased)

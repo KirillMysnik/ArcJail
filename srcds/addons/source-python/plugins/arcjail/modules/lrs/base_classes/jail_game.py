@@ -74,7 +74,7 @@ class JailGame(BaseGame):
         broadcast(strings_module['game_started'].tokenize(
             player1=self.prisoner.name,
             player2=self.guard.name,
-            game=self.full_caption
+            game=self.caption
         ))
 
     @stage('unsend-popups')
@@ -117,7 +117,7 @@ class JailGame(BaseGame):
         broadcast(strings_module['common_victory'].tokenize(
             winner=winner.name,
             loser=loser.name,
-            game=self.full_caption,
+            game=self.caption,
         ))
 
         self.set_stage_group('destroy')
@@ -137,7 +137,7 @@ class JailGame(BaseGame):
         broadcast(strings_module['common_draw'].tokenize(
             winner=self.prisoner.name,
             loser=self.guard.name,
-            game=self.full_caption,
+            game=self.caption,
         ))
 
         self.set_stage_group('destroy')

@@ -24,12 +24,18 @@ from listeners.tick import Delay
 from menus import PagedMenu, PagedOption
 from players.helpers import get_client_language
 
+from path import Path
+
+from advanced_ts import BaseLangStrings
+
 from controlled_cvars.handlers import (
     bool_handler, color_handler, float_handler, int_handler,
     sound_nullable_handler, string_handler
 )
 
 from ...arcjail import InternalEvent, load_downloadables
+
+from ...info import info
 
 from ...resource.paths import ARCJAIL_LOG_PATH
 
@@ -58,6 +64,7 @@ MAX_PLAYERS_NAMES_LIST_LENGTH = 36
 MAX_PLAYER_NAME_LENGTH = 10
 
 strings_module = build_module_strings('games/common')
+strings_game_captions = BaseLangStrings(Path(info.basename) / "games")
 config_manager = build_module_config('games/common')
 
 config_manager.controlled_cvar(
@@ -233,7 +240,7 @@ class DestructionFailure(Warning):
 
 class GameLauncher:
     def __init__(self, game_class):
-        self.caption = game_class.caption
+        self.caption = game_class._caption
         self.game_class = game_class
 
     def __eq__(self, value):

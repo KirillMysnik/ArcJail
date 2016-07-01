@@ -36,7 +36,7 @@ class BaseGame(metaclass=GameMeta):
             return self.game_class(leader_player, players, **kwargs)
 
     module = None
-    caption = strings_module['title basegame']
+    _caption = strings_module['title basegame']
     stage_groups = {
         'init': [
             "register-event-handlers",
@@ -66,6 +66,10 @@ class BaseGame(metaclass=GameMeta):
 
         for game_internal_event_handler_ in self._internal_events.values():
             game_internal_event_handler_.game_instance = self
+
+    @property
+    def caption(self):
+        return self._caption
 
     @property
     def players(self):

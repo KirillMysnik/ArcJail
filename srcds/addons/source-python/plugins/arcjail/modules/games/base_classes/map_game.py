@@ -29,8 +29,8 @@ from ...equipment_switcher import (
 from ...falldmg_protector import unprotect
 
 from ...jail_map import (
-    get_cage_names, get_games, get_players_in_area, register_push_handler,
-    teleport_player, unregister_push_handler)
+    get_cage_names, get_games, get_map_string, get_players_in_area,
+    register_push_handler, teleport_player, unregister_push_handler)
 
 from ...noblock import lock as lock_noblock
 from ...noblock import unlock as unlock_noblock
@@ -44,7 +44,8 @@ from ...silent_cvars import silent_set
 
 from .. import (
     config_manager, format_player_names, GameLauncher, helper_set_loser,
-    helper_set_neutral, helper_set_winner, Push, stage, strings_module)
+    helper_set_neutral, helper_set_winner, Push, stage, strings_game_captions,
+    strings_module)
 
 from .prepare_time import PrepareTime
 
@@ -54,7 +55,7 @@ DEFAULT_GRAVITY = 800
 
 class MapGame(PrepareTime):
     module = None
-    caption = strings_module['title mapgame']
+    _caption = strings_module['title mapgame']
 
     cvar_pushscale = ConVar('phys_pushscale')
     cvar_timescale = ConVar('phys_timescale')
@@ -83,7 +84,17 @@ class MapGame(PrepareTime):
 
     class GameLauncher(GameLauncher):
         def __init__(self, game_class, map_data):
-            self.caption = map_data.caption or game_class.caption
+            if map_data.caption:
+                try:
+                    self.caption = get_map_string(map_data.caption)
+                except KeyError:
+                    try:
+                        self.caption = strings_game_captions[map_data.caption]
+                    except KeyError:
+                        self.caption = game_class._caption
+            else:
+                self.caption = game_class._caption
+
             self.game_class = game_class
             self.map_data = map_data
 
@@ -151,6 +162,18 @@ class MapGame(PrepareTime):
 
             attr.game_instance = self
             self._pushes[(attr.slot_id, attr.push_id)] = attr
+
+    @property
+    def caption(self):
+        if self.map_data.caption:
+            try:
+                return get_map_string(self.map_data.caption)
+            except KeyError:
+                try:
+                    return strings_game_captions[self.map_data.caption]
+                except KeyError:
+                    return self._caption
+        return self._caption
 
     def _weapon_drop_filter(self, player):
         return player not in self._players

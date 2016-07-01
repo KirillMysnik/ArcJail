@@ -26,7 +26,7 @@ strings_module = build_module_strings('lrs/he_battle')
 
 
 class HighExplosiveBattle(CombatGame):
-    caption = strings_module['title']
+    _caption = strings_module['title']
     module = "he_battle"
     settings = [
         Setting('health', strings_module['settings hp'],

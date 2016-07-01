@@ -26,7 +26,7 @@ strings_module = build_module_strings('lrs/knife_battle')
 
 
 class KnifeBattle(CombatGame):
-    caption = strings_module['title']
+    _caption = strings_module['title']
     module = "knife_battle"
     settings = [
         Setting('health', strings_module['settings hp'],

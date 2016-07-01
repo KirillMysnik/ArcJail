@@ -52,7 +52,7 @@ class MapGameTeamBased(MapGame):
         def team_num_str(self):
             return 'team{}'.format(self.team_num)
 
-    caption = '$games_base title_mapgame_teambased'
+    _caption = '$games_base title_mapgame_teambased'
     num_teams = 2
 
     stage_groups = {

@@ -190,14 +190,14 @@ class ScoreGameBase(MapGameTeamBased):
 
 
 class ScoreGameStandard(ScoreGameBase, PlayerPreserving):
-    caption = strings_module['title standard']
+    _caption = strings_module['title standard']
     module = 'scoregame_standard'
 
 add_available_game(ScoreGameStandard)
 
 
 class ScoreGameNoPropKill(ScoreGameBase, PlayerPreserving):
-    caption = strings_module['title nopropkill']
+    _caption = strings_module['title nopropkill']
     module = 'scoregame_nopropkill'
 
     stage_groups = {
@@ -239,7 +239,7 @@ add_available_game(ScoreGameNoPropKill)
 
 
 class ScoreGameAllowDeaths(ScoreGameBase):
-    caption = strings_module['title allowdeaths']
+    _caption = strings_module['title allowdeaths']
     module = 'scoregame_allowdeaths'
 
 add_available_game(ScoreGameAllowDeaths)

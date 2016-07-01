@@ -62,7 +62,7 @@ class RaceBase(MapGame):
 
 
 class RaceSingleWinnerStandard(RaceBase):
-    caption = strings_module['title single_winner standard']
+    _caption = strings_module['title single_winner standard']
     module = 'race_single_winner_standard'
 
     def collect_winners(self, iteration=1):
@@ -97,7 +97,7 @@ add_available_game(RaceSingleWinnerStandard)
 
 
 class RaceMultipleWinnersStandard(RaceBase):
-    caption = strings_module['title multiple_winners standard']
+    _caption = strings_module['title multiple_winners standard']
     module = 'race_multiple_winners_standard'
 
     def collect_winners(self, iteration=1):
@@ -132,7 +132,7 @@ add_available_game(RaceMultipleWinnersStandard)
 
 
 class RaceSingleLoserStandard(RaceBase):
-    caption = strings_module['title single_loser standard']
+    _caption = strings_module['title single_loser standard']
     module = 'race_single_loser_standard'
 
     def collect_losers(self, iteration=1):
@@ -167,7 +167,7 @@ add_available_game(RaceSingleLoserStandard)
 
 
 class RaceMultipleLosersStandard(RaceBase):
-    caption = strings_module['title multiple_losers standard']
+    _caption = strings_module['title multiple_losers standard']
     module = 'race_multiple_losers_standard'
 
     def collect_losers(self, iteration=1):

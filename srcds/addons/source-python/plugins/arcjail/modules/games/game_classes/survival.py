@@ -199,7 +199,7 @@ def build_survival_base(*parent_classes):
 
 
 class SurvivalTeamBased(build_survival_base(MapGameTeamBased)):
-    caption = strings_module['title teambased_standard']
+    _caption = strings_module['title teambased_standard']
     module = 'survival_teambased_standard'
 
     stage_groups = {
@@ -295,7 +295,7 @@ add_available_game(SurvivalTeamBased)
 
 
 class SurvivalPlayerBased(build_survival_base(MapGame)):
-    caption = strings_module['title playerbased_standard']
+    _caption = strings_module['title playerbased_standard']
     module = 'survival_playerbased_standard'
 
     stage_groups = {
@@ -402,7 +402,7 @@ def build_survival_friendlyfire_base(*parent_classes):
 class SurvivalTeamBasedFriendlyFire(
         build_survival_friendlyfire_base(SurvivalTeamBased)):
 
-    caption = strings_module['title teambased_friendlyfire']
+    _caption = strings_module['title teambased_friendlyfire']
     module = 'survival_teambased_friendlyfire'
 
     @stage('survival-equip-damage-hooks')
@@ -565,7 +565,7 @@ add_available_game(SurvivalTeamBasedFriendlyFire)
 class SurvivalPlayerBasedFriendlyFire(
         build_survival_friendlyfire_base(SurvivalPlayerBased)):
 
-    caption = strings_module['title playerbased_friendlyfire']
+    _caption = strings_module['title playerbased_friendlyfire']
     module = 'survival_playerbased_friendlyfire'
 
     @stage('survival-equip-damage-hooks')

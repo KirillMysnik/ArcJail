@@ -47,7 +47,7 @@ strings_module = build_module_strings('lrs/shot4shot')
 
 
 class Shot4Shot(CombatGame):
-    caption = strings_module['title']
+    _caption = strings_module['title']
     module = "shot4shot"
     settings = [
         Setting('using_map_data', strings_common['settings map_data'],

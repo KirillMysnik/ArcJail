@@ -30,7 +30,7 @@ strings_module = build_module_strings('lrs/nozoom_battle')
 
 
 class NozoomBattle(CombatGame):
-    caption = strings_module['title']
+    _caption = strings_module['title']
     module = "nozoom_battle"
     settings = [
         Setting('health', strings_module['settings hp'],

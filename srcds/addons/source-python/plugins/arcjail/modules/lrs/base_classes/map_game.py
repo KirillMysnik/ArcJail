@@ -32,7 +32,8 @@ from ...equipment_switcher import (
 from ...falldmg_protector import unprotect
 
 from ...jail_map import (
-    get_games, register_push_handler, teleport_player, unregister_push_handler)
+    get_games, get_map_string, register_push_handler, teleport_player,
+    unregister_push_handler)
 
 from ...noblock import lock as lock_noblock
 from ...noblock import unlock as unlock_noblock
@@ -46,7 +47,7 @@ from ...team_balancer import lock_teams, unlock_teams
 
 from ...teams import GUARDS_TEAM, PRISONERS_TEAM
 
-from .. import GameLauncher, LastRequestGameStatus, stage, strings_module
+from .. import GameLauncher, stage, strings_game_captions, strings_module
 
 from .prepare_time import PrepareTime
 
@@ -79,7 +80,17 @@ class MapGame(PrepareTime):
 
     class GameLauncher(GameLauncher):
         def __init__(self, game_class, map_data):
-            self.caption = map_data.caption or game_class.caption
+            if map_data.caption:
+                try:
+                    self.caption = get_map_string(map_data.caption)
+                except KeyError:
+                    try:
+                        self.caption = strings_game_captions[map_data.caption]
+                    except KeyError:
+                        self.caption = game_class._caption
+            else:
+                self.caption = game_class._caption
+
             self.game_class = game_class
             self.map_data = map_data
 
@@ -116,8 +127,16 @@ class MapGame(PrepareTime):
             self._pushes[(attr.slot_id, attr.push_id)] = attr
 
     @property
-    def full_caption(self):
-        return self.map_data.caption or self.caption
+    def caption(self):
+        if self.map_data.caption:
+            try:
+                return get_map_string(self.map_data.caption)
+            except KeyError:
+                try:
+                    return strings_game_captions[self.map_data.caption]
+                except KeyError:
+                    return self._caption
+        return self._caption
 
     def _weapon_drop_filter(self, player):
         return player not in self._players

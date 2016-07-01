@@ -56,7 +56,7 @@ strings_module = build_module_strings('games/survival_flashbang_arena')
 
 
 class SurvivalFlashbangArenaPlayerBased(SurvivalPlayerBasedFriendlyFire):
-    caption = strings_module['title playerbased']
+    _caption = strings_module['title playerbased']
     module = 'survival_flashbang_arena_playerbased'
     stage_groups = {
                        'mapgame-start': [

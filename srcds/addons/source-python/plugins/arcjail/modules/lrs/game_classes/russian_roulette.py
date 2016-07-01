@@ -58,7 +58,7 @@ config_manager.controlled_cvar(
 
 
 class RussianRoulette(CombatGame):
-    caption = strings_module['title']
+    _caption = strings_module['title']
     module = "russian_roulette"
     settings = [
         HiddenSetting('health', 1),

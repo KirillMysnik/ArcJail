@@ -189,14 +189,14 @@ def build_survival_base(*parent_classes):
 
 
 class SurvivalPlayerBased(build_survival_base(MapGame)):
-    caption = strings_games['title playerbased_standard']
+    _caption = strings_games['title playerbased_standard']
     module = 'survival_playerbased_standard'
 
 add_available_game(SurvivalPlayerBased)
 
 
 class SurvivalTeamBased(build_survival_base(MapGameTeamBased)):
-    caption = strings_games['title teambased_standard']
+    _caption = strings_games['title teambased_standard']
     module = 'survival_teambased_standard'
 
 add_available_game(SurvivalTeamBased)
@@ -295,7 +295,7 @@ def build_survival_friendlyfire_base(*parent_classes):
 class SurvivalTeamBasedFriendlyFire(
         build_survival_friendlyfire_base(SurvivalTeamBased)):
 
-    caption = strings_games['title teambased_friendlyfire']
+    _caption = strings_games['title teambased_friendlyfire']
     module = 'survival_teambased_friendlyfire'
 
 add_available_game(SurvivalTeamBasedFriendlyFire)
@@ -304,7 +304,7 @@ add_available_game(SurvivalTeamBasedFriendlyFire)
 class SurvivalPlayerBasedFriendlyFire(
         build_survival_friendlyfire_base(SurvivalPlayerBased)):
 
-    caption = strings_games['title playerbased_friendlyfire']
+    _caption = strings_games['title playerbased_friendlyfire']
     module = 'survival_playerbased_friendlyfire'
 
 add_available_game(SurvivalPlayerBasedFriendlyFire)

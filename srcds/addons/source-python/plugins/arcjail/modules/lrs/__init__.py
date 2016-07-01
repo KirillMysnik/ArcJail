@@ -36,7 +36,8 @@ from ..game_status import (
     GameStatus, get_status, set_status, strings_module as strings_game_status)
 
 from ..games import (
-    game_event_handler, game_internal_event_handler, GameMeta, push, stage)
+    game_event_handler, game_internal_event_handler, GameMeta, push, stage,
+    strings_game_captions)
 
 from ..players import broadcast, main_player_manager, tell
 
@@ -219,7 +220,7 @@ class LastRequestGameStatus:
 
 class GameLauncher:
     def __init__(self, game_class):
-        self.caption = game_class.caption
+        self.caption = game_class._caption
         self.game_class = game_class
 
     def __eq__(self, other):

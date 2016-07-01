@@ -41,7 +41,7 @@ strings_module = build_module_strings('lrs/flashbang_battle')
 
 
 class FlashbangBattle(CombatGame):
-    caption = strings_module['title']
+    _caption = strings_module['title']
     module = "flashbang_battle"
     settings = [
         HiddenSetting('health', 1),

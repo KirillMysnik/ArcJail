@@ -29,7 +29,7 @@ MAX_SUMMAND_VALUE = 50
 
 
 class Maths(ChatGame):
-    caption = strings_games['title']
+    _caption = strings_games['title']
     rules = [
         strings_games['rules 1'],
     ]

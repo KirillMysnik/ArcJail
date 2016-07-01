@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from paths import CFG_PATH, GAME_PATH, LOG_PATH, PLUGIN_DATA_PATH
+from paths import (
+    CFG_PATH, GAME_PATH, LOG_PATH, PLUGIN_DATA_PATH, TRANSLATION_PATH)
 
 from ..info import info
 
@@ -23,3 +24,4 @@ ARCJAIL_DATA_PATH = PLUGIN_DATA_PATH / info.basename
 ARCJAIL_LOG_PATH = LOG_PATH / info.basename
 DOWNLOADLISTS_PATH = ARCJAIL_CFG_PATH / "downloadlists"
 MAPDATA_PATH = GAME_PATH / "mapdata"
+MAP_TRANSLATION_PATH = TRANSLATION_PATH / info.basename / "maps"

@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 from colors import Color
 from core import GAME_NAME
+
+from path import Path
 
 from advanced_ts import BaseLangStrings
 
@@ -45,8 +45,8 @@ else:
     }
 
 
-strings_common = BaseLangStrings(os.path.join(info.basename, "common"))
+strings_common = BaseLangStrings(Path(info.basename) / "common")
 
 
 def build_module_strings(module):
-    return BaseLangStrings(os.path.join(info.basename, 'modules', module))
+    return BaseLangStrings(Path(info.basename) / 'modules' / module)

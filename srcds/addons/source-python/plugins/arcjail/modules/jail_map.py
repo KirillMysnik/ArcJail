@@ -20,8 +20,11 @@ from warnings import warn
 from commands.server import ServerCommand
 from engines.server import global_vars
 from events import Event
-
 from mathlib import QAngle, Vector as Vector_MathLib
+
+from path import Path
+
+from advanced_ts import BaseLangStrings
 
 from ..arcjail import InternalEvent
 
@@ -29,7 +32,10 @@ from ..classes.geometry import Point, Vector, ConvexArea
 from ..classes.meta_parser import MetaParser
 from ..classes.string_values import value_from_string
 
-from ..resource.paths import ARCJAIL_DATA_PATH, MAPDATA_PATH
+from ..info import info
+
+from ..resource.paths import (
+    ARCJAIL_DATA_PATH, MAPDATA_PATH, MAP_TRANSLATION_PATH)
 
 from .ent_fire import new_output_connection
 
@@ -149,7 +155,7 @@ class Game(StageActionGame):
 _push_handlers = {}
 _game_settings = {}
 _map_status = 0
-map_strings = None
+_map_strings = None
 
 
 class MapData:
@@ -376,12 +382,27 @@ def reload_map_info():
             MapData.shop_windows.extend(section)
             continue
 
-    # TODO: Add map_strings
+    global _map_strings
+
+    path = MAP_TRANSLATION_PATH / '{0}.ini'.format(global_vars.map_name)
+    if path.isfile():
+        _map_strings = BaseLangStrings(
+            Path(info.basename) / "maps" / global_vars.map_name)
+
+    else:
+        _map_strings = None
 
 
 def reload_map_scripts():
     # TODO
     pass
+
+
+def get_map_string(id_):
+    if _map_strings is None:
+        raise KeyError
+
+    return _map_strings[id_]
 
 
 def is_shop_window(entity):

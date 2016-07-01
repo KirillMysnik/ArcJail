@@ -105,8 +105,8 @@ class ProtectedPlayer:
             else:
                 self.health = health
 
-            self.hook_hurt = lambda health_counter, game_event: True
-            self.hook_death = lambda health_counter, game_event: True
+            self.hook_hurt = lambda health_counter, info: True
+            self.hook_death = lambda health_counter, info: True
 
         def _hurt(self, info):
             if not self.hook_hurt(self, info):

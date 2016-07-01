@@ -18,16 +18,12 @@ from engines.precache import Model
 from entities.entity import Entity
 from entities.helpers import index_from_inthandle
 from filters.recipients import RecipientFilter
-from listeners import on_entity_created_listener_manager
 from listeners import on_entity_spawned_listener_manager
-from memory import make_object
-from memory.hooks import HookType
-
-from ....arcjail import InternalEvent
 
 from ....resource.strings import build_module_strings
 
-from ...effects.dissolve import dissolve
+from ...games.antiflash import (
+    register_detonation_filter, unregister_detonation_filter)
 
 from ...players import tell
 
@@ -76,7 +72,7 @@ class FlashbangBattle(CombatGame):
             self.guard.userid: False,
         }
 
-        add_hook_or_wait(self.pre_detonate)
+        register_detonation_filter(self.detonation_filter)
 
         if self._settings['trails']:
             on_entity_spawned_listener_manager.register_listener(
@@ -84,27 +80,22 @@ class FlashbangBattle(CombatGame):
 
     @stage('undo-combatgame-entry')
     def stage_undo_combatgame_entry(self):
-        remove_hook_or_stop_waiting(self.pre_detonate)
+        unregister_detonation_filter(self.detonation_filter)
 
         if self._settings['trails']:
             on_entity_spawned_listener_manager.unregister_listener(
                 self.listener_on_entity_spawned)
 
-    def pre_detonate(self, args):
-        entity = make_object(Entity, args[0])
-        if entity.classname != 'flashbang_projectile':
-            return
-
+    def detonation_filter(self, entity):
         try:
             owner_index = index_from_inthandle(entity.owner)
         except (OverflowError, ValueError):
-            return
+            return True
 
         if owner_index not in (self.prisoner.index, self.guard.index):
-            return
+            return True
 
-        dissolve(entity)
-        return True
+        return False
 
     def listener_on_entity_spawned(self, index, base_entity):
         if base_entity.classname != 'flashbang_projectile':
@@ -134,75 +125,3 @@ class FlashbangBattle(CombatGame):
         temp_entity.create(RecipientFilter())
 
 add_available_game(FlashbangBattle)
-
-
-_listener_registered = False
-_detonate_func = None
-_waiting_hooks = []
-_attached_hooks = []
-
-
-def add_hook_or_wait(hook):
-    if _detonate_func is None:
-        _waiting_hooks.append(hook)
-    else:
-        add_hook(hook)
-
-
-def remove_hook_or_stop_waiting(hook):
-    if _detonate_func is None:
-        _waiting_hooks.remove(hook)
-    else:
-        remove_hook(hook)
-
-
-def add_hook(hook):
-    _detonate_func.add_hook(HookType.PRE, hook)
-    _attached_hooks.append(hook)
-
-
-def remove_hook(hook):
-    _detonate_func.remove_hook(HookType.PRE, hook)
-    _attached_hooks.remove(hook)
-
-
-@InternalEvent('load')
-def on_load(event_var):
-    on_entity_created_listener_manager.register_listener(
-        listener_on_entity_created)
-
-    global _listener_registered
-    _listener_registered = True
-
-
-@InternalEvent('unload')
-def on_unload(event_var):
-    global _listener_registered
-    if _listener_registered:
-        on_entity_created_listener_manager.unregister_listener(
-            listener_on_entity_created)
-
-        _listener_registered = False
-
-    if _detonate_func is not None:
-        for attached_hook in tuple(_attached_hooks):
-            remove_hook(attached_hook)
-
-
-def listener_on_entity_created(index, base_entity):
-    if base_entity.classname != 'flashbang_projectile':
-        return
-
-    global _detonate_func
-    _detonate_func = Entity(index).detonate
-
-    for waiting_hook in _waiting_hooks:
-        add_hook(waiting_hook)
-
-    _waiting_hooks.clear()
-
-    on_entity_created_listener_manager.unregister_listener(
-        listener_on_entity_created)
-
-    global _listener_registered
-    _listener_registered = False

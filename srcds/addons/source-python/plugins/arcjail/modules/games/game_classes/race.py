@@ -16,6 +16,7 @@
 from random import choice
 
 from listeners.tick import Delay
+from players.teams import teams_by_name
 
 from ....resource.strings import build_module_strings
 
@@ -48,6 +49,16 @@ class RaceBase(MapGame):
 
         self._recollect_delay = None
 
+    @staticmethod
+    def _filter_func(player):
+        if player.dead:
+            return False
+
+        if player.team != teams_by_name['t']:
+            return False
+
+        return True
+
     @stage('cancel-recollect-delay')
     def stage_cancel_recollect_delay(self):
         if self._recollect_delay is not None:
@@ -69,6 +80,8 @@ class RaceSingleWinnerStandard(RaceBase):
         winners = set()
         for area_name in self.map_data.get_areas('winners'):
             winners.update(get_players_in_area(area_name))
+
+        winners = list(filter(self._filter_func, winners))
 
         if not winners:
             if iteration == MAX_RECOLLECT_ITERATIONS:
@@ -105,6 +118,8 @@ class RaceMultipleWinnersStandard(RaceBase):
         for area_name in self.map_data.get_areas('winners'):
             winners.update(get_players_in_area(area_name))
 
+        winners = list(filter(self._filter_func, winners))
+
         if not winners:
             if iteration == MAX_RECOLLECT_ITERATIONS:
                 self.set_stage_group('game-end-draw')
@@ -140,6 +155,8 @@ class RaceSingleLoserStandard(RaceBase):
         for area_name in self.map_data.get_areas('losers'):
             losers.update(get_players_in_area(area_name))
 
+        losers = list(filter(self._filter_func, losers))
+
         if not losers:
             if iteration == MAX_RECOLLECT_ITERATIONS:
                 self.set_stage_group('game-end-draw')
@@ -174,6 +191,8 @@ class RaceMultipleLosersStandard(RaceBase):
         losers = set()
         for area_name in self.map_data.get_areas('losers'):
             losers.update(get_players_in_area(area_name))
+
+        losers = list(filter(self._filter_func, losers))
 
         if not losers:
             if iteration == MAX_RECOLLECT_ITERATIONS:

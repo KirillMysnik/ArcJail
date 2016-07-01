@@ -49,7 +49,7 @@ class PlayerPreserving(JailGame):
             game_event.get_int('userid'))
 
         if player in self._players_all:
-            self.set_stage_group('abort-player-death')
+            self.set_stage_group('abort-player-dead')
 
     @game_internal_event_handler(
         'playerpreserving-main-player-deleted', 'main_player_deleted')

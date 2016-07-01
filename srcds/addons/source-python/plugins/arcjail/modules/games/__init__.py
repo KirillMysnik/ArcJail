@@ -398,8 +398,8 @@ def send_popup(player):
         tell(player, reason)
         return
 
-    if player.userid in _popups:
-        _popups[player.userid].close()
+    if player.index in _popups:
+        _popups[player.index].close()
 
     players = get_players_to_play()
 
@@ -417,7 +417,7 @@ def send_popup(player):
 
         _launch_game(launcher, player, players)
 
-    popup = _popups[player.userid] = PagedMenu(
+    popup = _popups[player.index] = PagedMenu(
         select_callback=select_callback,
         title=strings_module['popup title_choose']
     )

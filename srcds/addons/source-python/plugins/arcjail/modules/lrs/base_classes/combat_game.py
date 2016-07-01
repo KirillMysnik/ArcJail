@@ -206,7 +206,7 @@ class CombatGame(PrepareTime):
 
             p_player = protected_player_manager[player.index]
 
-            counter = self._counters[player.userid] = p_player.new_counter(
+            counter = self._counters[player.index] = p_player.new_counter(
                 display=strings_damage_hook['health game'])
 
             counter.health = self._settings.get('health', 100)
@@ -218,7 +218,7 @@ class CombatGame(PrepareTime):
     def stage_undo_survival_equip_damage_hooks(self):
         for player in self._players_all:
             p_player = protected_player_manager[player.index]
-            p_player.delete_counter(self._counters[player.userid])
+            p_player.delete_counter(self._counters[player.index])
             p_player.unset_protected()
 
     @game_event_handler('jailgame-player-death', 'player_death')

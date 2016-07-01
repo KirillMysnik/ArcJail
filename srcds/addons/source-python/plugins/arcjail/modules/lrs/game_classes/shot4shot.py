@@ -135,7 +135,7 @@ class Shot4Shot(CombatGame):
                             landed = False
 
                     if landed:
-                        self._flawless[player.userid] = False
+                        self._flawless[player.index] = False
                         self._score[info.attacker] += 1
 
                         InternalEvent.fire('jail_stop_accepting_bets',
@@ -156,7 +156,7 @@ class Shot4Shot(CombatGame):
                         else:
                             return False
 
-                    self._flawless[player.userid] = False
+                    self._flawless[player.index] = False
 
                     InternalEvent.fire('jail_stop_accepting_bets',
                                        instance=self)
@@ -167,7 +167,7 @@ class Shot4Shot(CombatGame):
 
             p_player = protected_player_manager[player.index]
 
-            counter = self._counters[player.userid] = p_player.new_counter(
+            counter = self._counters[player.index] = p_player.new_counter(
                 display=strings_damage_hook['health game'])
 
             counter.health = self._settings.get('health', 100)

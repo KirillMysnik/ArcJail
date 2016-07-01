@@ -68,8 +68,8 @@ class FlashbangBattle(CombatGame):
 
         # We don't need no flawless effects in a 1-hit game
         self._flawless = {
-            self.prisoner.userid: False,
-            self.guard.userid: False,
+            self.prisoner.index: False,
+            self.guard.index: False,
         }
 
         register_detonation_filter(self.detonation_filter)

@@ -130,7 +130,7 @@ class RussianRoulette(CombatGame):
 
             p_player = protected_player_manager[player.index]
 
-            counter = self._counters[player.userid] = p_player.new_counter()
+            counter = self._counters[player.index] = p_player.new_counter()
             counter.health = self._settings.get('health', 100)
             counter.hook_hurt = hook_hurt
 

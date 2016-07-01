@@ -18,6 +18,7 @@ from events.custom import CustomEvent
 from events.manager import game_event_manager
 from events.resource import ResourceFile
 from events.variable import BoolVariable, ShortVariable, StringVariable
+from players.helpers import index_from_userid
 
 
 __all__ = ['fake_death']
@@ -62,16 +63,16 @@ _faked_deaths = []
 def fake_death(victim, killer=None, headshot=False, dominated=False, revenge=False, weapon="point_hurt"):
     userid = victim.userid
     attacker = killer.userid if killer is not None else 0
-    _faked_deaths.append(userid)
+    _faked_deaths.append(victim.index)
     _fake_death(attacker, int(dominated), headshot, int(revenge), userid, weapon)
-    _faked_deaths.remove(userid)
+    _faked_deaths.remove(victim.index)
 
 
 @Event('player_death')
 def on_player_death(pd_event):
     userid = pd_event.get_int('userid')
     
-    if userid in _faked_deaths:
+    if index_from_userid(userid) in _faked_deaths:
         new_pd_event = Player_Death_Fake()
     else:
         new_pd_event = Player_Death_Real()

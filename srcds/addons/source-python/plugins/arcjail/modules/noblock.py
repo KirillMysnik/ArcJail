@@ -116,11 +116,11 @@ def say_noblock(command, index, team_only):
         tell(player, reason)
         return
 
-    if player.userid in _delays:
-        _delays[player.userid].cancel()
+    if player.index in _delays:
+        _delays[player.index].cancel()
 
     def callback():
-        del _delays[player.userid]
+        del _delays[player.index]
         if get_noblock_denial_reason(player):
             return
 
@@ -129,7 +129,7 @@ def say_noblock(command, index, team_only):
         else:
             set_force_off(player)
 
-    _delays[player.userid] = Delay(
+    _delays[player.index] = Delay(
         config_manager['chat_command_duration'], callback)
 
     if config_manager['default']:

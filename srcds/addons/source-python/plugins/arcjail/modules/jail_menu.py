@@ -88,14 +88,14 @@ def send_popup(player):
             options.append(option)
 
     if options:
-        if player.userid in _popups:
-            _popups[player.userid].close()
+        if player.index in _popups:
+            _popups[player.index].close()
 
         def select_callback(popup, player_index, option):
             callback = option.value
             callback(player)
 
-        menu = _popups[player.userid] = PagedMenu(
+        menu = _popups[player.index] = PagedMenu(
             select_callback=select_callback, title=strings_module['title'])
 
         for option in options:

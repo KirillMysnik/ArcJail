@@ -430,12 +430,12 @@ def send_rebel_popup(player, launcher, guard, settings):
         tell(player, strings_module['fail busy_partner'])
         return
 
-    if guard.userid in _popups:
-        _popups[guard.userid].close()
+    if guard.index in _popups:
+        _popups[guard.index].close()
 
     if is_rebel(player):
         def auto_action():
-            del _rebel_delays[player.userid]
+            del _rebel_delays[player.index]
 
             if config_manager['ask_guard_auto_action']:
                 reason = get_lr_denial_reason(player)
@@ -457,15 +457,15 @@ def send_rebel_popup(player, launcher, guard, settings):
             else:
                 tell(player, strings_module['fail decline'])
 
-        _rebel_delays[player.userid] = Delay(
+        _rebel_delays[player.index] = Delay(
             config_manager['ask_guard_timeout'], auto_action)
 
         def select_callback_rebel(popup, player_index, option):
-            if player.userid in _rebel_delays:
-                if _rebel_delays[player.userid].running:
-                    _rebel_delays[player.userid].cancel()
+            if player.index in _rebel_delays:
+                if _rebel_delays[player.index].running:
+                    _rebel_delays[player.index].cancel()
 
-                del _rebel_delays[player.userid]
+                del _rebel_delays[player.index]
 
             if option.value:
                 reason = get_lr_denial_reason(player)
@@ -487,7 +487,7 @@ def send_rebel_popup(player, launcher, guard, settings):
             else:
                 tell(player, strings_module['fail decline'])
 
-        popup = _popups[guard.userid] = PagedMenu(
+        popup = _popups[guard.index] = PagedMenu(
             select_callback=select_callback_rebel,
             title=strings_module['let_him_play'].tokenize(
                 player=player.name,
@@ -552,8 +552,8 @@ def send_settings_popup(player, launcher, guard, settings=None):
         send_rebel_popup(player, launcher, guard, settings)
         return
 
-    if player.userid in _popups:
-        _popups[player.userid].close()
+    if player.index in _popups:
+        _popups[player.index].close()
 
     def select_callback(popup, player_index, option):
         settings.update(option.value)
@@ -565,7 +565,7 @@ def send_settings_popup(player, launcher, guard, settings=None):
             visible_settings_count += 1
 
     if visible_settings_count > 0 and 'defaults' not in settings:
-        popup = _popups[player.userid] = PagedMenu(
+        popup = _popups[player.index] = PagedMenu(
             select_callback=select_callback,
             title=strings_module['popup title choose_defaults'],
         )
@@ -591,7 +591,7 @@ def send_settings_popup(player, launcher, guard, settings=None):
         send_rebel_popup(player, launcher, guard, settings)
         return
 
-    popup = _popups[player.userid] = PagedMenu(
+    popup = _popups[player.index] = PagedMenu(
         select_callback=select_callback,
         title=setting.caption,
     )
@@ -616,13 +616,13 @@ def send_player_popup(player, launcher):
         tell(player, reason)
         return
 
-    if player.userid in _popups:
-        _popups[player.userid].close()
+    if player.index in _popups:
+        _popups[player.index].close()
 
     def select_callback_player(popup, player_index, option):
         send_settings_popup(player, launcher, option.value)
 
-    popup = _popups[player.userid] = PagedMenu(
+    popup = _popups[player.index] = PagedMenu(
         select_callback=select_callback_player,
         title=strings_module['popup title choose_player'],
     )
@@ -649,17 +649,17 @@ def send_game_popup(player):
         tell(player, reason)
         return
 
-    if player.userid in _rebel_delays:
+    if player.index in _rebel_delays:
         tell(player, strings_module['fail already_asking_guard'])
         return
 
-    if player.userid in _popups:
-        _popups[player.userid].close()
+    if player.index in _popups:
+        _popups[player.index].close()
 
     def select_callback_game(popup, player_index, option):
         send_player_popup(player, option.value)
 
-    popup = _popups[player.userid] = PagedMenu(
+    popup = _popups[player.index] = PagedMenu(
         select_callback=select_callback_game,
         title=strings_module['popup title choose_game']
     )

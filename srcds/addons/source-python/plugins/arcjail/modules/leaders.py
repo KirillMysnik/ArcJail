@@ -81,11 +81,11 @@ def _give_leadership(player):
 
     InternalEvent.fire('jail_leadership_given', player=player)
 
-    if player.userid in _hp_bonuses:
+    if player.index in _hp_bonuses:
         return
 
     upgrade_health(player, config_manager['leader_hp'])
-    _hp_bonuses.add(player.userid)
+    _hp_bonuses.add(player.index)
 
 
 def _drop_leadership():

@@ -101,8 +101,8 @@ def send_leader_popup(player):
         tell(player, reason)
         return
 
-    if player.userid in _popups:
-        _popups[player.userid].close()
+    if player.index in _popups:
+        _popups[player.index].close()
 
     def select_callback(popup, player_index, option):
         reason = get_leader_respawn_denial_reason(player)
@@ -120,7 +120,7 @@ def send_leader_popup(player):
         broadcast(strings_module['resurrected_by_leader'].tokenize(
             player=player_.name))
 
-    popup = _popups[player.userid] = PagedMenu(
+    popup = _popups[player.index] = PagedMenu(
         select_callback=select_callback,
         title=strings_module['popup_title_resurrect']
     )

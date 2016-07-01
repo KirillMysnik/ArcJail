@@ -98,10 +98,15 @@ class MapGame(PrepareTime):
             self.game_class = game_class
             self.map_data = map_data
 
-        def __eq__(self, value):
+        def __eq__(self, other):
+            if type(other) != MapGame.GameLauncher:
+                return False
+
             return (self.game_class, self.map_data) == (
-                value.game_class, value.map_data
-            )
+                other.game_class, other.map_data)
+
+        def __hash__(self):
+            return hash((self.game_class, self.map_data))
 
         def get_launch_denial_reason(self, leader_player, players, **kwargs):
             if self not in self.game_class.get_available_launchers(
@@ -227,8 +232,7 @@ class MapGame(PrepareTime):
     @stage('start-notify')
     def stage_start_notify(self):
         InternalEvent.fire('games_game_started', instance=self)
-        broadcast(strings_module['game_started'].tokenize(
-            game=self.map_data.caption or self.caption))
+        broadcast(strings_module['game_started'].tokenize(game=self.caption))
 
     @stage('mapgame-cancel-falldmg-protection')
     def stage_mapgame_cancel_falldmg_protection(self):

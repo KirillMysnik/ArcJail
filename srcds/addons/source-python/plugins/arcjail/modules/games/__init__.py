@@ -243,8 +243,14 @@ class GameLauncher:
         self.caption = game_class._caption
         self.game_class = game_class
 
-    def __eq__(self, value):
-        return self.game_class == value.game_class
+    def __eq__(self, other):
+        if type(other) != GameLauncher:
+            return False
+
+        return self.game_class == other.game_class
+
+    def __hash__(self):
+        return hash(self.game_class)
 
     def launch(self, leader_player, players, **kwargs):
         raise NotImplementedError
@@ -731,13 +737,12 @@ from . import base_classes
 # =============================================================================
 # >> SUBMODULES IMPORT
 # =============================================================================
-from . import *
 current_dir = os.path.dirname(__file__)
 __all__ = parse_modules(current_dir)
 
+from . import *
 
 # =============================================================================
 # >> GAMES IMPORT
 # =============================================================================
 from . import game_classes
-

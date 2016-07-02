@@ -15,7 +15,11 @@
 
 from random import shuffle
 
+from core import GAME_NAME
+
 from ....arcjail import InternalEvent
+
+from ....resource.strings import COLOR_SCHEME
 
 from ...jail_map import teleport_player, get_games
 
@@ -216,24 +220,42 @@ class MapGameTeamBased(MapGame):
         players = self._players[:]
         shuffle(players)
 
-        broadcast(strings_module['players_two_teams'].tokenize(
-            color1=config_manager['team1_color'],
-            color2=config_manager['team2_color'],
-            team1=strings_module['team1'],
-            team2=strings_module['team2'],
-        ))
+        if GAME_NAME in ("csgo", ):
+            broadcast(strings_module['players_two_teams'].tokenize(
+                color1=COLOR_SCHEME['color_highlight'],
+                color2=COLOR_SCHEME['color_highlight'],
+                team1=strings_module['team1'],
+                team2=strings_module['team2'],
+            ))
+        else:
+            broadcast(strings_module['players_two_teams'].tokenize(
+                color1=config_manager['team1_color'],
+                color2=config_manager['team2_color'],
+                team1=strings_module['team1'],
+                team2=strings_module['team2'],
+            ))
 
         while players:
             p1, p2 = players.pop(), players.pop()
 
-            tell(p1, strings_module['your_team'].tokenize(
-                color=config_manager['team1_color'],
-                team=strings_module['team1']
-            ))
-            tell(p2, strings_module['your_team'].tokenize(
-                color=config_manager['team2_color'],
-                team=strings_module['team2']
-            ))
+            if GAME_NAME in ("csgo",):
+                tell(p1, strings_module['your_team'].tokenize(
+                    color=COLOR_SCHEME['color_highlight'],
+                    team=strings_module['team1']
+                ))
+                tell(p2, strings_module['your_team'].tokenize(
+                    color=COLOR_SCHEME['color_highlight'],
+                    team=strings_module['team2']
+                ))
+            else:
+                tell(p1, strings_module['your_team'].tokenize(
+                    color=config_manager['team1_color'],
+                    team=strings_module['team1']
+                ))
+                tell(p2, strings_module['your_team'].tokenize(
+                    color=config_manager['team2_color'],
+                    team=strings_module['team2']
+                ))
 
             if config_manager['prefer_model_over_color']:
                 make_model_request(
@@ -280,10 +302,17 @@ class MapGameTeamBased(MapGame):
             team_num=1,
         )
 
-        broadcast(strings_module['win_team'].tokenize(
-            color=config_manager['team1_color'],
-            team=strings_module['team1']
-        ))
+        if GAME_NAME in ("csgo",):
+            broadcast(strings_module['win_team'].tokenize(
+                color=COLOR_SCHEME['color_highlight'],
+                team=strings_module['team1']
+            ))
+        else:
+            broadcast(strings_module['win_team'].tokenize(
+                color=config_manager['team1_color'],
+                team=strings_module['team1']
+            ))
+
         for player in self._team1:
             helper_set_winner(player)
 
@@ -302,10 +331,17 @@ class MapGameTeamBased(MapGame):
             team_num=2,
         )
 
-        broadcast(strings_module['win_team'].tokenize(
-            color=config_manager['team2_color'],
-            team=strings_module['team2']
-        ))
+        if GAME_NAME in ("csgo",):
+            broadcast(strings_module['win_team'].tokenize(
+                color=COLOR_SCHEME['color_highlight'],
+                team=strings_module['team2']
+            ))
+        else:
+            broadcast(strings_module['win_team'].tokenize(
+                color=config_manager['team2_color'],
+                team=strings_module['team2']
+            ))
+
         for player in self._team2:
             helper_set_winner(player)
 
@@ -324,10 +360,17 @@ class MapGameTeamBased(MapGame):
             team_num=3,
         )
 
-        broadcast(strings_module['win_team'].tokenize(
-            color=config_manager['team3_color'],
-            team=strings_module['team3']
-        ))
+        if GAME_NAME in ("csgo",):
+            broadcast(strings_module['win_team'].tokenize(
+                color=COLOR_SCHEME['color_highlight'],
+                team=strings_module['team3']
+            ))
+        else:
+            broadcast(strings_module['win_team'].tokenize(
+                color=config_manager['team3_color'],
+                team=strings_module['team3']
+            ))
+
         for player in self._team3:
             helper_set_winner(player)
 
@@ -346,10 +389,17 @@ class MapGameTeamBased(MapGame):
             team_num=4,
         )
 
-        broadcast(strings_module['win_team'].tokenize(
-            color=config_manager['team4_color'],
-            team=strings_module['team4']
-        ))
+        if GAME_NAME in ("csgo",):
+            broadcast(strings_module['win_team'].tokenize(
+                color=COLOR_SCHEME['color_highlight'],
+                team=strings_module['team4']
+            ))
+        else:
+            broadcast(strings_module['win_team'].tokenize(
+                color=config_manager['team4_color'],
+                team=strings_module['team4']
+            ))
+
         for player in self._team4:
             helper_set_winner(player)
 

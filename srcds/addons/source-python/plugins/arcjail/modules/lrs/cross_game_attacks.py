@@ -86,7 +86,6 @@ class CrossGameAttackHandler:
         if self._enabled == 0:
             self._unset_hooks()
 
-    @InternalEvent('jail_lrs_status_set')
     def on_jail_lrs_status_set(self, event_var):
         instance, status = event_var['instance'], event_var['status']
 
@@ -108,3 +107,8 @@ class CrossGameAttackHandler:
             self._disable()
 
 cross_game_attack_handler = CrossGameAttackHandler()
+
+
+@InternalEvent('jail_lrs_status_set')
+def on_jail_lrs_status_set(event_var):
+    cross_game_attack_handler.on_jail_lrs_status_set(event_var)

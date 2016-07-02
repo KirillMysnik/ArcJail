@@ -38,9 +38,10 @@ class ArcjailUser:
     def __init__(self, player):
         self.player = player
 
-        # We're saving to database asynchronously, and player.steamid will
+        # We're saving to database asynchronously, and some properties will
         # be unavailable
         self._steamid = player.steamid
+        self._name = player.name
 
         self.last_online_reward = time()
         self.account = 0
@@ -96,7 +97,7 @@ class ArcjailUser:
             db_session.add(db_arcjail_user)
 
         db_arcjail_user.last_seen = time()
-        db_arcjail_user.last_used_name = self.player.name
+        db_arcjail_user.last_used_name = self._name
         db_arcjail_user.last_online_reward = self.last_online_reward
         db_arcjail_user.account = self.account
         db_arcjail_user.slot_data = dumps(self.slot_data)

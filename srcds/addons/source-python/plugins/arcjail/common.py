@@ -1,7 +1,7 @@
-from core import PLATFORM
+from core import GAME_NAME
 
 
-if PLATFORM in ("csgo", ):
+if GAME_NAME in ("csgo", ):
     def give_named_item(player, classname, subtype=0):
         player.give_named_item(classname, subtype, None, True)
 

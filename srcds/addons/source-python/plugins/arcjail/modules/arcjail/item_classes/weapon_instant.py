@@ -13,8 +13,9 @@
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
 from events import Event
-
 from listeners import OnClientDisconnect
+
+from ....common import give_named_item
 
 from ....resource.strings import build_module_strings
 
@@ -55,7 +56,7 @@ class WeaponInstant(BaseItemInstance):
 
         sold_weapons[player.index] = sold_weapons.get(player.index, 0) + 1
 
-        player.give_named_item(self['entity_to_give'], 0)
+        give_named_item(player, self['entity_to_give'], 0)
         return None
 
 register_item_instance_class('weapon_instant', WeaponInstant)

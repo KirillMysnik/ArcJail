@@ -15,6 +15,8 @@
 
 from ....arcjail import InternalEvent
 
+from ....common import give_named_item
+
 from ...teams import PRISONERS_TEAM
 
 from ..item_instance import BaseItemInstance
@@ -43,5 +45,4 @@ def on_player_respawn(event_var):
 
         arcjail_user.take_item(item, amount=1, async=True)
 
-        # TODO: Adjust give_named_item to CS:GO
-        player.give_named_item(item.class_['entity_to_give'], 0)
+        give_named_item(player, item.class_['entity_to_give'], 0)

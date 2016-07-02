@@ -21,6 +21,8 @@ from entities.constants import INVALID_ENTITY_INDEX
 from entities.entity import Entity
 from entities.helpers import edict_from_index
 
+from ....common import give_named_item
+
 from ...games import Push
 from ...games.base_classes.map_game import DEFAULT_GRAVITY
 
@@ -278,7 +280,7 @@ class MapGame(PrepareTime):
 
             equipment_player.infinite_weapons.clear()
             for weapon_classname in self.map_data['ARENA_EQUIPMENT']:
-                player.give_named_item(weapon_classname, 0)
+                give_named_item(player, weapon_classname, 0)
                 equipment_player.infinite_weapons.append(weapon_classname)
 
             equipment_player.infinite_on()

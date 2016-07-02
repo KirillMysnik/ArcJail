@@ -19,6 +19,8 @@ from listeners.tick import Delay
 
 from ....arcjail import InternalEvent
 
+from ....common import give_named_item
+
 from ....resource.strings import build_module_strings
 
 from ...damage_hook import (
@@ -99,7 +101,7 @@ class Shot4Shot(CombatGame):
 
             equipment_player.infinite_weapons.clear()
 
-            player.give_named_item(weapon_classname, 0)
+            give_named_item(player, weapon_classname, 0)
 
         self.guard.set_ammo(weapon_classname, 0)
         self.guard.set_clip(weapon_classname, 0)

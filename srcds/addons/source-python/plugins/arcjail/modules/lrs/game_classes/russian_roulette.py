@@ -20,6 +20,8 @@ from events import event_manager
 
 from controlled_cvars.handlers import int_handler
 
+from ....common import give_named_item
+
 from ....resource.strings import build_module_strings
 
 from ...damage_hook import protected_player_manager
@@ -100,7 +102,7 @@ class RussianRoulette(CombatGame):
 
             equipment_player.infinite_weapons.clear()
 
-            player.give_named_item(weapon_classname, 0)
+            give_named_item(player, weapon_classname, 0)
 
         self.guard.set_ammo(weapon_classname, 0)
         self.guard.set_clip(weapon_classname, 0)

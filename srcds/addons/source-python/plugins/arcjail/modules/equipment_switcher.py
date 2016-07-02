@@ -20,11 +20,12 @@ from entities.helpers import index_from_inthandle
 from entities.helpers import index_from_pointer
 from listeners import OnEntitySpawned
 from listeners.tick import Delay
+from mathlib import NULL_VECTOR
 from weapons.manager import weapon_manager
 
-from mathlib import NULL_VECTOR
-
 from ..arcjail import InternalEvent
+
+from ..common import give_named_item
 
 from ..classes.base_player_manager import BasePlayerManager
 
@@ -60,8 +61,8 @@ class SavedPlayer:
 
         self._nade_refill_delay = Delay(
             PROJECTILE_REFILL_DELAY,
-            self.player.give_named_item,
-            weapon_classname, 0
+            give_named_item,
+            self.player, weapon_classname, 0
         )
 
     def save_health(self):
@@ -104,8 +105,8 @@ class SavedPlayer:
     def restore_weapons(self):
         self.strip()
         for weapon_dict in self.saved_weapons:
-            self.player.give_named_item(
-                weapon_dict['classname'], weapon_dict['subtype'])
+            give_named_item(
+                self.player, weapon_dict['classname'], weapon_dict['subtype'])
 
             if weapon_dict['clip'] > -1:
                 self.player.set_clip(

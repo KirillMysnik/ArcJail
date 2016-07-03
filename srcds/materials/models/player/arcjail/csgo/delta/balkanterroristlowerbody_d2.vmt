@@ -1,0 +1,13 @@
+"patch"
+{
+	"include" "materials/models/player/arcjail/csgo/delta/tm_balkan_shared.vmt"
+	"insert"
+	{	
+	"$baseTexture" "models\player\arcjail\csgo\delta\BalkanTerroristLowerBody_d2"
+	"$bumpmap" "models\player\arcjail\csgo\delta\BalkanTerroristLowerBody_n"
+		
+	"$phongexponenttexture" "models\player\arcjail\csgo\delta\BalkanTerroristLowerBody_exponent"
+	"$rimmask" "1"
+	
+	}	
+}

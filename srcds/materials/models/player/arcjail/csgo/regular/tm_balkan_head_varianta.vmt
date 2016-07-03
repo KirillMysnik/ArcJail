@@ -1,0 +1,15 @@
+"patch"
+{
+	"include" "materials/models/player/arcjail/csgo/regular/tm_balkan_shared.vmt"
+	"insert"
+	{	
+	"$baseTexture" "models\player\arcjail\csgo\regular\tm_balkan_head_variantA"
+	"$bumpmap" "models\player\arcjail\csgo\regular\tm_balkan_head_variantA_normal"
+		
+	"$phongexponenttexture" "models\player\arcjail\csgo\regular\tm_balkan_head_variantA_exponent"
+//	"$rimmask" "1"
+	"$rimlight" "0"
+	
+"$nodecal" 1
+	}	
+}

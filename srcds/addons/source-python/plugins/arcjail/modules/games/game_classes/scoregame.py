@@ -13,12 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
+from core import GAME_NAME
+
 from controlled_cvars.handlers import (
     bool_handler, int_handler, sound_nullable_handler)
 
 from ....arcjail import load_downloadables
 
-from ....resource.strings import build_module_strings
+from ....resource.strings import build_module_strings, COLOR_SCHEME
 
 from ...damage_hook import get_hook, protected_player_manager
 
@@ -104,49 +106,88 @@ class ScoreGameBase(MapGameTeamBased):
 
     @stage('scoregame-new-score2')
     def stage_scoregame_new_score2(self):
-        broadcast(strings_module['new_score2'].tokenize(
-            color1=config_manager_common['team1_color'],
-            team1=strings_common['team1'],
-            score1=self.score['team1'],
-            color2=config_manager_common['team2_color'],
-            team2=strings_common['team2'],
-            score2=self.score['team2']
-        ))
+        if GAME_NAME in ("csgo",):
+            broadcast(strings_module['new_score2'].tokenize(
+                color1=COLOR_SCHEME['color_highlight'],
+                team1=strings_common['team1'],
+                score1=self.score['team1'],
+                color2=COLOR_SCHEME['color_highlight'],
+                team2=strings_common['team2'],
+                score2=self.score['team2']
+            ))
+        else:
+            broadcast(strings_module['new_score2'].tokenize(
+                color1=config_manager_common['team1_color'],
+                team1=strings_common['team1'],
+                score1=self.score['team1'],
+                color2=config_manager_common['team2_color'],
+                team2=strings_common['team2'],
+                score2=self.score['team2']
+            ))
 
         self.set_stage_group('scoregame-check-team-scores')
 
     @stage('scoregame-new-score3')
     def stage_scoregame_new_score3(self):
-        broadcast(strings_module['new_score2'].tokenize(
-            color1=config_manager_common['team1_color'],
-            team1=strings_common['team1'],
-            score1=self.score['team1'],
-            color2=config_manager_common['team2_color'],
-            team2=strings_common['team2'],
-            score2=self.score['team2'],
-            color3=config_manager_common['team3_color'],
-            team3=strings_common['team3'],
-            score3=self.score['team3']
-        ))
+        if GAME_NAME in ("csgo",):
+            broadcast(strings_module['new_score2'].tokenize(
+                color1=COLOR_SCHEME['color_highlight'],
+                team1=strings_common['team1'],
+                score1=self.score['team1'],
+                color2=COLOR_SCHEME['color_highlight'],
+                team2=strings_common['team2'],
+                score2=self.score['team2'],
+                color3=COLOR_SCHEME['color_highlight'],
+                team3=strings_common['team3'],
+                score3=self.score['team3']
+            ))
+        else:
+            broadcast(strings_module['new_score2'].tokenize(
+                color1=config_manager_common['team1_color'],
+                team1=strings_common['team1'],
+                score1=self.score['team1'],
+                color2=config_manager_common['team2_color'],
+                team2=strings_common['team2'],
+                score2=self.score['team2'],
+                color3=config_manager_common['team3_color'],
+                team3=strings_common['team3'],
+                score3=self.score['team3']
+            ))
 
         self.set_stage_group('scoregame-check-team-scores')
 
     @stage('scoregame-new-score4')
     def stage_scoregame_new_score4(self):
-        broadcast(strings_module['new_score2'].tokenize(
-            color1=config_manager_common['team1_color'],
-            team1=strings_common['team1'],
-            score1=self.score['team1'],
-            color2=config_manager_common['team2_color'],
-            team2=strings_common['team2'],
-            score2=self.score['team2'],
-            color3=config_manager_common['team3_color'],
-            team3=strings_common['team3'],
-            score3=self.score['team3'],
-            color4=config_manager_common['team4_color'],
-            team4=strings_common['team4'],
-            score4=self.score['team4'],
-        ))
+        if GAME_NAME in ("csgo",):
+            broadcast(strings_module['new_score2'].tokenize(
+                color1=COLOR_SCHEME['color_highlight'],
+                team1=strings_common['team1'],
+                score1=self.score['team1'],
+                color2=COLOR_SCHEME['color_highlight'],
+                team2=strings_common['team2'],
+                score2=self.score['team2'],
+                color3=COLOR_SCHEME['color_highlight'],
+                team3=strings_common['team3'],
+                score3=self.score['team3'],
+                color4=COLOR_SCHEME['color_highlight'],
+                team4=strings_common['team4'],
+                score4=self.score['team4'],
+            ))
+        else:
+            broadcast(strings_module['new_score2'].tokenize(
+                color1=config_manager_common['team1_color'],
+                team1=strings_common['team1'],
+                score1=self.score['team1'],
+                color2=config_manager_common['team2_color'],
+                team2=strings_common['team2'],
+                score2=self.score['team2'],
+                color3=config_manager_common['team3_color'],
+                team3=strings_common['team3'],
+                score3=self.score['team3'],
+                color4=config_manager_common['team4_color'],
+                team4=strings_common['team4'],
+                score4=self.score['team4'],
+            ))
 
         self.set_stage_group('scoregame-check-team-scores')
 

@@ -1,0 +1,32 @@
+{
+  "groups":
+  [
+    {
+      "guard": "",
+      "regular_prisoner": "models/player/arcjail/csgo/regularb.mdl",
+      "rebel": "models/player/arcjail/csgo/rebelb.mdl",
+      "alpha": "models/player/arcjail/csgo/alphab.mdl",
+      "bravo": "models/player/arcjail/csgo/bravob.mdl",
+      "charlie": "models/player/arcjail/csgo/charlieb.mdl",
+      "delta": "models/player/arcjail/csgo/deltab.mdl"
+    },
+    {
+      "guard": "",
+      "regular_prisoner": "models/player/arcjail/csgo/regulard.mdl",
+      "rebel": "models/player/arcjail/csgo/rebeld.mdl",
+      "alpha": "models/player/arcjail/csgo/alphad.mdl",
+      "bravo": "models/player/arcjail/csgo/bravod.mdl",
+      "charlie": "models/player/arcjail/csgo/charlied.mdl",
+      "delta": "models/player/arcjail/csgo/deltad.mdl"
+    },
+    {
+      "guard": "",
+      "regular_prisoner": "models/player/arcjail/csgo/regulare.mdl",
+      "rebel": "models/player/arcjail/csgo/rebele.mdl",
+      "alpha": "models/player/arcjail/csgo/alphae.mdl",
+      "bravo": "models/player/arcjail/csgo/bravoe.mdl",
+      "charlie": "models/player/arcjail/csgo/charliee.mdl",
+      "delta": "models/player/arcjail/csgo/deltae.mdl"
+    }
+  ]
+}

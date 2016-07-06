@@ -36,7 +36,7 @@ from .player_colors import cancel_color_request, make_color_request
 
 from .players import broadcast, main_player_manager
 
-from .skins import cancel_model_request, make_model_request
+from .skins import model_player_manager
 
 from .teams import GUARDS_TEAM, PRISONERS_TEAM
 
@@ -81,12 +81,6 @@ config_manager.controlled_cvar(
     default="200,0,0",
     description="Colors for rebelling prisoners - Red,Green,Blue. "
                 "E.g. 200,0,0.",
-)
-config_manager.controlled_cvar(
-    string_handler,
-    "rebel_model",
-    default="models/player/arcjail/rebel/rebel.mdl",
-    description="Model for rebelling prisoners",
 )
 config_manager.controlled_cvar(
     bool_handler,
@@ -143,8 +137,8 @@ def _set_rebel(player):
     _rebels.add(player)
 
     if config_manager['prefer_model_over_color']:
-        make_model_request(
-            player, SKIN_PRIORITY, 'rebels', config_manager['rebel_model'])
+        model_player_manager[player.index].make_request(
+            'rebels', SKIN_PRIORITY, "rebel")
 
     else:
         make_color_request(
@@ -160,7 +154,7 @@ def _unset_rebel(player):
     _rebels.discard(player)
 
     cancel_color_request(player, 'rebels')
-    cancel_model_request(player, 'rebels')
+    model_player_manager[player.index].cancel_request('rebels')
 
     InternalEvent.fire('jail_rebel_unset', player=player)
 

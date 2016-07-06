@@ -29,7 +29,7 @@ from ...players import broadcast, main_player_manager, tell
 
 from ...rebels import get_rebels
 
-from ...skins import cancel_model_request, make_model_request
+from ...skins import model_player_manager
 
 from .. import (
     config_manager, game_event_handler, game_internal_event_handler,
@@ -209,7 +209,9 @@ class MapGameTeamBased(MapGame):
     @stage('undo-mapgame-teambased-split-teams')
     def stage_undo_mapgame_teambased_split_teams(self):
         for player in self._players:
-            cancel_model_request(player, 'games-teambased')
+            model_player_manager[player.index].cancel_request(
+                'games-teambased')
+
             cancel_color_request(player, 'games-teambased')
 
     @stage('mapgame-teambased-split-teams2')
@@ -220,7 +222,7 @@ class MapGameTeamBased(MapGame):
         players = self._players[:]
         shuffle(players)
 
-        if GAME_NAME in ("csgo", ):
+        if GAME_NAME in ("csgo",):
             broadcast(strings_module['players_two_teams'].tokenize(
                 color1=COLOR_SCHEME['color_highlight'],
                 color2=COLOR_SCHEME['color_highlight'],
@@ -258,14 +260,12 @@ class MapGameTeamBased(MapGame):
                 ))
 
             if config_manager['prefer_model_over_color']:
-                make_model_request(
-                    p1, SKIN_PRIORITY, 'games-teambased',
-                    config_manager['team1_model']
-                )
-                make_model_request(
-                    p2, SKIN_PRIORITY, 'games-teambased',
-                    config_manager['team2_model']
-                )
+                model_player_manager[p1.index].make_request(
+                   'games-teambased', SKIN_PRIORITY, "alpha")
+
+                model_player_manager[p2.index].make_request(
+                   'games-teambased', SKIN_PRIORITY, "bravo")
+
             else:
                 make_color_request(
                     p1, COLOR_PRIORITY, 'games-teambased',

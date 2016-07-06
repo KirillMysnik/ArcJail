@@ -1,0 +1,14 @@
+{
+  "groups":
+  [
+    {
+      "guard": "",
+      "regular_prisoner": "models/player/arcjail/regular/regular.mdl",
+      "rebel": "models/player/arcjail/rebel/rebel.mdl",
+      "alpha": "models/player/arcjail/team_alpha/team_alpha.mdl",
+      "bravo": "models/player/arcjail/team_bravo/team_bravo.mdl",
+      "charlie": "models/player/arcjail/team_charlie/team_charlie.mdl",
+      "delta": "models/player/arcjail/team_delta/team_delta.mdl"
+    }
+  ]
+}

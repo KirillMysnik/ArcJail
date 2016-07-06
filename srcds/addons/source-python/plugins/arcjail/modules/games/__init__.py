@@ -119,22 +119,10 @@ config_manager.controlled_cvar(
     description="Color for players in team Alpha",
 )
 config_manager.controlled_cvar(
-    string_handler,
-    "team1_model",
-    default="models/player/arcjail/team_alpha/team_alpha.mdl",
-    description="Model for team Alpha players",
-)
-config_manager.controlled_cvar(
     color_handler,
     "team2_color",
     default="235,200,0",
     description="Color for players in team Bravo",
-)
-config_manager.controlled_cvar(
-    string_handler,
-    "team2_model",
-    default="models/player/arcjail/team_bravo/team_bravo.mdl",
-    description="Model for team Bravo players",
 )
 config_manager.controlled_cvar(
     color_handler,
@@ -143,22 +131,10 @@ config_manager.controlled_cvar(
     description="Color for players in team Charlie",
 )
 config_manager.controlled_cvar(
-    string_handler,
-    "team3_model",
-    default="models/player/arcjail/team_charlie/team_charlie.mdl",
-    description="Model for team Charlie players",
-)
-config_manager.controlled_cvar(
     color_handler,
     "team4_color",
     default="255,102,0",
     description="Color for players in team Delta",
-)
-config_manager.controlled_cvar(
-    string_handler,
-    "team4_model",
-    default="models/player/arcjail/team_delta/team_delta.mdl",
-    description="Model for team Delta players",
 )
 config_manager.controlled_cvar(
     bool_handler,

@@ -16,7 +16,6 @@
 from effects.base import TempEntity
 from engines.precache import Model
 from entities.entity import Entity
-from entities.helpers import index_from_inthandle
 from filters.recipients import RecipientFilter
 from listeners import on_entity_spawned_listener_manager
 
@@ -87,26 +86,18 @@ class FlashbangBattle(CombatGame):
                 self.listener_on_entity_spawned)
 
     def detonation_filter(self, entity):
-        try:
-            owner_index = index_from_inthandle(entity.owner)
-        except (OverflowError, ValueError):
-            return True
-
-        if owner_index not in (self.prisoner.index, self.guard.index):
-            return True
-
-        return False
+        return entity.owner_handle not in (
+            self.prisoner.inthandle, self.guard.inthandle)
 
     def listener_on_entity_spawned(self, index, base_entity):
         if base_entity.classname != 'flashbang_projectile':
             return
 
-        try:
-            owner_index = index_from_inthandle(Entity(index).owner)
-        except (OverflowError, ValueError):
-            return
+        entity = Entity(index)
 
-        if owner_index not in (self.prisoner.index, self.guard.index):
+        if entity.owner_handle not in (
+                self.prisoner.inthandle, self.guard.inthandle):
+
             return
 
         temp_entity = TempEntity('BeamFollow')

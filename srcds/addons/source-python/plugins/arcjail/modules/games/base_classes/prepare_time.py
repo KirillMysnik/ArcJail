@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from entities.entity import Entity
-from entities.helpers import index_from_inthandle
 from events.manager import event_manager
 from listeners.tick import Delay, on_tick_listener_manager
 from messages import TextMsg
@@ -164,12 +162,10 @@ class PrepareTime(JailGame):
 
     def _prepare_freeze_tick_handler(self):
         for player in self._players:
-            try:
-                weapon_index = index_from_inthandle(player.active_weapon)
-            except (OverflowError, ValueError):
+            weapon = player.active_weapon
+            if weapon is None:
                 continue
 
-            weapon = Entity(weapon_index)
             weapon.next_attack += 1
             weapon.next_secondary_fire_attack += 1
 
@@ -189,12 +185,10 @@ class PrepareTime(JailGame):
         for player in self._players:
             player.stuck = False
 
-            try:
-                weapon_index = index_from_inthandle(player.active_weapon)
-            except:
+            weapon = player.active_weapon
+            if weapon is None:
                 continue
 
-            weapon = Entity(weapon_index)
             weapon.next_attack = 0
             weapon.next_secondary_fire_attack = 0
 

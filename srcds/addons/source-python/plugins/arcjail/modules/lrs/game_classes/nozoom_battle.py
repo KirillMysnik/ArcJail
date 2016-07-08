@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from entities.entity import Entity
-from entities.helpers import index_from_inthandle
 from listeners.tick import on_tick_listener_manager
 
 from ....resource.strings import build_module_strings
 
 from .. import (
-    add_available_game, config_manager, Setting, SettingOption, stage,
+    add_available_game, Setting, SettingOption, stage,
     strings_module as strings_common)
 
 from ..base_classes.combat_game import CombatGame
@@ -60,12 +58,10 @@ class NozoomBattle(CombatGame):
 
     def _nozoom_tick_handler(self):
         for player in self._players:
-            try:
-                weapon_index = index_from_inthandle(player.active_weapon)
-            except (OverflowError, ValueError):
+            weapon = player.active_weapon
+            if weapon is None:
                 continue
 
-            weapon = Entity(weapon_index)
             weapon.next_secondary_fire_attack += 1
 
 

@@ -15,12 +15,11 @@
 
 from commands.client import ClientCommand
 from entities.entity import Entity
-from entities.helpers import edict_from_index
-from entities.helpers import index_from_inthandle
-from entities.helpers import index_from_pointer
+from entities.helpers import edict_from_index, index_from_pointer
 from listeners import OnEntitySpawned
 from listeners.tick import Delay
 from mathlib import NULL_VECTOR
+from weapons.entity import Weapon
 from weapons.manager import weapon_manager
 
 from ..arcjail import InternalEvent
@@ -71,20 +70,18 @@ class SavedPlayer:
     def save_weapons(self):
         self.saved_weapons = []
 
-        for index in self.player.weapon_indexes():
-            weapon = Entity(index)
+        for weapon in self.player.weapons():
             weapon_dict = {
                 'classname': weapon.classname,
-                'clip': None,
-                'ammo': None,
-                'subtype': None,
+                'clip': weapon.clip,
+                'subtype': weapon.get_property_int('m_iSubType'),
             }
-            weapon_class = weapon_manager[weapon.classname]
-            if weapon_class.ammoprop is not None:
-                weapon_dict['ammo'] = self.player.get_ammo(weapon.classname)
 
-            weapon_dict['clip'] = weapon.clip
-            weapon_dict['subtype'] = weapon.get_property_int('m_iSubType')
+            try:
+                weapon_dict['ammo'] = weapon.ammo
+            except ValueError:
+                weapon_dict['ammo'] = None
+
             self.saved_weapons.append(weapon_dict)
 
         self.strip()
@@ -94,8 +91,7 @@ class SavedPlayer:
         self.save_weapons()
 
     def strip(self):
-        for index in self.player.weapon_indexes():
-            weapon = Entity(index)
+        for weapon in self.player.weapons():
             self.player.drop_weapon(weapon.pointer, NULL_VECTOR, NULL_VECTOR)
             weapon.remove()
 
@@ -105,16 +101,13 @@ class SavedPlayer:
     def restore_weapons(self):
         self.strip()
         for weapon_dict in self.saved_weapons:
-            give_named_item(
-                self.player, weapon_dict['classname'], weapon_dict['subtype'])
+            weapon = Weapon.create(weapon_dict['classname'])
+            weapon.teleport(self.player.origin, None, None)
+            weapon.spawn()
 
-            if weapon_dict['clip'] > -1:
-                self.player.set_clip(
-                    weapon_dict['classname'], weapon_dict['clip'])
-
+            weapon.clip = weapon_dict['clip']
             if weapon_dict['ammo'] is not None:
-                self.player.set_ammo(
-                    weapon_dict['classname'], weapon_dict['ammo'])
+                weapon.ammo = weapon_dict['ammo']
 
     def restore_all(self):
         self.restore_health()
@@ -131,20 +124,27 @@ class SavedPlayer:
 
             weapon_class = weapon_manager[weapon_classname]
             if weapon_class.maxammo > 0:
-                self.player.set_ammo(weapon_classname, weapon_class.maxammo)
+                Weapon(index).ammo = weapon_class.maxammo
+
+    def _refill_infinite_ammo(self):
+        self.max_ammo(self.infinite_weapons)
+        self._ammo_refill_delay = Delay(
+            INFINITE_AMMO_REFILL_INTERVAL, self._refill_infinite_ammo)
 
     def infinite_on(self):
         if (self._ammo_refill_delay is not None or
-                    self._nade_refill_delay is not None):
+                self._nade_refill_delay is not None):
 
             raise ValueError("Infinite equipment is already turned on")
 
-        def refill_ammo():
-            self.max_ammo(self.infinite_weapons)
-            self._ammo_refill_delay = Delay(
-                INFINITE_AMMO_REFILL_INTERVAL, refill_ammo)
+        new_infinite_weapons = []
+        for weapon_classname in self.infinite_weapons:
+            if weapon_manager[weapon_classname].maxammo > 0:
+                new_infinite_weapons.append(weapon_classname)
 
-        refill_ammo()
+        self.infinite_weapons = new_infinite_weapons
+
+        self._refill_infinite_ammo()
 
     def infinite_off(self):
         if self._ammo_refill_delay is None:
@@ -158,7 +158,6 @@ class SavedPlayer:
                 self._nade_refill_delay.cancel()
 
             self._nade_refill_delay = None
-
 
 saved_player_manager = BasePlayerManager(SavedPlayer)
 
@@ -181,10 +180,11 @@ def listener_on_entity_spawned(index, base_entity):
         return
 
     entity = Entity(index)
-    if entity.owner == -1:
+    owner = entity.owner
+    if owner is None:
         return
 
-    saved_player = saved_player_manager[index_from_inthandle(entity.owner)]
+    saved_player = saved_player_manager[owner.index]
     weapon_classname = PROJECTILE_MAPPING[base_entity.classname]
     saved_player._nade_thrown(weapon_classname)
 

@@ -17,7 +17,7 @@ from effects.base import TempEntity
 from engines.precache import Model
 from entities.constants import DamageTypes
 from entities.entity import Entity
-from entities.helpers import edict_from_index, index_from_inthandle
+from entities.helpers import edict_from_index
 from filters.recipients import RecipientFilter
 from listeners import on_entity_spawned_listener_manager
 
@@ -81,13 +81,8 @@ class SurvivalFlashbangArenaPlayerBased(SurvivalPlayerBasedFriendlyFire):
         return weapon_classname == FLASHBANG_CLASSNAME
 
     def detonation_filter(self, entity):
-        try:
-            owner_index = index_from_inthandle(entity.owner)
-        except (OverflowError, ValueError):
-            return True
-
         for player in self._players:
-            if player.index == owner_index:
+            if player.inthandle == entity.owner_handle:
                 return False
 
         return True
@@ -96,13 +91,10 @@ class SurvivalFlashbangArenaPlayerBased(SurvivalPlayerBasedFriendlyFire):
         if base_entity.classname != 'flashbang_projectile':
             return
 
-        try:
-            owner_index = index_from_inthandle(Entity(index).owner)
-        except (OverflowError, ValueError):
-            return
+        entity = Entity(index)
 
         for player in self._players:
-            if player.index == owner_index:
+            if player.inthandle == entity.owner_handle:
                 break
         else:
             return

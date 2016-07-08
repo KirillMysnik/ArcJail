@@ -14,7 +14,6 @@
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
 from commands.client import ClientCommand
-from entities.helpers import index_from_inthandle
 from events import Event
 from filters.players import PlayerIter
 from filters.entities import EntityIter
@@ -326,12 +325,7 @@ def on_item_pickup(game_event):
 
     weapon_class = 'weapon_%s' % game_event.get_string('item')
     for entity in EntityIter(weapon_class):
-        try:
-            owner_index = index_from_inthandle(entity.owner)
-        except (OverflowError, ValueError):
-            continue
-
-        if owner_index == player.index:
+        if entity.owner_handle == player.inthandle:
             break
 
     else:
@@ -390,23 +384,13 @@ def cmd_on_drop(command, index):
         if not entity.classname.startswith('weapon_'):
             continue
 
-        try:
-            owner_index = index_from_inthandle(entity.owner)
-        except (OverflowError, ValueError):
-            continue
-
-        if owner_index == player.index:
+        if entity.owner_handle == player.inthandle:
             weapons.append(entity)
 
     def confirm_weapon_drop():
         for entity in weapons:
-            try:
-                owner_index = index_from_inthandle(entity.owner)
-            except (OverflowError, ValueError):
-                pass
-            else:
-                if owner_index == player.index:
-                    continue
+            if entity.owner_handle == player.inthandle:
+                continue
 
             mark_weapon_hot(entity)
 

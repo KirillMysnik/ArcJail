@@ -82,7 +82,9 @@ class ModelPlayer(list):
             if request_max is None or request.priority >= request_max.priority:
                 request_max = request
 
-        self.player.model = precache[self._group[request_max.model_id]]
+        model_path = self._group[request_max.model_id]
+        if model_path:
+            self.player.model = precache[model_path]
 
     def make_request(self, id_, priority, model_id):
         for request in self:

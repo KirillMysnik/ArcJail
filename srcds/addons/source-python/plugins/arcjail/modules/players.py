@@ -93,6 +93,9 @@ def listener_on_client_active(index):
 
 @OnClientDisconnect
 def listener_on_client_disconnect(index):
+    if index not in main_player_manager:
+        return
+
     player = main_player_manager[index]
     main_player_manager.delete(player)
 

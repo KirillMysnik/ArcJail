@@ -93,9 +93,14 @@ class CrossGameAttackHandler:
             self._enable()
 
             for index in (instance.guard.index, instance.prisoner.index):
+                if index not in self._counters:
+                    continue
+
                 p_player = protected_player_manager[index]
                 p_player.delete_counter(self._counters[index])
                 p_player.unset_protected()
+
+                del self._counters[index]
 
         elif status == LastRequestGameStatus.FINISHED:
             for player in instance.players:

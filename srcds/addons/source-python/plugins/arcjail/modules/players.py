@@ -15,7 +15,7 @@
 
 from events import Event
 from filters.players import PlayerIter
-from listeners import OnClientActive, OnClientDisconnect, OnLevelShutdown
+from listeners import OnClientActive, OnClientDisconnect, OnLevelInit
 from messages import SayText2
 from players.entity import Player
 from players.teams import teams_by_name
@@ -100,7 +100,7 @@ def listener_on_client_disconnect(index):
     main_player_manager.delete(player)
 
 
-@OnLevelShutdown
-def listener_on_level_init():
+@OnLevelInit
+def listener_on_level_init(map_name):
     for player in list(main_player_manager.values()):
         main_player_manager.delete(player)

@@ -16,8 +16,10 @@
 from commands.client import ClientCommand
 from entities.entity import Entity
 from entities.helpers import edict_from_index, index_from_pointer
+from entities.hooks import EntityCondition, EntityPreHook
 from listeners import OnEntitySpawned
 from listeners.tick import Delay
+from memory import make_object
 from mathlib import NULL_VECTOR
 from weapons.entity import Weapon
 from weapons.manager import weapon_manager
@@ -27,6 +29,8 @@ from ..arcjail import InternalEvent
 from ..common import give_named_item
 
 from ..classes.base_player_manager import BasePlayerManager
+
+from ..resource.memory import CCSPlayer
 
 from .players import main_player_manager
 
@@ -273,3 +277,13 @@ def unregister_weapon_drop_filter(callback):
 def on_unload(event_var):
     if bump_weapon_function is not None:
         bump_weapon_function.remove_pre_hook(pre_bump_weapon)
+
+
+def make_weapon_can_use(player):
+    return make_object(CCSPlayer, player.pointer).weapon_can_use
+
+
+@EntityPreHook(EntityCondition.is_player, make_weapon_can_use)
+def pre_weapon_can_use(args):
+    """A little fix for picking up knives in CS:GO."""
+    return True

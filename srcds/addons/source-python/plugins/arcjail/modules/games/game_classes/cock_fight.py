@@ -15,7 +15,8 @@
 
 from random import choice
 
-from engines.sound import Sound
+from core import GAME_NAME
+from engines.sound import Sound, StreamSound
 from entities.constants import INVALID_ENTITY_INTHANDLE
 from listeners.tick import on_tick_listener_manager
 
@@ -64,6 +65,8 @@ config_manager.controlled_cvar(
     description="Vertical force to apply to the cock when it has "
                 "climbed onto somebody",
 )
+
+SoundClass = StreamSound if GAME_NAME in ("csgo", ) else Sound
 
 _downloadables_sounds = load_downloadables('cockfight-sounds.res')
 sounds = []
@@ -171,7 +174,7 @@ class CockFight(PrepareTime):
 
         if player in self.players:
             sound_name = choice(sounds)
-            sound = Sound(sound_name, player.index)
+            sound = SoundClass(sound_name, player.index)
             sound.play()
 
 

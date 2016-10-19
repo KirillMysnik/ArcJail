@@ -152,7 +152,9 @@ class SavedPlayer:
         )
 
         self.infinite_weapons = list(filter(
-            lambda classname: classname in maxed_weapon_classnames,
+            lambda classname:
+                classname in maxed_weapon_classnames or
+                classname in PROJECTILE_CLASSNAMES,
             self.infinite_weapons
         ))
 

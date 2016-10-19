@@ -16,6 +16,7 @@
 from entities.constants import DamageTypes
 from events import event_manager
 from listeners.tick import Delay
+from weapons.entity import Weapon
 
 from ....arcjail import InternalEvent
 
@@ -101,12 +102,17 @@ class Shot4Shot(CombatGame):
 
             equipment_player.infinite_weapons.clear()
 
-            give_named_item(player, weapon_classname, 0)
+        weapon = Weapon(
+            give_named_item(self.guard, weapon_classname, 0).index)
 
-        self.guard.set_ammo(weapon_classname, 0)
-        self.guard.set_clip(weapon_classname, 0)
-        self.prisoner.set_ammo(weapon_classname, 0)
-        self.prisoner.set_clip(weapon_classname, 1)
+        weapon.clip = 0
+        weapon.ammo = 0
+
+        weapon = Weapon(
+            give_named_item(self.prisoner, weapon_classname, 0).index)
+
+        weapon.clip = 1
+        weapon.ammo = 0
 
         register_weapon_drop_filter(self._weapon_drop_filter)
         register_weapon_pickup_filter(self._weapon_pickup_filter)
@@ -205,7 +211,10 @@ class Shot4Shot(CombatGame):
             return
 
         opponent = self.prisoner if player == self.guard else self.guard
-        opponent.set_clip(self._settings['weapons'][0], 1)
+        for weapon in opponent.weapons():
+            if weapon.classname == self._settings['weapons'][0]:
+                weapon.clip = 1
+                break
 
     def _on_weapon_fire_competitive(self, game_event):
         player = main_player_manager.get_by_userid(
@@ -251,6 +260,9 @@ class Shot4Shot(CombatGame):
 
             tell(self._players, strings_module['round_draw'])
 
-        opponent.set_clip(self._settings['weapons'][0], 1)
+        for weapon in opponent.weapons():
+            if weapon.classname == self._settings['weapons'][0]:
+                weapon.clip = 1
+                break
 
 add_available_game(Shot4Shot)

@@ -17,6 +17,7 @@ from random import randint
 
 from players.constants import HitGroup
 from events import event_manager
+from weapons.entity import Weapon
 
 from controlled_cvars.handlers import int_handler
 
@@ -102,12 +103,17 @@ class RussianRoulette(CombatGame):
 
             equipment_player.infinite_weapons.clear()
 
-            give_named_item(player, weapon_classname, 0)
+        weapon = Weapon(
+            give_named_item(self.guard, weapon_classname, 0).index)
 
-        self.guard.set_ammo(weapon_classname, 0)
-        self.guard.set_clip(weapon_classname, 0)
-        self.prisoner.set_ammo(weapon_classname, 0)
-        self.prisoner.set_clip(weapon_classname, 1)
+        weapon.clip = 0
+        weapon.ammo = 0
+
+        weapon = Weapon(
+            give_named_item(self.prisoner, weapon_classname, 0).index)
+
+        weapon.clip = 1
+        weapon.ammo = 0
 
         register_weapon_drop_filter(self._weapon_drop_filter)
         register_weapon_pickup_filter(self._weapon_pickup_filter)
@@ -158,7 +164,10 @@ class RussianRoulette(CombatGame):
             )
 
         else:
-            opponent.set_clip(self._settings['weapons'][0], 1)
+            for weapon in opponent.weapons():
+                if weapon.classname == self._settings['weapons'][0]:
+                    weapon.clip = 1
+                    break
 
     @classmethod
     def get_available_launchers(cls):

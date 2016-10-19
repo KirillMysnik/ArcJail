@@ -77,14 +77,10 @@ class SavedPlayer:
         for weapon in self.player.weapons():
             weapon_dict = {
                 'classname': weapon.classname,
-                'clip': weapon.clip,
                 'subtype': weapon.get_property_int('m_iSubType'),
+                'ammo': weapon.ammo if weapon.has_ammo() else None,
+                'clip': weapon.ammo if weapon.has_clip() else None
             }
-
-            try:
-                weapon_dict['ammo'] = weapon.ammo
-            except ValueError:
-                weapon_dict['ammo'] = None
 
             self.saved_weapons.append(weapon_dict)
 
@@ -109,7 +105,9 @@ class SavedPlayer:
             weapon.teleport(self.player.origin, None, None)
             weapon.spawn()
 
-            weapon.clip = weapon_dict['clip']
+            if weapon_dict['clip'] is not None:
+                weapon.clip = weapon_dict['clip']
+
             if weapon_dict['ammo'] is not None:
                 weapon.ammo = weapon_dict['ammo']
 
@@ -118,20 +116,27 @@ class SavedPlayer:
         self.restore_weapons()
 
     def max_ammo(self, weapon_classnames):
-        for index in self.player.weapon_indexes():
-            weapon_classname = edict_from_index(index).classname
-            if weapon_classname not in weapon_classnames:
+        maxed_weapons = []
+
+        for weapon in self.player.weapons():
+            if weapon.classname not in weapon_classnames:
                 continue
 
-            if weapon_classname in PROJECTILE_CLASSNAMES:
+            if weapon.classname in PROJECTILE_CLASSNAMES:
                 continue
 
-            weapon_class = weapon_manager[weapon_classname]
-            if weapon_class.maxammo > 0:
-                Weapon(index).ammo = weapon_class.maxammo
+            weapon_class = weapon_manager[weapon.classname]
+            if not weapon.has_ammo() or weapon_class.maxammo <= 0:
+                continue
+
+            weapon.ammo = weapon_class.maxammo
+            maxed_weapons.append(weapon)
+
+        return maxed_weapons
 
     def _refill_infinite_ammo(self):
         self.max_ammo(self.infinite_weapons)
+
         self._ammo_refill_delay = Delay(
             INFINITE_AMMO_REFILL_INTERVAL, self._refill_infinite_ammo)
 
@@ -141,14 +146,18 @@ class SavedPlayer:
 
             raise ValueError("Infinite equipment is already turned on")
 
-        new_infinite_weapons = []
-        for weapon_classname in self.infinite_weapons:
-            if weapon_manager[weapon_classname].maxammo > 0:
-                new_infinite_weapons.append(weapon_classname)
+        maxed_weapon_classnames = map(
+            lambda weapon: weapon.classname,
+            self.max_ammo(self.infinite_weapons)
+        )
 
-        self.infinite_weapons = new_infinite_weapons
+        self.infinite_weapons = list(filter(
+            lambda classname: classname in maxed_weapon_classnames,
+            self.infinite_weapons
+        ))
 
-        self._refill_infinite_ammo()
+        self._ammo_refill_delay = Delay(
+            INFINITE_AMMO_REFILL_INTERVAL, self._refill_infinite_ammo)
 
     def infinite_off(self):
         if self._ammo_refill_delay is None:
@@ -179,11 +188,11 @@ def on_main_player_deleted(event_var):
 
 
 @OnEntitySpawned
-def listener_on_entity_spawned(index, base_entity):
+def listener_on_entity_spawned(base_entity):
     if base_entity.classname not in PROJECTILE_MAPPING:
         return
 
-    entity = Entity(index)
+    entity = Entity(base_entity.index)
     owner = entity.owner
     if owner is None:
         return

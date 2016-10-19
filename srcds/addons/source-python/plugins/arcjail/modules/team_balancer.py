@@ -14,7 +14,7 @@
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
 from commands.client import ClientCommand
-from engines.server import engine_server
+from cvars import cvar
 from events import Event
 from messages import TextMsg, VGUIMenu
 from players.teams import teams_by_name
@@ -23,17 +23,12 @@ from controlled_cvars import InvalidValue
 from controlled_cvars.handlers import bool_handler, sound_nullable_handler
 
 from ..arcjail import InternalEvent
-
 from ..resource.strings import build_module_strings
 
 from .game_status import GameStatus, set_status
-
 from .guards_license import guards_licenses_manager
-
 from .teams import PRISONERS_TEAM, GUARDS_TEAM
-
 from .players import broadcast, main_player_manager, tell
-
 from . import build_module_config
 
 
@@ -53,6 +48,9 @@ text_msg = {
     'denied balance': TextMsg(strings_module['denied balance']),
     'denied no_license': TextMsg(strings_module['denied no_license']),
 }
+
+cvar_limitteams = cvar.find_var('mp_limitteams')
+cvar_autoteambalance = cvar.find_var('mp_autoteambalance')
 
 
 def ratio_handler(cvar):
@@ -147,8 +145,8 @@ def deny(player):
 
 
 def reset_cvars():
-    engine_server.server_command("mp_limitteams 0;")
-    engine_server.server_command("mp_autoteambalance 0;")
+    cvar_limitteams.set_int(0)
+    cvar_autoteambalance.set_int(0)
 
 
 def show_team_selection(player):

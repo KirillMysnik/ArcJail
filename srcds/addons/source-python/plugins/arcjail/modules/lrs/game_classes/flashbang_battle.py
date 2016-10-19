@@ -89,10 +89,11 @@ class FlashbangBattle(CombatGame):
         return entity.owner_handle not in (
             self.prisoner.inthandle, self.guard.inthandle)
 
-    def listener_on_entity_spawned(self, index, base_entity):
+    def listener_on_entity_spawned(self, base_entity):
         if base_entity.classname != 'flashbang_projectile':
             return
 
+        index = base_entity.index
         entity = Entity(index)
 
         if entity.owner_handle not in (

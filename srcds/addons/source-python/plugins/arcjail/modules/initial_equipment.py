@@ -19,7 +19,6 @@ Replaces game_player_equip stripping functionality on CS:GO as the entity
 does not work for that game.
 """
 
-from entities.entity import Entity
 from listeners import OnEntitySpawned
 
 from ..arcjail import InternalEvent
@@ -30,11 +29,11 @@ from .equipment_switcher import saved_player_manager
 
 
 @OnEntitySpawned
-def listener_on_entity_spawned(index, base_entity):
+def listener_on_entity_spawned(base_entity):
     if base_entity.classname != "game_player_equip":
         return
 
-    Entity(index).remove()
+    base_entity.remove()
 
 
 @InternalEvent('player_respawn')

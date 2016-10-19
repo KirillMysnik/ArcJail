@@ -101,14 +101,14 @@ def on_unload(event_var):
         _remove_hook()
 
 
-def listener_on_entity_created(index, base_entity):
+def listener_on_entity_created(base_entity):
     if base_entity.classname != 'flashbang_projectile':
         return
 
-    entity = Entity(index)
+    entity = Entity(base_entity.index)
 
+    global _detonate_func
     if _detonate_func is None:
-        global _detonate_func
         _detonate_func = entity.detonate
 
         global _waiting

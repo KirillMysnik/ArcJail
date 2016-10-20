@@ -17,11 +17,10 @@ from random import randint
 
 from players.constants import HitGroup
 from events import event_manager
+from memory import make_object
 from weapons.entity import Weapon
 
 from controlled_cvars.handlers import int_handler
-
-from ....common import give_named_item
 
 from ....resource.strings import build_module_strings
 
@@ -103,15 +102,13 @@ class RussianRoulette(CombatGame):
 
             equipment_player.infinite_weapons.clear()
 
-        weapon = Weapon(
-            give_named_item(self.guard, weapon_classname, 0).index)
-
+        weapon = make_object(
+            Weapon, self.guard.give_named_item(weapon_classname))
         weapon.clip = 0
         weapon.ammo = 0
 
-        weapon = Weapon(
-            give_named_item(self.prisoner, weapon_classname, 0).index)
-
+        weapon = make_object(
+            Weapon, self.prisoner.give_named_item(weapon_classname))
         weapon.clip = 1
         weapon.ammo = 0
 

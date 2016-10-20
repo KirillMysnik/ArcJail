@@ -21,8 +21,6 @@ from entities.helpers import edict_from_index
 
 from ....arcjail import InternalEvent
 
-from ....common import give_named_item
-
 from ...equipment_switcher import (
     register_weapon_drop_filter, register_weapon_pickup_filter,
     saved_player_manager, unregister_weapon_drop_filter,
@@ -349,7 +347,7 @@ class MapGame(PrepareTime):
 
             equipment_player.infinite_weapons.clear()
             for weapon_classname in self.map_data['ARENA_EQUIPMENT']:
-                give_named_item(player, weapon_classname, 0)
+                player.give_named_item(weapon_classname)
                 equipment_player.infinite_weapons.append(weapon_classname)
 
             equipment_player.infinite_on()

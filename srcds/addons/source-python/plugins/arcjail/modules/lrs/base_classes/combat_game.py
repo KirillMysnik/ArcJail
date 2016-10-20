@@ -20,8 +20,6 @@ from entities.helpers import edict_from_index
 
 from ....arcjail import InternalEvent
 
-from ....common import give_named_item
-
 from ...damage_hook import (
     protected_player_manager, strings_module as strings_damage_hook)
 
@@ -151,7 +149,7 @@ class CombatGame(PrepareTime):
 
             equipment_player.infinite_weapons.clear()
             for weapon_classname in self._settings.get('weapons', ()):
-                give_named_item(player, weapon_classname, 0)
+                player.give_named_item(weapon_classname)
                 equipment_player.infinite_weapons.append(weapon_classname)
 
             equipment_player.infinite_on()

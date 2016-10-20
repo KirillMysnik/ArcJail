@@ -18,8 +18,6 @@ from listeners.tick import Delay
 
 from controlled_cvars.handlers import sound_nullable_handler
 
-from ....common import give_named_item
-
 from ....resource.strings import build_module_strings
 
 from ... import build_module_config
@@ -59,7 +57,7 @@ class PartyForEverybody(BaseItemInstance):
 
         def party():
             for player_ in PlayerIter(['alive'], ['spec', 'un']):
-                give_named_item(player_, self['entity_to_give'], 0)
+                player_.give_named_item(self['entity_to_give'])
 
         Delay(self.get('delay', 0), party)
 

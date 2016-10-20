@@ -23,8 +23,6 @@ from listeners import OnEntitySpawned
 
 from ..arcjail import InternalEvent
 
-from ..common import give_named_item
-
 from .equipment_switcher import saved_player_manager
 
 
@@ -43,4 +41,4 @@ def on_player_respawn(event_var):
 
     saved_player.strip()
 
-    give_named_item(player, "weapon_knife")
+    player.give_named_item("weapon_knife")

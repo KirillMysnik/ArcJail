@@ -21,8 +21,6 @@ from entities.helpers import edict_from_index
 from filters.recipients import RecipientFilter
 from listeners import on_entity_spawned_listener_manager
 
-from ....common import give_named_item
-
 from ....resource.strings import build_module_strings
 
 from ...damage_hook import (
@@ -228,7 +226,7 @@ class SurvivalFlashbangArenaPlayerBased(SurvivalPlayerBasedFriendlyFire):
             equipment_player.save_weapons()
 
             equipment_player.infinite_weapons.clear()
-            give_named_item(player, FLASHBANG_CLASSNAME, 0)
+            player.give_named_item(FLASHBANG_CLASSNAME)
             equipment_player.infinite_weapons.append(FLASHBANG_CLASSNAME)
 
             equipment_player.infinite_on()

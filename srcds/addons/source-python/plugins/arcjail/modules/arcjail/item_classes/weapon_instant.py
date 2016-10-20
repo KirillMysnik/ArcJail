@@ -15,8 +15,6 @@
 from events import Event
 from listeners import OnClientDisconnect
 
-from ....common import give_named_item
-
 from ....resource.strings import build_module_strings
 
 from ...teams import PRISONERS_TEAM
@@ -56,7 +54,7 @@ class WeaponInstant(BaseItemInstance):
 
         sold_weapons[player.index] = sold_weapons.get(player.index, 0) + 1
 
-        give_named_item(player, self['entity_to_give'], 0)
+        player.give_named_item(self['entity_to_give'])
         return None
 
 register_item_instance_class('weapon_instant', WeaponInstant)

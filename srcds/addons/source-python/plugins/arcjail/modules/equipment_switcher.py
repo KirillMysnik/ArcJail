@@ -26,8 +26,6 @@ from weapons.manager import weapon_manager
 
 from ..arcjail import InternalEvent
 
-from ..common import give_named_item
-
 from ..classes.base_player_manager import BasePlayerManager
 
 from ..resource.memory import CCSPlayer
@@ -64,8 +62,7 @@ class SavedPlayer:
 
         self._nade_refill_delay = Delay(
             PROJECTILE_REFILL_DELAY,
-            give_named_item,
-            self.player, weapon_classname, 0
+            self.player.give_named_item, weapon_classname
         )
 
     def save_health(self):

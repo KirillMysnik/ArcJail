@@ -21,7 +21,7 @@ from ...resource.strings import build_module_strings
 
 from ..damage_hook import get_hook, protected_player_manager
 
-from ..players import main_player_manager
+from ..players import player_manager
 
 from .. import build_module_config
 
@@ -117,8 +117,7 @@ class WinReward(JailGame):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if player not in self._players:
             return

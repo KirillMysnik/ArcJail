@@ -19,21 +19,17 @@ from controlled_cvars.handlers import (
     bool_handler, int_handler, sound_nullable_handler)
 
 from ....arcjail import load_downloadables
-
 from ....resource.strings import build_module_strings, COLOR_SCHEME
 
-from ...damage_hook import get_hook, protected_player_manager
-
-from ...players import broadcast
-
 from ... import build_module_config
-
-from ..base_classes.map_game_team_based import MapGameTeamBased
-from ..base_classes.player_preserving import PlayerPreserving
+from ...damage_hook import get_hook, protected_player_manager
+from ...players import broadcast
 
 from .. import (
     add_available_game, config_manager as config_manager_common,
     play_flawless_effects, push, stage, strings_module as strings_common)
+from ..base_classes.map_game_team_based import MapGameTeamBased
+from ..base_classes.player_preserving import PlayerPreserving
 
 
 strings_module = build_module_strings('games/scoregame')

@@ -22,7 +22,7 @@ from ...resource.paths import ARCJAIL_DATA_PATH
 from ...resource.strings import build_module_strings
 
 from ..arcjail.arcjail_user import arcjail_user_manager
-from ..players import main_player_manager, tell
+from ..players import player_manager, tell
 
 
 strings_module = build_module_strings('credits/common')
@@ -85,7 +85,7 @@ def on_round_end(game_event):
     for index, credits_earned in credits_earned_storage.items():
         credits_spent = credits_spent_storage[index]
 
-        player = main_player_manager[index]
+        player = player_manager[index]
         tell(player, strings_module['credits_diff_round'],
              plus=credits_earned, minus=credits_spent)
 

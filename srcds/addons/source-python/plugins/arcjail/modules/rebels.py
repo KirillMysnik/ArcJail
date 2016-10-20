@@ -22,24 +22,17 @@ from listeners.tick import Delay
 from mathlib import NULL_VECTOR
 
 from controlled_cvars.handlers import (bool_handler, color_handler,
-                                       list_handler, sound_handler,
-                                       string_handler)
+                                       list_handler, sound_handler)
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
-from .admin import section
-
-from .player_colors import cancel_color_request, make_color_request
-
-from .players import broadcast, main_player_manager
-
-from .skins import model_player_manager
-
-from .teams import GUARDS_TEAM, PRISONERS_TEAM
-
 from . import build_module_config
+from .admin import section
+from .player_colors import cancel_color_request, make_color_request
+from .players import broadcast, player_manager
+from .skins import model_player_manager
+from .teams import GUARDS_TEAM, PRISONERS_TEAM
 
 
 strings_module = build_module_strings('rebels')
@@ -241,14 +234,14 @@ def mark_weapon_hot(entity):
 
 @Event('player_death_real')
 def on_player_death_real(game_event):
-    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
+    player = player_manager.get_by_userid(game_event['userid'])
 
     if player not in _rebels:
         return
 
     _unset_rebel(player)
 
-    aid = game_event.get_int('attacker')
+    aid = game_event['attacker']
     if aid == player.userid or not aid:
         broadcast(strings_module['suicide'].tokenize(rebel=player.name))
         InternalEvent.fire('jail_rebel_suicide',
@@ -262,23 +255,22 @@ def on_player_death_real(game_event):
 
 @Event('player_hurt')
 def on_player_hurt(game_event):
-    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
+    player = player_manager.get_by_userid(game_event['userid'])
 
     # Only able rebel against guards
     if player.team != GUARDS_TEAM:
         return
 
     # They don't rebel if, say, flashbang was used
-    # TODO: Save this cvar on change, don't require it every time
-    if game_event.get_string('weapon') in config_manager['soft_weapons']:
+    if game_event['weapon'] in config_manager['soft_weapons']:
         return
 
-    aid = game_event.get_int('attacker')
+    aid = game_event['attacker']
     # World- and self-damage won't count
     if aid == player.userid or not aid:
         return
 
-    attacker = main_player_manager.get_by_userid(aid)
+    attacker = player_manager.get_by_userid(aid)
     # Further checks on attacker
     if not _can_rebel(attacker):
         return
@@ -319,11 +311,12 @@ def on_item_pickup(game_event):
         return (mapmaker_opinion == -1 and should_rebel or
                 mapmaker_opinion == 1)
 
-    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
+    player = player_manager.get_by_userid(game_event['userid'])
     if player.dead or not _can_rebel(player):
         return
 
-    weapon_class = 'weapon_%s' % game_event.get_string('item')
+    # TODO: Use weapon_manager to get the proper "weapon_" prefix
+    weapon_class = 'weapon_{}'.format(game_event['item'])
     for entity in EntityIter(weapon_class):
         if entity.owner_handle == player.inthandle:
             break
@@ -340,9 +333,9 @@ def on_item_pickup(game_event):
             broadcast(strings_module['by_pickup'].tokenize(rebel=player.name))
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    _rebels.discard(event_var['main_player'])
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
+    _rebels.discard(player)
 
 
 @Event('round_start')
@@ -360,13 +353,13 @@ def on_round_end(game_event):
 
 
 @InternalEvent('load')
-def on_load(event_var):
-    is_rebel = lambda player: main_player_manager[player.index] in _rebels
+def on_load():
+    is_rebel = lambda player: player in _rebels
     PlayerIter.register_filter('jail_rebel', is_rebel)
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     PlayerIter.unregister_filter('jail_rebel')
 
 
@@ -375,7 +368,7 @@ def cmd_on_drop(command, index):
     if not config_manager['drop_hot_weapons']:
         return
 
-    player = main_player_manager[index]
+    player = player_manager[index]
     if not (player.team == GUARDS_TEAM or is_rebel(player)):
         return True
 

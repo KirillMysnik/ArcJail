@@ -18,14 +18,13 @@ from spam_proof_commands.say import SayCommand
 from events import Event
 from menus import PagedMenu, PagedOption
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
-from .players import main_player_manager, tell
+from .players import player_manager, tell
 
 
-ANTI_SPAM_TIMEOUT = 2
+ANTI_SPAM_TIMEOUT = 1
 
 
 strings_module = build_module_strings('jail_menu')
@@ -116,7 +115,7 @@ def on_round_start(game_event):
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     for popup in _popups.values():
         popup.close()
 
@@ -125,9 +124,9 @@ def on_unload(event_var):
 
 @SayCommand(ANTI_SPAM_TIMEOUT, '!jmenu')
 def chat_on_jmenu(command, index, team_only):
-    send_popup(main_player_manager[index])
+    send_popup(player_manager[index])
 
 
 @ClientCommand(ANTI_SPAM_TIMEOUT, 'jmenu')
 def cmd_on_jmenu(command, index):
-    send_popup(main_player_manager[index])
+    send_popup(player_manager[index])

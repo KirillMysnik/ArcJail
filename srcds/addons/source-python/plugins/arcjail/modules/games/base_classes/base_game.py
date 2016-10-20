@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from json import dumps
+import json
 from warnings import warn
 
 from core import echo_console
 from events.manager import event_manager
 
-from ....arcjail import internal_event_manager, InternalEvent
+from ....internal_events import internal_event_manager, InternalEvent
 
 from ...players import broadcast
 
@@ -172,7 +172,7 @@ class BaseGame(metaclass=GameMeta):
         return (cls.GameLauncher(cls), )
 
     def print_stages(self):
-        echo_console(dumps(self._stage_groups, indent=2))
+        echo_console(json.dumps(self._stage_groups, indent=2))
 
     @stage('destroy')
     def stage_destroy(self):

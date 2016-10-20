@@ -20,13 +20,12 @@ from listeners.tick import Delay
 from controlled_cvars.handlers import (
     bool_handler, float_handler, int_handler, sound_nullable_handler)
 
-from ....arcjail import InternalEvent
-
+from ....internal_events import InternalEvent
 from ....resource.strings import build_module_strings
 
-from ...players import broadcast, main_player_manager, tell
-
 from ... import build_module_config
+from ...players import broadcast, player_manager, tell
+
 
 from .. import (
     game_event_handler, helper_set_neutral, helper_set_winner, stage,
@@ -233,10 +232,8 @@ class ChatGame(PlayerPreserving):
 
     @game_event_handler('chatgame-player-say', 'player_say')
     def event_chatgame_player_say(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
-
-        message = game_event.get_string('text')
+        player = player_manager.get_by_userid(game_event['userid'])
+        message = game_event['text']
 
         if player not in self._players:
             return

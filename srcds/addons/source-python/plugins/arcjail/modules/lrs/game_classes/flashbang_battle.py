@@ -23,14 +23,12 @@ from ....resource.strings import build_module_strings
 
 from ...games.antiflash import (
     register_detonation_filter, unregister_detonation_filter)
-
 from ...players import tell
-
-from ..base_classes.combat_game import CombatGame
 
 from .. import (
     add_available_game, HiddenSetting, Setting, SettingOption, stage,
     strings_module as strings_common)
+from ..base_classes.combat_game import CombatGame
 
 
 BEAM_MODEL = Model('sprites/laserbeam.vmt')

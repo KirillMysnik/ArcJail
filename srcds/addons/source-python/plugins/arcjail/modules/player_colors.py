@@ -17,7 +17,7 @@ from colors import Color
 from events import Event
 from players.helpers import index_from_userid
 
-from ..arcjail import InternalEvent
+from ..internal_events import InternalEvent
 
 
 DEFAULT_COLOR = Color(255, 255, 255)
@@ -39,21 +39,19 @@ def on_round_start(game_event):
 
 @Event('player_death_real')
 def on_player_death_real(game_event):
-    index = index_from_userid(game_event.get_int('userid'))
+    index = index_from_userid(game_event['userid'])
     if index in requests:
         del requests[index]
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    index = event_var['main_player'].index
-    if index in requests:
-        del requests[index]
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
+    if player.index in requests:
+        del requests[player.index]
 
 
 @InternalEvent('player_respawn')
-def on_player_respawn(event_var):
-    player = event_var['player']
+def on_player_respawn(player):
     if player.index in requests:
         del requests[player.index]
     _update_player(player)

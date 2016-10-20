@@ -20,7 +20,6 @@ from ....resource.strings import build_module_strings
 from .. import (
     add_available_game, Setting, SettingOption, stage,
     strings_module as strings_common)
-
 from ..base_classes.combat_game import CombatGame
 
 

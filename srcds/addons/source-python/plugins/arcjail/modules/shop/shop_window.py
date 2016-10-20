@@ -17,7 +17,6 @@ from listeners import OnEntityOutput
 from players.entity import Player
 
 from ..jail_map import is_shop_window
-
 from ..motd.shop import send_page
 
 

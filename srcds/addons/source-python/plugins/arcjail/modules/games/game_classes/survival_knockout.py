@@ -22,13 +22,9 @@ from ....resource.strings import build_module_strings
 from ...damage_hook import (
     get_hook, is_world, protected_player_manager,
     strings_module as strings_damage_hook)
-
-from ...players import main_player_manager
-
+from ...players import player_manager
 from ...rebels import register_rebel_filter
-
 from ...show_damage import show_damage
-
 from ...teams import GUARDS_TEAM
 
 from .. import add_available_game, stage
@@ -80,7 +76,7 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager[info.attacker]
+            attacker = player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -95,7 +91,7 @@ class SurvivalKnockoutPlayerBased(SurvivalPlayerBasedFriendlyFire):
             min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
             return info.damage >= min_damage
 
-        for player in main_player_manager.values():
+        for player in player_manager.values():
             if player.dead:
                 continue
 
@@ -156,7 +152,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                 if info.attacker == victim.index or is_world(info.attacker):
                     return False
 
-                attacker = main_player_manager[info.attacker]
+                attacker = player_manager[info.attacker]
 
                 try:
                     attacker_team = self.get_player_team(attacker)
@@ -179,7 +175,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
                 if info.attacker == victim.index or is_world(info.attacker):
                     return False
 
-                attacker = main_player_manager[info.attacker]
+                attacker = player_manager[info.attacker]
 
                 if attacker not in self._players:
                     return False
@@ -196,7 +192,7 @@ class SurvivalKnockoutTeamBased(SurvivalTeamBasedFriendlyFire):
             min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
             return info.damage >= min_damage
 
-        for player in main_player_manager.values():
+        for player in player_manager.values():
             if player.dead:
                 continue
 

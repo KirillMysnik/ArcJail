@@ -13,22 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from json import dumps, loads
+import json
 
 from players.helpers import get_client_language
 
 from ...models.arcjail_user import ArcjailUser as DB_ArcjailUser
-
 from ...models.item import Item as DB_Item
-
 from ...resource.sqlalchemy import Session
-
 from ...resource.strings import build_module_strings
 
 from ..admin import section
-
-from ..arcjail.arcjail_user import arcjail_user_manager
-
 from ..arcjail.item_classes import item_classes
 
 from . import plugin_instance
@@ -84,7 +78,7 @@ def send_page(player):
         if data['action'] == "view-inventory":
             inventory_items = []
 
-            for item_id in loads(db_arcjail_user.slot_data):
+            for item_id in json.loads(db_arcjail_user.slot_data):
                 db_item = db_session.query(DB_Item).filter_by(
                     id=item_id).first()
 
@@ -141,7 +135,7 @@ def send_page(player):
                     'popup_error': error.get_string(language),
                 }
 
-            slot_data = loads(db_arcjail_user.slot_data)
+            slot_data = json.loads(db_arcjail_user.slot_data)
             for item_id in slot_data:
                 db_item = db_session.query(DB_Item).filter_by(
                     id=item_id).first()
@@ -166,7 +160,7 @@ def send_page(player):
                 db_session.commit()
 
                 slot_data.append(db_item.id)
-                db_arcjail_user.slot_data = dumps(slot_data)
+                db_arcjail_user.slot_data = json.dumps(slot_data)
 
             db_session.commit()
             db_session.close()

@@ -21,12 +21,10 @@ from players.teams import teams_by_name
 from ...games.game_classes.race import (
     MAX_RECOLLECT_ITERATIONS, RECOLLECT_PLAYERS_INTERVAL,
     strings_module as strings_games)
-
 from ...jail_map import get_players_in_area
 
-from ..base_classes.map_game import MapGame
-
 from .. import add_available_game, push, stage
+from ..base_classes.map_game import MapGame
 
 
 class RaceBase(MapGame):

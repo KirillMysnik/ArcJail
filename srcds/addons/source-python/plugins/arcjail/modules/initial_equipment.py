@@ -21,7 +21,7 @@ does not work for that game.
 
 from listeners import OnEntitySpawned
 
-from ..arcjail import InternalEvent
+from ..internal_events import InternalEvent
 
 from .equipment_switcher import saved_player_manager
 
@@ -35,10 +35,8 @@ def listener_on_entity_spawned(base_entity):
 
 
 @InternalEvent('player_respawn')
-def on_player_respawn(event_var):
-    player = event_var['player']
+def on_player_respawn(player):
     saved_player = saved_player_manager[player.index]
-
     saved_player.strip()
 
     player.give_named_item("weapon_knife")

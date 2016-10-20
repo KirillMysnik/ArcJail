@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ...players import broadcast, main_player_manager
+from ...players import broadcast, player_manager
 
 from .. import (
     game_event_handler, game_internal_event_handler, stage, strings_module)
@@ -45,22 +45,19 @@ class PlayerPreserving(JailGame):
 
     @game_event_handler('playerpreserving-player-death', 'player_death')
     def event_playerpreserving_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if player in self._players_all:
             self.set_stage_group('abort-player-dead')
 
     @game_internal_event_handler(
-        'playerpreserving-main-player-deleted', 'main_player_deleted')
-    def event_playerpreserving_main_player_deleted(self, event_var):
-        player = event_var['main_player']
+        'playerpreserving-main-player-deleted', 'player_deleted')
+    def event_playerpreserving_player_deleted(self, player):
         if player in self._players_all:
             self.set_stage_group('abort-player-disconnect')
 
     @game_internal_event_handler(
         'playerpreserving-arcjail-rebel-set', 'jail_rebel_set')
-    def event_playerpreserving_arcjail_rebel_set(self, event_var):
-        player = event_var['player']
+    def event_playerpreserving_arcjail_rebel_set(self, player):
         if player in self._players_all:
             self.set_stage_group('abort-player-rebel')

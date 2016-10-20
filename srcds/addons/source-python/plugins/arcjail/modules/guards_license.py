@@ -18,16 +18,12 @@ from time import time
 
 from listeners.tick import GameThread
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..resource.sqlalchemy import Session
-
 from ..resource.strings import build_module_strings
-
 from ..models.guards_license import GuardsLicense as DB_GuardsLicense
 
 from .admin import section
-
 from .players import tell
 
 
@@ -136,20 +132,15 @@ def format_ts(ts):
     return datetime.fromtimestamp(ts).strftime('%d.%m.%Y %H:%M:%S')
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    player = event_var['main_player']
-
+@InternalEvent('player_created')
+def on_player_created(player):
     guards_licenses_manager[player.index] = None
-
     GameThread(
         target=guards_licenses_manager.load_license, args=(player, )).start()
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
-
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     del guards_licenses_manager[player.index]
 
 

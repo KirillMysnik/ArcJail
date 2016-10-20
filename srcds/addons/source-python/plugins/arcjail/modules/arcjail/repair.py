@@ -22,15 +22,12 @@ a) Item was removed from the database, but is still referenced in ArcjailUser
 b) Item was created in the database, but is yet to be referenced in ArcjailUser
 """
 
-from json import dumps, loads
+import json
 
-from ...arcjail import InternalEvent
-
+from ...internal_events import InternalEvent
 from ...models.arcjail_user import ArcjailUser as DB_ArcjailUser
 from ...models.item import Item as DB_Item
-
 from ...resource.logger import logger
-
 from ...resource.sqlalchemy import Session
 
 
@@ -42,7 +39,7 @@ def repair():
     # Fix old references to deleted items
     logger.log_debug("Step 1/2...")
     for db_arcjail_user in db_session.query(DB_ArcjailUser).all():
-        slot_data = loads(db_arcjail_user.slot_data)
+        slot_data = json.loads(db_arcjail_user.slot_data)
         new_slot_data = []
 
         for item_id in slot_data:
@@ -53,7 +50,7 @@ def repair():
                 logger.log_debug("[!] User '{}' has invalid item '{}'".format(
                     db_arcjail_user.id, item_id))
 
-        db_arcjail_user.slot_data = dumps(new_slot_data)
+        db_arcjail_user.slot_data = json.dumps(new_slot_data)
 
     # Fix missing references to newly obtained items
     # Also remove items that belong to deleted players
@@ -69,14 +66,14 @@ def repair():
             db_session.delete(db_item)
             continue
 
-        slot_data = loads(db_arcjail_user.slot_data)
+        slot_data = json.loads(db_arcjail_user.slot_data)
         if db_item.id not in slot_data:
             logger.log_debug(
                 "[!] User '{}' did not have item '{}' "
                 "that belongs to him".format(db_arcjail_user.id, db_item.id))
 
             slot_data.append(db_item.id)
-            db_arcjail_user.slot_data = dumps(slot_data)
+            db_arcjail_user.slot_data = json.dumps(slot_data)
 
     db_session.commit()
     db_session.close()
@@ -85,5 +82,5 @@ def repair():
 
 
 @InternalEvent('load')
-def on_load(event_var):
+def on_load():
     repair()

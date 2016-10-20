@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ...arcjail import InternalEvent
+from ...internal_events import InternalEvent
 
 from ..damage_hook import (
     is_world, protected_player_manager, strings_module as strings_damage_hook)
-
-from ..players import main_player_manager
-
+from ..players import player_manager
 from ..teams import GUARDS_TEAM, PRISONERS_TEAM
 
 from . import get_player_game_instance, LastRequestGameStatus
@@ -38,7 +36,7 @@ class CrossGameAttackHandler:
                         is_world(info.attacker)):
                     return True
 
-                attacker = main_player_manager[info.attacker]
+                attacker = player_manager[info.attacker]
                 if attacker.team == player.team:
                     return False
 
@@ -55,7 +53,7 @@ class CrossGameAttackHandler:
             p_player.set_protected()
 
     def _set_hooks(self):
-        for player in main_player_manager.values():
+        for player in player_manager.values():
             if player.dead:
                 return
 
@@ -86,9 +84,7 @@ class CrossGameAttackHandler:
         if self._enabled == 0:
             self._unset_hooks()
 
-    def on_jail_lrs_status_set(self, event_var):
-        instance, status = event_var['instance'], event_var['status']
-
+    def on_jail_lrs_status_set(self, instance, status):
         if status == LastRequestGameStatus.NOT_STARTED:
             self._enable()
 
@@ -115,5 +111,5 @@ cross_game_attack_handler = CrossGameAttackHandler()
 
 
 @InternalEvent('jail_lrs_status_set')
-def on_jail_lrs_status_set(event_var):
-    cross_game_attack_handler.on_jail_lrs_status_set(event_var)
+def on_jail_lrs_status_set(instance, status):
+    cross_game_attack_handler.on_jail_lrs_status_set(instance, status)

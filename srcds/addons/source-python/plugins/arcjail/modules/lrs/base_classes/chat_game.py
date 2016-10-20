@@ -20,7 +20,7 @@ from listeners.tick import Delay
 from ...games.base_classes.chat_game import (
     config_manager as config_manager_games, strings_module as strings_games)
 
-from ...players import broadcast, main_player_manager, tell
+from ...players import broadcast, player_manager, tell
 
 from .. import game_event_handler, stage
 
@@ -161,10 +161,8 @@ class ChatGame(NoOffenseGame):
 
     @game_event_handler('chatgame-player-say', 'player_say')
     def event_chatgame_player_say(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
-
-        message = game_event.get_string('text')
+        player = player_manager.get_by_userid(game_event['userid'])
+        message = game_event['text']
 
         if player not in self._players:
             return

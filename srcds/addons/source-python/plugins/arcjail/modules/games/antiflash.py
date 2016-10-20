@@ -19,7 +19,7 @@ from memory import make_object
 from memory.hooks import HookType
 from events import Event
 
-from ...arcjail import InternalEvent
+from ...internal_events import InternalEvent
 
 from ..effects.dissolve import dissolve
 
@@ -87,13 +87,13 @@ def _remove_hook():
 
 
 @InternalEvent('load')
-def on_load(event_var):
+def on_load():
     on_entity_created_listener_manager.register_listener(
         listener_on_entity_created)
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     on_entity_created_listener_manager.unregister_listener(
         listener_on_entity_created)
 

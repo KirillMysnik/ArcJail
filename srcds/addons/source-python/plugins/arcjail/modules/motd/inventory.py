@@ -18,7 +18,6 @@ from players.helpers import get_client_language
 from ..arcjail import strings_module as strings_arcjail
 from ..arcjail.arcjail_user import arcjail_user_manager
 from ..arcjail.item_classes import get_item_instance, item_categories_json
-
 from ..players import tell
 
 from . import plugin_instance

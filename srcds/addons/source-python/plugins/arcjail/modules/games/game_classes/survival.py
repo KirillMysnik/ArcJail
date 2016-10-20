@@ -24,33 +24,23 @@ from ....resource.strings import build_module_strings
 from ...damage_hook import (
     get_hook, is_world, protected_player_manager,
     strings_module as strings_damage_hook)
-
 from ...equipment_switcher import saved_player_manager
-
 from ...falldmg_protector import protect as falldmg_protect
-
 from ...no_ff_spam import (
     disable as no_ff_spam_disable, enable as no_ff_spam_enable)
-
-from ...players import broadcast, main_player_manager
-
+from ...players import broadcast, player_manager
 from ...rebels import register_rebel_filter, unregister_rebel_filter
-
 from ...show_damage import show_damage
-
 from ...silent_cvars import silent_set
-
 from ...teams import GUARDS_TEAM
-
 from ... import build_module_config
-
-from ..base_classes.map_game import MapGame
-from ..base_classes.map_game_team_based import MapGameTeamBased
 
 from .. import (
     add_available_game, config_manager as config_manager_common,
     game_event_handler, helper_set_loser, push, stage,
     strings_module as strings_common)
+from ..base_classes.map_game import MapGame
+from ..base_classes.map_game_team_based import MapGameTeamBased
 
 
 class PossibleDeadEndWarning(Warning):
@@ -104,7 +94,7 @@ def build_survival_base(*parent_classes):
                 min_damage = self.map_data['ARENA_MIN_DAMAGE_TO_HURT']
                 return info.damage >= min_damage
 
-            for player in main_player_manager.values():
+            for player in player_manager.values():
                 if player.dead:
                     continue
 
@@ -161,7 +151,7 @@ def build_survival_base(*parent_classes):
 
         @stage('undo-survival-equip-damage-hooks')
         def stage_undo_survival_equip_damage_hooks(self):
-            for player in main_player_manager.values():
+            for player in player_manager.values():
                 if player.dead:
                     continue
 
@@ -187,7 +177,7 @@ def build_survival_base(*parent_classes):
 
         @game_event_handler('survival-player-death', 'player_death')
         def event_survival_player_death(self, game_event):
-            player = main_player_manager.get_by_userid(game_event['userid'])
+            player = player_manager.get_by_userid(game_event['userid'])
 
             if player not in self._players_all:
                 return
@@ -261,7 +251,7 @@ class SurvivalTeamBased(build_survival_base(MapGameTeamBased)):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(game_event['userid'])
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if self.leader == player:
             self.set_stage_group('abort-leader-dead')
@@ -342,7 +332,7 @@ class SurvivalPlayerBased(build_survival_base(MapGame)):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(game_event['userid'])
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if self.leader == player:
             self.set_stage_group('abort-leader-dead')
@@ -421,7 +411,7 @@ class SurvivalTeamBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager[info.attacker]
+            attacker = player_manager[info.attacker]
 
             if attacker in self._players and (
                 victim in self._team1 and attacker not in self._team1 or
@@ -448,7 +438,7 @@ class SurvivalTeamBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return hook_min_damage(counter, info)
 
-            attacker = main_player_manager.get(info.attacker)
+            attacker = player_manager.get(info.attacker)
 
             if attacker in self._players and (
                 victim in self._team1 and attacker not in self._team1 or
@@ -474,7 +464,7 @@ class SurvivalTeamBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager[info.attacker]
+            attacker = player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -496,7 +486,7 @@ class SurvivalTeamBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return hook_min_damage(counter, info)
 
-            attacker = main_player_manager.get(info.attacker)
+            attacker = player_manager.get(info.attacker)
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -505,7 +495,7 @@ class SurvivalTeamBasedFriendlyFire(
 
             return False
 
-        for player in main_player_manager.values():
+        for player in player_manager.values():
             if player.dead:
                 continue
 
@@ -580,7 +570,7 @@ class SurvivalPlayerBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager[info.attacker]
+            attacker = player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -595,7 +585,7 @@ class SurvivalPlayerBasedFriendlyFire(
             if info.attacker == victim.index or is_world(info.attacker):
                 return hook_min_damage(counter, info)
 
-            attacker = main_player_manager[info.attacker]
+            attacker = player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -604,7 +594,7 @@ class SurvivalPlayerBasedFriendlyFire(
 
             return False
 
-        for player in main_player_manager.values():
+        for player in player_manager.values():
             if player.dead:
                 continue
 
@@ -654,7 +644,7 @@ class SurvivalPlayerBasedFriendlyFire(
 
     @stage('undo-survival-equip-damage-hooks')
     def stage_undo_survival_equip_damage_hooks(self):
-        for player in main_player_manager.values():
+        for player in player_manager.values():
             if player.dead:
                 continue
 

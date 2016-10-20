@@ -17,18 +17,13 @@ from random import shuffle
 
 from core import GAME_NAME
 
-from ....arcjail import InternalEvent
-
+from ....internal_events import InternalEvent
 from ....resource.strings import COLOR_SCHEME
 
 from ...jail_map import teleport_player, get_games
-
 from ...player_colors import cancel_color_request, make_color_request
-
-from ...players import broadcast, main_player_manager, tell
-
+from ...players import broadcast, player_manager, tell
 from ...rebels import get_rebels
-
 from ...skins import model_player_manager
 
 from .. import (
@@ -410,8 +405,7 @@ class MapGameTeamBased(MapGame):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if self.leader == player:
             self.set_stage_group('abort-leader-dead')
@@ -431,10 +425,8 @@ class MapGameTeamBased(MapGame):
                 self.set_stage_group('abort-not-enough-players')
 
     @game_internal_event_handler(
-        'jailgame-main-player-deleted', 'main_player_deleted')
-    def event_jailgame_main_player_deleted(self, event_var):
-        player = event_var['main_player']
-
+        'jailgame-main-player-deleted', 'player_deleted')
+    def event_jailgame_player_deleted(self, player):
         if self.leader == player:
             self.set_stage_group('abort-leader-disconnect')
 

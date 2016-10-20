@@ -18,21 +18,15 @@ from listeners.tick import Delay
 
 from controlled_cvars.handlers import bool_handler, float_handler
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
-from .game_status import GameStatus, get_status
-
-from .jail_map import get_map_connections, register_push_handler
-
-from .jail_menu import new_available_option
-
-from .leaders import is_leader
-
-from .players import broadcast, tell
-
 from . import build_module_config
+from .game_status import GameStatus, get_status
+from .jail_map import get_map_connections, register_push_handler
+from .jail_menu import new_available_option
+from .leaders import is_leader
+from .players import broadcast, tell
 
 
 WARNING_DELAY = 30
@@ -131,7 +125,7 @@ def on_round_start(game_event):
 
 
 @InternalEvent('jail_game_status_started')
-def on_jail_game_status_started(event_var):
+def on_jail_game_status_started():
     if not get_connections_open():
         return
 
@@ -162,7 +156,7 @@ def on_jail_game_status_started(event_var):
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     for delay in _delays.values():
         delay.cancel()
 

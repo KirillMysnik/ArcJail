@@ -21,7 +21,6 @@ from controlled_cvars.handlers import sound_nullable_handler
 from ....resource.strings import build_module_strings
 
 from ... import build_module_config
-
 from ...players import broadcast
 
 from ..item_instance import BaseItemInstance

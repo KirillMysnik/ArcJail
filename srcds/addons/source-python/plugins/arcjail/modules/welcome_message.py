@@ -17,11 +17,11 @@ from listeners.tick import Delay
 
 from controlled_cvars.handlers import bool_handler, sound_handler
 
-from ..arcjail import InternalEvent, load_downloadables
-
-from .players import main_player_manager
+from ..arcjail import load_downloadables
+from ..internal_events import InternalEvent
 
 from . import build_module_config
+from .players import player_manager
 
 
 SPAWN_ANNOUNCE_DELAY = 2.0
@@ -51,23 +51,21 @@ def announce(player):
 
 
 @InternalEvent('player_respawn')
-def on_player_respawn(event_var):
-    player = event_var['player']
+def on_player_respawn(player):
     if player.index not in _announced_uids:
         _announced_uids[player.index] = Delay(
             SPAWN_ANNOUNCE_DELAY, announce, player)
 
 
-@InternalEvent('main_players_loaded')
-def on_main_players_loaded(event_var):
-    for player in main_player_manager.values():
+@InternalEvent('players_loaded')
+def on_players_loaded():
+    for player in player_manager.values():
         _announced_uids[player.index] = None
         announce(player)
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     if player.index in _announced_uids:
         if (_announced_uids[player.index] is not None and
                 _announced_uids[player.index].running):

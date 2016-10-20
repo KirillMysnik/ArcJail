@@ -15,12 +15,12 @@
 
 from commands.say import SayCommand
 
-from ..players import main_player_manager, tell
+from ..players import player_manager, tell
 
 from . import strings_module as strings_common
 
 
 @SayCommand('!shop')
 def say_shop(command, index, team_only):
-    player = main_player_manager[index]
+    player = player_manager[index]
     tell(player, strings_common['cmd_shop_response'])

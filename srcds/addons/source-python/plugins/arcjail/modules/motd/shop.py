@@ -19,9 +19,7 @@ from ..arcjail import strings_module as strings_arcjail
 from ..arcjail.arcjail_user import arcjail_user_manager
 from ..arcjail.item_classes import (
     get_item_instance, item_categories_json, iter_item_instance_classes)
-
 from ..credits import spend_credits
-
 from ..players import tell
 
 from . import plugin_instance

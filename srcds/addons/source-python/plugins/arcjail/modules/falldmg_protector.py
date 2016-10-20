@@ -17,10 +17,8 @@ from events import Event
 from listeners.tick import Delay
 from messages import Shake
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..classes.base_player_manager import BasePlayerManager
-
 from ..resource.strings import build_module_strings
 
 from .damage_hook import get_hook, protected_player_manager
@@ -100,22 +98,20 @@ class FallProtectedPlayer:
 fall_protected_player_manager = BasePlayerManager(FallProtectedPlayer)
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_created')
+def on_player_created(player):
     fall_protected_player_manager.create(player)
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     fall_protected_player_manager.delete(player)
 
 
 @Event('player_death_real')
 def on_player_death_real(game_event):
     p_player = fall_protected_player_manager.get_by_userid(
-        game_event.get_int('userid'))
+        game_event['userid'])
 
     p_player.cancel_delay()
 

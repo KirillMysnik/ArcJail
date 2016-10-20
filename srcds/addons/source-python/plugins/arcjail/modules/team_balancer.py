@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
+from enum import IntEnum
+
 from commands.client import ClientCommand
 from cvars import cvar
 from events import Event
@@ -22,14 +24,14 @@ from players.teams import teams_by_name
 from controlled_cvars import InvalidValue
 from controlled_cvars.handlers import bool_handler, sound_nullable_handler
 
-from ..arcjail import InternalEvent
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
+from . import build_module_config
 from .game_status import GameStatus, set_status
 from .guards_license import guards_licenses_manager
 from .teams import PRISONERS_TEAM, GUARDS_TEAM
-from .players import broadcast, main_player_manager, tell
-from . import build_module_config
+from .players import broadcast, player_manager, tell
 
 
 strings_module = build_module_strings('team_balancer')
@@ -90,7 +92,7 @@ SPECTATORS_TEAM = teams_by_name['spec']
 
 def count_teams():
     num_prisoners = num_guards = 0
-    for player in main_player_manager.values():
+    for player in player_manager.values():
         if player.team == PRISONERS_TEAM:
             num_prisoners += 1
         elif player.team == GUARDS_TEAM:
@@ -98,10 +100,10 @@ def count_teams():
     return num_prisoners, num_guards
 
 
-class ImbalanceCase:
-    BALANCED = 1
-    NEED_MORE_PRISONERS = 2
-    NEED_MORE_GUARDS = 3
+class ImbalanceCase(IntEnum):
+    BALANCED = 0
+    NEED_MORE_PRISONERS = 1
+    NEED_MORE_GUARDS = 2
 
 
 def check_teams(num_prisoners, num_guards):
@@ -117,9 +119,9 @@ def check_teams(num_prisoners, num_guards):
     return ImbalanceCase.BALANCED
 
 
-class SwapDirection:
-    MORE_PRISONERS = 1
-    MORE_GUARDS = 2
+class SwapDirection(IntEnum):
+    MORE_PRISONERS = 0
+    MORE_GUARDS = 1
 
 
 def check_swap(num_prisoners, num_guards, swap_direction):
@@ -167,7 +169,7 @@ def unlock_teams():
 
 
 @InternalEvent('load')
-def on_load(arc_event):
+def on_load():
     reset_cvars()
 
 
@@ -189,7 +191,7 @@ def on_round_start(game_event):
 
 @Event('player_spawn')
 def on_player_spawn(game_event):
-    player = main_player_manager.get_by_userid(game_event['userid'])
+    player = player_manager.get_by_userid(game_event['userid'])
     if player.team != GUARDS_TEAM:
         return
 
@@ -205,7 +207,7 @@ def on_player_spawn(game_event):
 
 
 @InternalEvent('jail_game_status_reset')
-def on_jail_game_status_reset(event_var):
+def on_jail_game_status_reset():
     if check_teams(*count_teams()) == ImbalanceCase.BALANCED:
         set_status(GameStatus.FREE)
     else:
@@ -220,7 +222,7 @@ def cl_jointeam(command, index):
     if len(command) < 2:
         return False
 
-    player = main_player_manager[index]
+    player = player_manager[index]
 
     # Deny invalid args
     try:

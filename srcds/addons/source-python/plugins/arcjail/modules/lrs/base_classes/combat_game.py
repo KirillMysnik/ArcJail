@@ -18,24 +18,18 @@ from random import shuffle
 
 from entities.helpers import edict_from_index
 
-from ....arcjail import InternalEvent
+from ....internal_events import InternalEvent
 
 from ...damage_hook import (
     protected_player_manager, strings_module as strings_damage_hook)
-
 from ...equipment_switcher import (
     register_weapon_drop_filter, register_weapon_pickup_filter,
     saved_player_manager, unregister_weapon_drop_filter,
     unregister_weapon_pickup_filter)
-
 from ...falldmg_protector import unprotect
-
 from ...games import play_flawless_effects
-
 from ...jail_map import get_lrs, teleport_player
-
-from ...players import main_player_manager
-
+from ...players import player_manager
 from ...show_damage import show_damage
 
 from .. import config_manager, game_event_handler, stage
@@ -223,9 +217,7 @@ class CombatGame(PrepareTime):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
-
+        player = player_manager.get_by_userid(game_event['userid'])
         if player not in self._players:
             return
 

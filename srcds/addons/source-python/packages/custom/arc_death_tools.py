@@ -70,18 +70,18 @@ def fake_death(victim, killer=None, headshot=False, dominated=False, revenge=Fal
 
 @Event('player_death')
 def on_player_death(pd_event):
-    userid = pd_event.get_int('userid')
+    userid = pd_event['userid']
     
     if index_from_userid(userid) in _faked_deaths:
         new_pd_event = Player_Death_Fake()
     else:
         new_pd_event = Player_Death_Real()
     
-    new_pd_event.attacker = pd_event.get_int('attacker')
-    new_pd_event.dominated = pd_event.get_int('dominated')
-    new_pd_event.headshot = pd_event.get_bool('headshot')
-    new_pd_event.revenge = pd_event.get_int('revenge')
+    new_pd_event.attacker = pd_event['attacker']
+    new_pd_event.dominated = pd_event['dominated']
+    new_pd_event.headshot = pd_event['headshot']
+    new_pd_event.revenge = pd_event['revenge']
     new_pd_event.userid = userid
-    new_pd_event.weapon = pd_event.get_string('weapon')
+    new_pd_event.weapon = pd_event['weapon']
     
     new_pd_event.fire()

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from json import load
+import json
 
 from spam_proof_commands.client import ClientCommand
 from spam_proof_commands.say import SayCommand
@@ -41,7 +41,7 @@ ANTI_SPAM_TIMEOUT = 2
 
 strings_module = build_module_strings('inventory')
 with open(ARCJAIL_DATA_PATH / 'inventory-ad-lines.json') as f:
-    inventory_ad_lines_ids = load(f)
+    inventory_ad_lines_ids = json.load(f)
 
 
 def popup_select_callback(popup, player_index, option):

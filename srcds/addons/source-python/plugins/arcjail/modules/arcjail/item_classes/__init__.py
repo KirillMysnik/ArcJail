@@ -14,7 +14,7 @@
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from json import load
+import json
 
 from ....resource.paths import ARCJAIL_DATA_PATH
 
@@ -22,10 +22,10 @@ from ....resource.paths import ARCJAIL_DATA_PATH
 registered_item_instance_classes = {}
 
 with open(ARCJAIL_DATA_PATH / 'items.json') as f:
-    items_json = load(f)
+    items_json = json.load(f)
 
 with open(ARCJAIL_DATA_PATH / 'item-categories.json') as f:
-    item_categories_json = load(f)
+    item_categories_json = json.load(f)
 
 
 def register_item_instance_class(class_id, item_instance_class):

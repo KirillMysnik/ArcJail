@@ -15,8 +15,7 @@
 
 from events import Event
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
 
@@ -60,6 +59,6 @@ def on_round_start(game_event):
 
 
 @InternalEvent('load')
-def on_load(event_var):
+def on_load():
     global _status
     _status = GameStatus.NOT_STARTED

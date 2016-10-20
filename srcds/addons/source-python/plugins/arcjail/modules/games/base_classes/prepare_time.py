@@ -17,11 +17,10 @@ from events.manager import event_manager
 from listeners.tick import Delay, on_tick_listener_manager
 from messages import TextMsg
 
-from ....arcjail import internal_event_manager
+from ....internal_events import internal_event_manager
 
 from ...overlays import show_overlay
-
-from ...players import broadcast, main_player_manager
+from ...players import broadcast, player_manager
 
 from .. import config_manager, stage, strings_module
 
@@ -101,17 +100,16 @@ class PrepareTime(JailGame):
             self.set_stage_group('prepare-continue')
 
     def _prepare_event_handler_player_death(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = player_manager.get_by_userid(game_event['userid'])
         if player in self._players or player == self.leader:
             self.set_stage_group('abort-prepare-interrupted')
 
-    def _prepare_event_handler_main_player_deleted(self, event_var):
-        player = event_var['main_player']
+    def _prepare_event_handler_player_deleted(self, player):
         if player in self._players or player == self.leader:
             self.set_stage_group('abort-prepare-interrupted')
 
     def _prepare_event_handler_player_hurt(self, game_event):
-        player = main_player_manager[game_event.get_int('userid')]
+        player = player_manager.get_by_userid(game_event['userid'])
         if player in self._players or player == self.leader:
             self.set_stage_group('abort-prepare-interrupted')
 
@@ -124,8 +122,8 @@ class PrepareTime(JailGame):
             'player_hurt', self._prepare_event_handler_player_hurt)
 
         internal_event_manager.register_event_handler(
-            'main_player_deleted',
-            self._prepare_event_handler_main_player_deleted
+            'player_deleted',
+            self._prepare_event_handler_player_deleted
         )
 
     @stage('undo-prepare-register-event-handlers')
@@ -137,8 +135,8 @@ class PrepareTime(JailGame):
             'player_hurt', self._prepare_event_handler_player_hurt)
 
         internal_event_manager.unregister_event_handler(
-            'main_player_deleted',
-            self._prepare_event_handler_main_player_deleted
+            'player_deleted',
+            self._prepare_event_handler_player_deleted
         )
 
     @stage('prepare-cancel-delays')

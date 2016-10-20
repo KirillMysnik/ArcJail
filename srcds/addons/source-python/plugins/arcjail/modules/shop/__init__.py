@@ -16,7 +16,6 @@
 from controlled_cvars.handlers import sound_nullable_handler
 
 from ...arcjail import load_downloadables
-
 from ...resource.strings import build_module_strings
 
 from .. import build_module_config

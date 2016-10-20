@@ -22,7 +22,7 @@ from controlled_cvars.handlers import bool_handler, float_handler
 
 from ..resource.strings import build_module_strings
 
-from .players import main_player_manager, tell
+from .players import player_manager, tell
 
 from .teams import PRISONERS_TEAM
 
@@ -110,7 +110,7 @@ def on_round_start(game_event):
 
 @SayCommand(ANTI_SPAM_TIMEOUT, ['!block', '!noblock'])
 def say_noblock(command, index, team_only):
-    player = main_player_manager[index]
+    player = player_manager[index]
     reason = get_noblock_denial_reason(player)
     if reason:
         tell(player, reason)

@@ -21,11 +21,9 @@ from controlled_cvars.handlers import int_handler
 
 from ...resource.strings import build_module_strings
 
+from .. import build_module_config
 from ..arcjail.arcjail_user import arcjail_user_manager
 from ..arcjail.item_classes import get_item_instance
-
-from .. import build_module_config
-
 from ..players import tell
 
 

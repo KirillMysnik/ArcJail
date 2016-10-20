@@ -13,22 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ....arcjail import InternalEvent
+from ....internal_events import InternalEvent
 
 from ....resource.strings import build_module_strings
 
 from ...damage_hook import get_hook, protected_player_manager
-
 from ...games.game_classes.scoregame import (
     get_goal_sound, config_manager as config_manager_games)
-
 from ...games import play_flawless_effects
-
 from ...players import broadcast
 
-from ..base_classes.map_game_team_based import MapGameTeamBased
-
 from .. import add_available_game, push, stage
+from ..base_classes.map_game_team_based import MapGameTeamBased
 
 
 strings_module = build_module_strings('lrs/scoregame')

@@ -22,9 +22,8 @@ from ....resource.strings import build_module_strings
 
 from ...jail_map import get_players_in_area
 
-from ..base_classes.map_game import MapGame
-
 from .. import add_available_game, push, stage
+from ..base_classes.map_game import MapGame
 
 
 RECOLLECT_PLAYERS_INTERVAL = 0.25

@@ -19,27 +19,21 @@ from random import shuffle
 from cvars import ConVar
 from entities.helpers import edict_from_index
 
-from ....arcjail import InternalEvent
+from ....internal_events import InternalEvent
 
 from ...equipment_switcher import (
     register_weapon_drop_filter, register_weapon_pickup_filter,
     saved_player_manager, unregister_weapon_drop_filter,
     unregister_weapon_pickup_filter)
-
 from ...falldmg_protector import unprotect
-
 from ...jail_map import (
     get_cage_names, get_games, get_map_string, get_players_in_area,
     register_push_handler, teleport_player, unregister_push_handler)
-
 from ...noblock import lock as lock_noblock
 from ...noblock import unlock as unlock_noblock
 from ...noblock import set_default, set_force_off, set_force_on
-
 from ...players import broadcast
-
 from ...rebels import get_rebels
-
 from ...silent_cvars import silent_set
 
 from .. import (

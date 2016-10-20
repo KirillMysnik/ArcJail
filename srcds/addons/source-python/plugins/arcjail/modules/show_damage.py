@@ -18,15 +18,13 @@ from messages import TextMsg
 
 from controlled_cvars.handlers import sound_nullable_handler, string_handler
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..classes.base_player_manager import BasePlayerManager
-
 from ..resource.strings import build_module_strings
 
+from . import build_module_config
 from .overlays import show_overlay
 
-from . import build_module_config
 
 TEXT_VISIBLE_TIMEOUT = 2
 MARKER_VISIBLE_TIMEOUT = 0.2
@@ -93,15 +91,13 @@ class ShowDamagePlayer:
 show_damage_player_manager = BasePlayerManager(ShowDamagePlayer)
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_created')
+def on_player_created(player):
     show_damage_player_manager.create(player)
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     show_damage_player_manager.delete(player)
 
 

@@ -16,9 +16,8 @@
 from events import Event
 from listeners.tick import Delay
 
-from ..arcjail import InternalEvent
-
 from ..classes.base_player_manager import BasePlayerManager
+from ..internal_events import InternalEvent
 
 
 class OverlayPlayer:
@@ -58,15 +57,13 @@ class OverlayPlayer:
 overlay_player_manager = BasePlayerManager(OverlayPlayer)
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_created')
+def on_player_created(player):
     overlay_player_manager.create(player)
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     overlay_player_manager.delete(player)
 
 

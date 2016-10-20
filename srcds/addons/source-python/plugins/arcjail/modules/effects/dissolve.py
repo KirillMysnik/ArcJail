@@ -15,34 +15,29 @@
 
 from core import PLATFORM
 from engines.server import global_vars
-from memory import Convention, DataType, find_binary, NULL
+from entities.constants import DissolveType
+from memory import Convention, DataType
 
 
 if PLATFORM == 'windows':
-    DISSOLVE_IDENTIFIER = b'\x55\x8B\xEC\x80\x7D\x10\x00\x56\x57\x8B\xF1\x74\x14'
+    DISSOLVE_INDEX = 230
 else:
-    DISSOLVE_IDENTIFIER = "_ZN14CBaseAnimating8DissolveEPKcfbi6Vectori"
-
-server = find_binary('server')
-
-dissolve_srv = server[DISSOLVE_IDENTIFIER].make_function(
-    Convention.THISCALL,
-    (
-        DataType.POINTER,
-        DataType.POINTER,
-        DataType.FLOAT,
-        DataType.BOOL,
-        DataType.INT,
-        DataType.POINTER,
-        DataType.INT
-    ),
-    DataType.BOOL
-)
+    DISSOLVE_INDEX = 231
 
 
-def dissolve(entity, type_=0):
-    dissolve_srv(
-        entity.pointer, NULL,
-        global_vars.current_time,
-        False, type_, entity.origin, 2
-    )
+def dissolve(entity, type_=DissolveType.NORMAL):
+    entity.pointer.make_virtual_function(
+        DISSOLVE_INDEX,
+        Convention.THISCALL,
+        (
+            DataType.POINTER,
+            DataType.STRING,
+            DataType.FLOAT,
+            DataType.BOOL,
+            DataType.INT,
+            DataType.POINTER,
+            DataType.INT
+        ),
+        DataType.BOOL
+    )(entity.pointer, "", global_vars.current_time, False, type_,
+      entity.origin, 2)

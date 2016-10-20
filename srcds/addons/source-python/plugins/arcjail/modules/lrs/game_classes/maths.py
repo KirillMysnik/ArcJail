@@ -17,9 +17,8 @@ from random import randint
 
 from ...games.game_classes.maths import strings_module as strings_games
 
-from ..base_classes.chat_game import ChatGame
-
 from .. import add_available_game, stage
+from ..base_classes.chat_game import ChatGame
 
 
 MIN_OPERATIONS = 2

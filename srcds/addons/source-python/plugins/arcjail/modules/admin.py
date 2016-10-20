@@ -17,8 +17,7 @@ from warnings import warn
 
 from core.manager import core_plugin_manager
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
 
@@ -34,7 +33,7 @@ if core_plugin_manager.is_loaded('arcadmin'):
     section = popup_main.add_child(Section, strings_module['popup title'])
 
     @InternalEvent('unload')
-    def on_unload(event_var):
+    def on_unload():
         popup_main.remove(section)
 
 else:

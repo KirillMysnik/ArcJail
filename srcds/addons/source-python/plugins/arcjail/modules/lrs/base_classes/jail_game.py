@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ....arcjail import InternalEvent
+from ....internal_events import InternalEvent
 
-from ...players import broadcast, main_player_manager
+from ...players import broadcast, player_manager
 
 from .. import (
     config_manager, game_event_handler, game_internal_event_handler,
@@ -109,7 +109,7 @@ class JailGame(BaseGame):
             return
 
         InternalEvent.fire(
-            'jail_lr_won', winner=winner, loser=loser, game_instance=self)
+            'jail_lr_won', winner=winner, loser=loser, instance=self)
 
         if config_manager['victory_sound'] is not None:
             config_manager['victory_sound'].play(winner.index)
@@ -144,8 +144,7 @@ class JailGame(BaseGame):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if player in self._players:
             self._players.remove(player)
@@ -153,10 +152,8 @@ class JailGame(BaseGame):
             self.set_stage_group('abort-player-out')
 
     @game_internal_event_handler(
-        'jailgame-main-player-deleted', 'main_player_deleted')
-    def event_jailgame_main_player_deleted(self, event_var):
-        player = event_var['main_player']
-
+        'jailgame-main-player-deleted', 'player_deleted')
+    def event_jailgame_player_deleted(self, player):
         if player in self._players:
             self._players.remove(player)
 

@@ -19,7 +19,7 @@ from controlled_cvars.handlers import bool_handler, float_handler
 
 from ..resource.strings import build_module_strings
 
-from .players import broadcast, main_player_manager, tell
+from .players import broadcast, player_manager, tell
 
 from .teams import GUARDS_TEAM, PRISONERS_TEAM
 
@@ -61,7 +61,7 @@ def get_kill_denial_reason(player):
 
 @SayCommand(ANTI_SPAM_TIMEOUT, ["!suicide", "!kill"])
 def say_kill(command, index, team_only):
-    player = main_player_manager[index]
+    player = player_manager[index]
 
     reason = get_kill_denial_reason(player)
     if reason is not None:

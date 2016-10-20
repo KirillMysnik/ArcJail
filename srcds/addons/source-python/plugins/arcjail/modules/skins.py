@@ -13,16 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from json import load as json_load
+import json
 from random import choice
 
 from core import GAME_NAME
 from engines.precache import Model
 
-from ..arcjail import InternalEvent, load_downloadables
-
+from ..arcjail import load_downloadables
 from ..classes.base_player_manager import BasePlayerManager
-
+from ..internal_events import InternalEvent
 from ..resource.paths import ARCJAIL_CFG_PATH, DOWNLOADLISTS_PATH
 
 from .teams import GUARDS_TEAM, PRISONERS_TEAM
@@ -39,12 +38,14 @@ else:
 
 
 # other/skins.json
-_groups_json_path = ARCJAIL_CFG_PATH / "other" / "skins-{}.json".format(GAME_NAME)
+_groups_json_path = ARCJAIL_CFG_PATH / "other" / "skins-{}.json".format(
+    GAME_NAME)
+
 if not _groups_json_path.isfile():
     _groups_json_path = ARCJAIL_CFG_PATH / "other" / "skins.json"
 
 with open(_groups_json_path) as f:
-    groups = json_load(f)['groups']
+    groups = json.load(f)['groups']
 
 precache = {}
 for group in groups:
@@ -109,8 +110,7 @@ model_player_manager = BasePlayerManager(ModelPlayer)
 
 
 @InternalEvent('player_respawn')
-def on_player_respawn(event_var):
-    player = event_var['player']
+def on_player_respawn(player):
     model_player = model_player_manager[player.index]
     model_player.clear()
 
@@ -128,13 +128,11 @@ def on_player_respawn(event_var):
     )
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_created')
+def on_player_created(player):
     model_player_manager.create(player)
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     model_player_manager.delete(player)

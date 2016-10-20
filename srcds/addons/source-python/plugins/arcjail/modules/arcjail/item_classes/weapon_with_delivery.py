@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ....arcjail import InternalEvent
+from ....internal_events import InternalEvent
 
 from ...teams import PRISONERS_TEAM
 
@@ -28,11 +28,10 @@ class WeaponWithDelivery(BaseItemInstance):
 register_item_instance_class('weapon_with_delivery', WeaponWithDelivery)
 
 
-@InternalEvent("player_respawn")
-def on_player_respawn(event_var):
+@InternalEvent('player_respawn')
+def on_player_respawn(player):
     from ..arcjail_user import arcjail_user_manager
 
-    player = event_var['player']
     if player.team not in WeaponWithDelivery.team_restriction:
         return
 

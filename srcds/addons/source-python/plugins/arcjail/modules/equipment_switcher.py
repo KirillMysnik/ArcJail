@@ -24,13 +24,11 @@ from mathlib import NULL_VECTOR
 from weapons.entity import Weapon
 from weapons.manager import weapon_manager
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..classes.base_player_manager import BasePlayerManager
-
 from ..resource.memory import CCSPlayer
 
-from .players import main_player_manager
+from .players import player_manager
 
 
 INFINITE_AMMO_REFILL_INTERVAL = 5
@@ -174,15 +172,13 @@ class SavedPlayer:
 saved_player_manager = BasePlayerManager(SavedPlayer)
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_created')
+def on_player_created(player):
     saved_player_manager.create(player)
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     saved_player_manager.delete(player)
 
 
@@ -208,7 +204,7 @@ weapon_drop_filters = []
 
 def pre_bump_weapon(pointers):
     pointer_player, pointer_weapon = pointers
-    player = main_player_manager[index_from_pointer(pointer_player)]
+    player = player_manager[index_from_pointer(pointer_player)]
 
     weapon_index = index_from_pointer(pointer_weapon)
 
@@ -224,7 +220,7 @@ def pre_bump_weapon(pointers):
 def check_bump_weapons():
     global bump_weapon_function
     if weapon_pickup_filters and bump_weapon_function is None:
-        for player in main_player_manager.values():
+        for player in player_manager.values():
             break
 
         else:
@@ -256,7 +252,7 @@ def unregister_weapon_pickup_filter(callback):
 
 @ClientCommand('drop')
 def cl_drop(command, index):
-    player = main_player_manager[index]
+    player = player_manager[index]
 
     for callback in weapon_drop_filters:
         if callback(player) is False:
@@ -282,7 +278,7 @@ def unregister_weapon_drop_filter(callback):
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     if bump_weapon_function is not None:
         bump_weapon_function.remove_pre_hook(pre_bump_weapon)
 

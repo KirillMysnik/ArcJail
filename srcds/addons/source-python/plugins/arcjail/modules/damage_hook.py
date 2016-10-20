@@ -26,17 +26,13 @@ from players.helpers import get_client_language
 
 from controlled_cvars.handlers import int_handler
 
-from ..arcjail import InternalEvent
-
 from ..classes.base_player_manager import BasePlayerManager
-
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
-from .players import main_player_manager
-
-from .teams import GUARDS_TEAM, PRISONERS_TEAM
-
 from . import build_module_config
+from .players import player_manager
+from .teams import GUARDS_TEAM, PRISONERS_TEAM
 
 
 strings_module = build_module_strings('damage_hook')
@@ -81,7 +77,7 @@ def get_hook(flags, next_hook=(lambda counter, info: True)):
         if (info.attacker != counter.owner.player.index and
                 not is_world(info.attacker)):
 
-            attacker = main_player_manager[info.attacker]
+            attacker = player_manager[info.attacker]
             if 'P' in flags:
                 if attacker.team == PRISONERS_TEAM:
                     return next_hook(counter, info)
@@ -202,7 +198,7 @@ class ProtectedPlayer:
 
         return None
 
-    def _spawn(self, game_event):
+    def _spawn(self):
         self._pre_protection_health = None
         self.dead = False
         self._counters = []
@@ -227,15 +223,13 @@ class ProtectedPlayer:
 protected_player_manager = BasePlayerManager(ProtectedPlayer)
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_created')
+def on_player_created(player):
     protected_player_manager.create(player)
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     protected_player_manager.delete(player)
 
 
@@ -250,17 +244,16 @@ def on_take_damage(args):
 
 
 @InternalEvent('player_respawn')
-def on_player_respawn(event_var):
-    player = event_var['player']
+def on_player_respawn(player):
     protected_player = protected_player_manager[player.index]
-    protected_player._spawn(event_var['game_event'])
+    protected_player._spawn()
 
 
 delay = None
 
 
 @InternalEvent('load')
-def on_load(event_var):
+def on_load():
     def callback():
         for protected_player in protected_player_manager.values():
             if not protected_player.dead:
@@ -273,6 +266,6 @@ def on_load(event_var):
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     if delay:
         delay.cancel()

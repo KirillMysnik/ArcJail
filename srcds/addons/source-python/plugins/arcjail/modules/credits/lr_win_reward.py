@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ...arcjail import InternalEvent
-
+from ...internal_events import InternalEvent
 from ...resource.strings import build_module_strings
 
 from . import credits_config, earn_credits
@@ -24,6 +23,6 @@ strings_module = build_module_strings('credits/lr_win_reward')
 
 
 @InternalEvent('jail_lr_won')
-def on_jail_lr_won(event_var):
-    earn_credits(event_var['winner'], int(credits_config['rewards']['lr_win']),
+def on_jail_lr_won(winner, loser, instance):
+    earn_credits(winner, int(credits_config['rewards']['lr_win']),
                  strings_module['reason'])

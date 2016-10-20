@@ -26,21 +26,15 @@ from ....resource.strings import build_module_strings
 from ...damage_hook import (
     get_hook, is_world, protected_player_manager,
     strings_module as strings_damage_hook)
-
 from ...equipment_switcher import (
     register_weapon_pickup_filter, saved_player_manager,
     unregister_weapon_pickup_filter)
-
-from ...players import main_player_manager
-
+from ...players import player_manager
 from ...rebels import register_rebel_filter
-
 from ...show_damage import show_damage
-
 from ...teams import GUARDS_TEAM
 
 from .. import add_available_game, stage
-
 from ..antiflash import (
     register_detonation_filter, unregister_detonation_filter)
 
@@ -139,7 +133,7 @@ class SurvivalFlashbangArenaPlayerBased(SurvivalPlayerBasedFriendlyFire):
             if info.attacker == victim.index or is_world(info.attacker):
                 return False
 
-            attacker = main_player_manager[info.attacker]
+            attacker = player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -157,7 +151,7 @@ class SurvivalFlashbangArenaPlayerBased(SurvivalPlayerBasedFriendlyFire):
             if info.attacker == victim.index or is_world(info.attacker):
                 return True
 
-            attacker = main_player_manager[info.attacker]
+            attacker = player_manager[info.attacker]
 
             if attacker in self._players:
                 show_damage(attacker, info.damage)
@@ -169,7 +163,7 @@ class SurvivalFlashbangArenaPlayerBased(SurvivalPlayerBasedFriendlyFire):
 
             return False
 
-        for player in main_player_manager.values():
+        for player in player_manager.values():
             if player.dead:
                 continue
 

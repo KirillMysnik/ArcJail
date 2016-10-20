@@ -19,26 +19,21 @@ from listeners.tick import Delay
 from memory import make_object
 from weapons.entity import Weapon
 
-from ....arcjail import InternalEvent
-
+from ....internal_events import InternalEvent
 from ....resource.strings import build_module_strings
 
 from ...damage_hook import (
     protected_player_manager, strings_module as strings_damage_hook)
-
 from ...equipment_switcher import (
     register_weapon_drop_filter, register_weapon_pickup_filter,
     saved_player_manager, unregister_weapon_drop_filter,
     unregister_weapon_pickup_filter)
-
-from ...players import broadcast, main_player_manager, tell
-
+from ...players import broadcast, player_manager, tell
 from ...show_damage import show_damage
 
 from .. import (
     add_available_game, HiddenSetting, Setting, SettingOption,
     stage, strings_module as strings_common)
-
 from ..base_classes.combat_game import CombatGame
 
 
@@ -201,8 +196,7 @@ class Shot4Shot(CombatGame):
                 'weapon_fire', self._on_weapon_fire_classic)
 
     def _on_weapon_fire_classic(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if player not in self._players:
             return
@@ -214,8 +208,7 @@ class Shot4Shot(CombatGame):
                 break
 
     def _on_weapon_fire_competitive(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if player not in self._players:
             return

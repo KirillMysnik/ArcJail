@@ -18,8 +18,7 @@ from commands.say import SayCommand
 
 from ..arcjail import strings_module as strings_arcoins
 from ..arcjail.arcjail_user import arcjail_user_manager
-
-from ..players import main_player_manager, tell
+from ..players import player_manager, tell
 
 from . import plugin_instance
 
@@ -58,5 +57,5 @@ def send_page(player):
 @ClientCommand('account')
 @SayCommand('!account')
 def say_account(command, index, team_only=None):
-    player = main_player_manager[index]
+    player = player_manager[index]
     send_page(player)

@@ -18,25 +18,25 @@ from filters.players import PlayerIter
 from listeners import OnClientActive, OnClientDisconnect, OnLevelInit
 from messages import SayText2
 from players.entity import Player
-from players.teams import teams_by_name
-
-from ..arcjail import InternalEvent
 
 from ..classes.base_player_manager import BasePlayerManager
-
+from ..internal_events import InternalEvent
 from ..resource.strings import COLOR_SCHEME, strings_common
 
 
-class MainPlayerManager(BasePlayerManager):
+_initial_spawns = []
+
+
+class PlayerManager(BasePlayerManager):
     def create(self, player):
-        main_player = super().create(player)
-        InternalEvent.fire('main_player_created', main_player=main_player)
+        player = super().create(player)
+        InternalEvent.fire('player_created', player=player)
 
     def delete(self, player):
-        main_player = super().delete(player)
-        InternalEvent.fire('main_player_deleted', main_player=main_player)
+        player = super().delete(player)
+        InternalEvent.fire('player_deleted', player=player)
 
-main_player_manager = MainPlayerManager(lambda player: player)
+player_manager = PlayerManager(lambda player: player)
 
 
 def tell(players, message, **tokens):
@@ -57,50 +57,50 @@ def tell(players, message, **tokens):
 
 def broadcast(message, **tokens):
     """Send a SayText2 message to all registered users."""
-    tell(list(main_player_manager.values()), message, **tokens)
+    tell(list(player_manager.values()), message, **tokens)
 
 
 @InternalEvent('load')
-def on_load(event_var):
+def on_load():
     for player in PlayerIter():
-        main_player_manager.create(player)
+        player_manager.create(player)
 
-    InternalEvent.fire('main_players_loaded')
+    InternalEvent.fire('players_loaded')
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
-    for player in list(main_player_manager.values()):
-        main_player_manager.delete(player)
+def on_unload():
+    for player in list(player_manager.values()):
+        player_manager.delete(player)
 
 
 @Event('player_spawn')
 def on_player_spawn(game_event):
-    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
-    if player.team != teams_by_name['un']:
-        InternalEvent.fire(
-            'player_respawn',
-            player=player,
-            game_event=game_event,
-        )
+    player = player_manager.get_by_userid(game_event['userid'])
+
+    if player.index not in _initial_spawns:
+        _initial_spawns.append(player.index)
+        return
+
+    InternalEvent.fire('player_respawn', player=player)
 
 
 @OnClientActive
 def listener_on_client_active(index):
     player = Player(index)
-    main_player_manager.create(player)
+    player_manager.create(player)
 
 
 @OnClientDisconnect
 def listener_on_client_disconnect(index):
-    if index not in main_player_manager:
+    if index not in player_manager:
         return
 
-    player = main_player_manager[index]
-    main_player_manager.delete(player)
+    player = player_manager[index]
+    player_manager.delete(player)
 
 
 @OnLevelInit
 def listener_on_level_init(map_name):
-    for player in list(main_player_manager.values()):
-        main_player_manager.delete(player)
+    for player in list(player_manager.values()):
+        player_manager.delete(player)

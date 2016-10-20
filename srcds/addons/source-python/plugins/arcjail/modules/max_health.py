@@ -15,7 +15,7 @@
 
 from controlled_cvars import InvalidValue
 
-from ..arcjail import InternalEvent
+from ..internal_events import InternalEvent
 
 from . import build_module_config
 
@@ -70,17 +70,16 @@ def get_max_health(player):
 
 
 @InternalEvent('player_respawn')
-def on_player_respawn(event_var):
-    player = event_var['player']
+def on_player_respawn(player):
     set_max_health(player, config_manager['default_value'])
     restore_health(player)
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    set_max_health(event_var['main_player'], config_manager['default_value'])
+@InternalEvent('player_created')
+def on_player_created(player):
+    set_max_health(player, config_manager['default_value'])
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    del players[event_var['main_player'].index]
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
+    del players[player.index]

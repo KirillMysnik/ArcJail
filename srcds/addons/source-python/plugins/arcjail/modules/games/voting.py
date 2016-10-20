@@ -20,15 +20,12 @@ from menus import PagedMenu, PagedOption
 
 from controlled_cvars.handlers import float_handler
 
-from ...arcjail import InternalEvent
-
+from ...internal_events import InternalEvent
 from ...resource.strings import build_module_strings
 
 from .. import build_module_config
-
 from ..jail_menu import new_available_option
-
-from ..players import broadcast, main_player_manager, tell
+from ..players import broadcast, player_manager, tell
 
 from . import (
     get_available_launchers, get_game_denial_reason, get_players_to_play)
@@ -63,7 +60,7 @@ class GameVoting(dict):
         if option.value != "WONT_PLAY":
             self[option.value] = self.get(option.value, 0) + 1
 
-            player = main_player_manager[index]
+            player = player_manager[index]
             broadcast(strings_module['player_voted'].tokenize(
                 player=player.name, choice=option.value.caption))
 

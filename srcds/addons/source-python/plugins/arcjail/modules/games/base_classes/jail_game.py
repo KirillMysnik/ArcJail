@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ...players import broadcast, main_player_manager
+from ...players import broadcast, player_manager
 
 from ...rebels import get_rebels
 
@@ -80,8 +80,7 @@ class JailGame(BaseGame):
 
     @game_event_handler('jailgame-player-death', 'player_death')
     def event_jailgame_player_death(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if self.leader == player:
             self.set_stage_group('abort-leader-dead')
@@ -93,10 +92,8 @@ class JailGame(BaseGame):
                 self.set_stage_group('abort-not-enough-players')
 
     @game_internal_event_handler(
-        'jailgame-main-player-deleted', 'main_player_deleted')
-    def event_jailgame_main_player_deleted(self, event_var):
-        player = event_var['main_player']
-
+        'jailgame-main-player-deleted', 'player_deleted')
+    def event_jailgame_player_deleted(self, player):
         if self.leader == player:
             self.set_stage_group('abort-leader-disconnect')
 

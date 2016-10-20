@@ -16,9 +16,7 @@
 from ...resource.strings import build_module_strings
 
 from ..game_status import get_status, GameStatus
-
 from ..players import tell
-
 from ..teams import GUARDS_TEAM, PRISONERS_TEAM
 
 

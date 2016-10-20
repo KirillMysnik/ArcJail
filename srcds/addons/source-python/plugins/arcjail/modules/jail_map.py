@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from json import load as json_load
+import json
 from traceback import format_exc
 from warnings import warn
 
@@ -26,20 +26,16 @@ from path import Path
 
 from advanced_ts import BaseLangStrings
 
-from ..arcjail import InternalEvent
-
 from ..classes.geometry import Point, Vector, ConvexArea
 from ..classes.meta_parser import MetaParser
 from ..classes.string_values import value_from_string
-
 from ..info import info
-
+from ..internal_events import InternalEvent
 from ..resource.paths import (
     ARCJAIL_DATA_PATH, MAPDATA_PATH, MAP_TRANSLATION_PATH)
 
 from .ent_fire import new_output_connection
-
-from .players import main_player_manager
+from .players import player_manager
 
 
 ORIGIN_OFFSET_Z = 32
@@ -268,7 +264,7 @@ def reload_map_info():
 
     with open(mapdata_json) as f:
         try:
-            data = json_load(f)
+            data = json.load(f)
         except:
             raise CorruptMapData("Can't load JSON for {0}!".format(
                 mapdata_json
@@ -440,7 +436,7 @@ def get_players_in_area(area_name):
         return []
 
     rs = []
-    for player in main_player_manager.values():
+    for player in player_manager.values():
         player_point = (Point(tuple(player.origin)) +
                         Vector(0, 0, ORIGIN_OFFSET_Z))
 
@@ -532,7 +528,7 @@ def on_server_spawn(game_event):
 
 
 @InternalEvent('load')
-def on_load(arc_event):
+def on_load():
     reload_game_settings()
     reload_map_info()
     reload_map_scripts()
@@ -541,7 +537,7 @@ def on_load(arc_event):
 
 
 @InternalEvent('jail_game_started')
-def on_jail_game_started(arc_event):
+def on_jail_game_started():
     for connection_string in get_map_var_list('OnJailRoundStart'):
         connection = new_output_connection(connection_string)
         connection.fire()

@@ -13,15 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from ....arcjail import InternalEvent
+from ....internal_events import InternalEvent
 
 from ...damage_hook import is_world, protected_player_manager
-
 from ...games.game_classes.survival_knockout import (
     push_by_damage_info, strings_module as strings_games)
-
-from ...players import main_player_manager
-
+from ...players import player_manager
 from ...show_damage import show_damage
 
 from .. import add_available_game, stage
@@ -44,7 +41,7 @@ def build_survival_knockout_base(*parent_classes):
 
                         return False
 
-                    attacker = main_player_manager[info.attacker]
+                    attacker = player_manager[info.attacker]
                     if attacker in self._players:
                         self._flawless[player.index] = False
 

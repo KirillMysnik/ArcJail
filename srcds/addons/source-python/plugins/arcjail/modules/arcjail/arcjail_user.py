@@ -13,25 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with ArcJail.  If not, see <http://www.gnu.org/licenses/>.
 
-from json import dumps, loads
+import json
 from time import time
 
 from events import Event
 from listeners.tick import GameThread
 
-from ...arcjail import InternalEvent
-
 from ...classes.base_player_manager import BasePlayerManager
-
+from ...internal_events import InternalEvent
 from ...models.arcjail_user import ArcjailUser as DB_ArcjailUser
-
 from ...resource.logger import logger
-
 from ...resource.sqlalchemy import Session
 
-from .global_inventory import global_inventory
-
 from .item import Item
+from .global_inventory import global_inventory
 
 
 class ArcjailUser:
@@ -65,7 +60,7 @@ class ArcjailUser:
         if db_arcjail_user is not None:
             self.account = db_arcjail_user.account
             self.last_online_reward = db_arcjail_user.last_online_reward
-            self.slot_data = loads(db_arcjail_user.slot_data)
+            self.slot_data = json.loads(db_arcjail_user.slot_data)
 
         self._loaded = True
 
@@ -100,7 +95,7 @@ class ArcjailUser:
         db_arcjail_user.last_used_name = self._name
         db_arcjail_user.last_online_reward = self.last_online_reward
         db_arcjail_user.account = self.account
-        db_arcjail_user.slot_data = dumps(self.slot_data)
+        db_arcjail_user.slot_data = json.dumps(self.slot_data)
 
         db_session.commit()
         db_session.close()
@@ -129,9 +124,9 @@ class ArcjailUser:
             slot_data = []
 
         else:
-            slot_data = loads(db_arcjail_user.slot_data)
+            slot_data = json.loads(db_arcjail_user.slot_data)
 
-        db_arcjail_user.slot_data = dumps(slot_data + [item.id, ])
+        db_arcjail_user.slot_data = json.dumps(slot_data + [item.id, ])
 
         db_session.commit()
         db_session.close()
@@ -263,15 +258,13 @@ class ArcjailUserManager(BasePlayerManager):
 arcjail_user_manager = ArcjailUserManager(base_class=ArcjailUser)
 
 
-@InternalEvent('main_player_created')
-def on_main_player_created(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_created')
+def on_player_created(player):
     arcjail_user_manager.create(player)
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    player = event_var['main_player']
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
     arcjail_user_manager.delete(player)
 
 
@@ -282,6 +275,6 @@ def on_round_end(game_event):
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     for arcjail_user in arcjail_user_manager.values():
         GameThread(target=arcjail_user.save_to_database).start()

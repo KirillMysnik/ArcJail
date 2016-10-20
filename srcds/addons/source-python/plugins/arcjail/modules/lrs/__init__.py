@@ -28,24 +28,19 @@ from controlled_cvars.handlers import (
     bool_handler, float_handler, int_handler, sound_nullable_handler,
     string_handler)
 
-from ...arcjail import InternalEvent, load_downloadables
-
+from ...arcjail import load_downloadables
+from ...internal_events import InternalEvent
 from ...resource.strings import build_module_strings
 
 from ..game_status import (
     GameStatus, get_status, set_status, strings_module as strings_game_status)
-
 from ..games import (
     game_event_handler, game_internal_event_handler, GameMeta, push, stage,
     strings_game_captions)
-
-from ..players import broadcast, main_player_manager, tell
-
-from ..rebels import is_rebel, register_rebel_filter
-
-from ..teams import PRISONERS_TEAM
-
 from .. import build_module_config, parse_modules
+from ..players import broadcast, player_manager, tell
+from ..rebels import is_rebel, register_rebel_filter
+from ..teams import PRISONERS_TEAM
 
 
 strings_module = build_module_strings('lrs/common')
@@ -712,13 +707,13 @@ def on_round_start(game_event):
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     reset()
 
 
 @SayCommand('!lr')
 def say_games(command, index, team_only):
-    player = main_player_manager[index]
+    player = player_manager[index]
     send_game_popup(player)
 
 

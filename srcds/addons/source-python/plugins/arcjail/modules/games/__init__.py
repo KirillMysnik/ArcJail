@@ -33,30 +33,21 @@ from controlled_cvars.handlers import (
     sound_nullable_handler, string_handler
 )
 
-from ...arcjail import InternalEvent, load_downloadables
-
+from ...arcjail import load_downloadables
 from ...info import info
-
+from ...internal_events import InternalEvent
 from ...resource.paths import ARCJAIL_LOG_PATH
-
 from ...resource.strings import build_module_strings, COLOR_SCHEME
 
+from .. import build_module_config, parse_modules
 from ..admin import section
-
 from ..effects.sprites import set_player_sprite
-
 from ..game_status import get_status, GameStatus, set_status
 from ..game_status import strings_module as strings_game_status
-
 from ..jail_menu import new_available_option
-
 from ..leaders import is_leader
-
 from ..overlays import show_overlay
-
-from ..players import main_player_manager, tell
-
-from .. import build_module_config, parse_modules
+from ..players import player_manager, tell
 
 
 MIN_PLAYERS_IN_GAME = 2
@@ -258,8 +249,8 @@ def _launch_game(launcher, leader_player, players, **kwargs):
 def get_players_to_play():
     rs = []
     for player in PlayerIter(('jail_prisoner', 'alive')):
-        if player.index in main_player_manager:
-            rs.append(main_player_manager[player.index])
+        if player.index in player_manager:
+            rs.append(player_manager[player.index])
 
     return tuple(rs)
 
@@ -471,13 +462,13 @@ def on_round_start(game_event):
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     reset()
 
 
 @SayCommand('!games')
 def say_games(command, index, team_only):
-    player = main_player_manager[index]
+    player = player_manager[index]
     send_popup(player)
 
 
@@ -647,9 +638,9 @@ class GameInternalEventHandler:
         self.callback = None
         self.game_instance = None
 
-    def __call__(self, event_data):
+    def __call__(self, **kwargs):
         if self.callback is not None:
-            self.callback(self.game_instance, event_data)
+            self.callback(self.game_instance, **kwargs)
 
 
 class Push:

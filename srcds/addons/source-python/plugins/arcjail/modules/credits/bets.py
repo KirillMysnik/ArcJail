@@ -17,20 +17,14 @@ from listeners import OnClientDisconnect
 
 from spam_proof_commands.say import SayCommand
 
-from ...arcjail import InternalEvent
-
+from ...internal_events import InternalEvent
 from ...resource.strings import build_module_strings
 
 from ..arcjail import strings_module as strings_arcjail
-
 from ..arcjail.arcjail_user import arcjail_user_manager
-
 from ..credits import earn_credits, spend_credits
-
 from ..lrs import LastRequestGameStatus
-
 from ..lrs.win_reward import WinReward
-
 from ..players import broadcast, tell
 
 
@@ -174,23 +168,22 @@ class SweepstakesLR(Sweepstakes):
 
 
 @InternalEvent('jail_lrs_status_set')
-def on_jail_lrs_status_set(event_var):
+def on_jail_lrs_status_set(instance, status):
     global current_sweepstakes
     if current_sweepstakes is not None:
         return
 
-    game_instance, status = event_var['instance'], event_var['status']
     if status != LastRequestGameStatus.NOT_STARTED:
         return
 
-    if isinstance(game_instance, WinReward):
+    if isinstance(instance, WinReward):
         return
 
-    current_sweepstakes = SweepstakesLR(game_instance)
+    current_sweepstakes = SweepstakesLR(instance)
 
 
 @InternalEvent('jail_lr_won')
-def on_jail_lr_won(event_var):
+def on_jail_lr_won(winner, loser, instance):
     global current_sweepstakes
     if current_sweepstakes is None:
         return
@@ -198,10 +191,7 @@ def on_jail_lr_won(event_var):
     if not isinstance(current_sweepstakes, SweepstakesLR):
         return
 
-    winner, loser = event_var['winner'], event_var['loser']
-    game_instance = event_var['game_instance']
-
-    if not current_sweepstakes.is_related(game_instance):
+    if not current_sweepstakes.is_related(instance):
         return
 
     current_sweepstakes.finish((winner, ))
@@ -209,7 +199,7 @@ def on_jail_lr_won(event_var):
 
 
 @InternalEvent('jail_lr_destroyed')
-def on_jail_lr_destroyed(event_var):
+def on_jail_lr_destroyed(instance):
     global current_sweepstakes
     if current_sweepstakes is None:
         return
@@ -217,9 +207,7 @@ def on_jail_lr_destroyed(event_var):
     if not isinstance(current_sweepstakes, SweepstakesLR):
         return
 
-    game_instance = event_var['game_instance']
-
-    if not current_sweepstakes.is_related(game_instance):
+    if not current_sweepstakes.is_related(instance):
         return
 
     current_sweepstakes.abort()
@@ -227,16 +215,14 @@ def on_jail_lr_destroyed(event_var):
 
 
 @InternalEvent('jail_stop_accepting_bets')
-def on_jail_stop_accepting_bets(event_var):
+def on_jail_stop_accepting_bets(instance):
     if current_sweepstakes is None:
         return
 
     if not isinstance(current_sweepstakes, SweepstakesLR):
         return
 
-    game_instance = event_var['instance']
-
-    if not current_sweepstakes.is_related(game_instance):
+    if not current_sweepstakes.is_related(instance):
         return
 
     if not current_sweepstakes.accepting:

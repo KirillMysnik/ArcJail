@@ -21,7 +21,7 @@ from ...resource.logger import logger
 
 from ...resource.sqlalchemy import Session
 
-from ..players import main_player_manager
+from ..players import player_manager
 
 from .item_classes import item_classes
 
@@ -42,7 +42,7 @@ class Item:
 
     def get_player(self):
         if self._current_owner:
-            return main_player_manager[index_from_steamid(self._current_owner)]
+            return player_manager[index_from_steamid(self._current_owner)]
 
         return None
 

@@ -17,35 +17,26 @@ from warnings import warn
 
 from cvars import ConVar
 
-from ....arcjail import InternalEvent
+from ....internal_events import InternalEvent
 
 from ...damage_hook import (
     get_hook, is_world, protected_player_manager,
     strings_module as strings_damage_hook)
-
 from ...equipment_switcher import saved_player_manager
-
 from ...falldmg_protector import protect as falldmg_protect
-
 from ...games.game_classes.survival import (
     PossibleDeadEndWarning, strings_module as strings_games)
-
 from ...games import play_flawless_effects
-
 from ...no_ff_spam import (
     disable as no_ff_spam_disable, enable as no_ff_spam_enable)
-
-from ...players import main_player_manager
-
+from ...players import player_manager
 from ...show_damage import show_damage
-
 from ...silent_cvars import silent_set
-
-from ..base_classes.map_game import MapGame
-from ..base_classes.map_game_team_based import MapGameTeamBased
 
 from .. import (
     add_available_game, game_event_handler, push, stage)
+from ..base_classes.map_game import MapGame
+from ..base_classes.map_game_team_based import MapGameTeamBased
 
 
 def build_survival_base(*parent_classes):
@@ -154,8 +145,7 @@ def build_survival_base(*parent_classes):
 
         @game_event_handler('jailgame-player-death', 'player_death')
         def event_jailgame_player_death(self, game_event):
-            player = main_player_manager.get_by_userid(
-                game_event.get_int('userid'))
+            player = player_manager.get_by_userid(game_event['userid'])
 
             if player == self.prisoner:
                 winner, loser = self.guard, self.prisoner
@@ -172,8 +162,7 @@ def build_survival_base(*parent_classes):
 
         @game_event_handler('survival-player-death', 'player_death')
         def event_survival_player_death(self, game_event):
-            player = main_player_manager.get_by_userid(
-                game_event.get_int('userid'))
+            player = player_manager.get_by_userid(game_event['userid'])
 
             if player not in self._players:
                 return
@@ -256,7 +245,7 @@ def build_survival_friendlyfire_base(*parent_classes):
 
                         return False
 
-                    attacker = main_player_manager[info.attacker]
+                    attacker = player_manager[info.attacker]
                     if attacker in self._players:
                         show_damage(attacker, info.damage)
                         return hook_min_damage(counter, info)
@@ -269,7 +258,7 @@ def build_survival_friendlyfire_base(*parent_classes):
 
                         return hook_min_damage(counter, info)
 
-                    attacker = main_player_manager[info.attacker]
+                    attacker = player_manager[info.attacker]
                     if attacker in self._players:
                         show_damage(attacker, info.damage)
                         return hook_min_damage(counter, info)

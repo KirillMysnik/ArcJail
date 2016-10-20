@@ -20,19 +20,14 @@ from players.constants import LifeState
 
 from controlled_cvars.handlers import bool_handler
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
-from .game_status import GameStatus, get_status
-
-from .jail_menu import new_available_option
-
-from .leaders import is_leader
-
-from .players import broadcast, tell
-
 from . import build_module_config
+from .game_status import GameStatus, get_status
+from .jail_menu import new_available_option
+from .leaders import is_leader
+from .players import broadcast, tell
 
 
 strings_module = build_module_strings('respawn')
@@ -152,7 +147,7 @@ def on_round_start(game_event):
 
 
 @InternalEvent('unload')
-def on_unload(event_var):
+def on_unload():
     for popup in _popups.values():
         popup.close()
 

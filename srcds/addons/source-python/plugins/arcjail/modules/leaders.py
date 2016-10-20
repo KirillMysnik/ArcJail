@@ -19,21 +19,15 @@ from events import Event
 from controlled_cvars import InvalidValue
 from controlled_cvars.handlers import bool_handler
 
-from ..arcjail import InternalEvent
-
+from ..internal_events import InternalEvent
 from ..resource.strings import build_module_strings
 
-from .admin import section
-
-from .jail_menu import new_available_option
-
-from .max_health import upgrade_health
-
-from .players import broadcast, main_player_manager, tell
-
-from .teams import GUARDS_TEAM
-
 from . import build_module_config
+from .admin import section
+from .jail_menu import new_available_option
+from .max_health import upgrade_health
+from .players import broadcast, player_manager, tell
+from .teams import GUARDS_TEAM
 
 
 ANTI_SPAM_TIMEOUT = 2
@@ -130,16 +124,16 @@ def get_leadership_denial_reason(player):
 
 @Event('player_death_real')
 def on_player_death_real(game_event):
-    player = main_player_manager.get_by_userid(game_event.get_int('userid'))
+    player = player_manager.get_by_userid(game_event['userid'])
     if _leader is not None and player == _leader:
         broadcast(strings_module['leader_died'].tokenize(player=player.name))
 
         _drop_leadership()
 
 
-@InternalEvent('main_player_deleted')
-def on_main_player_deleted(event_var):
-    if _leader is not None and event_var['main_player'] == _leader:
+@InternalEvent('player_deleted')
+def on_player_deleted(player):
+    if _leader is not None and player == _leader:
         broadcast(strings_module['leader_disconnected'].tokenize(
             player=_leader.name))
 
@@ -163,7 +157,7 @@ def on_round_end(game_event):
 
 @SayCommand(ANTI_SPAM_TIMEOUT, '!lead')
 def chat_on_lead(command, index, team_only):
-    player = main_player_manager[index]
+    player = player_manager[index]
     if _leader is not None and _leader == player:
         _drop_leadership()
         broadcast(strings_module['leader_drop'].tokenize(player=player.name))
@@ -181,7 +175,7 @@ def chat_on_lead(command, index, team_only):
 
 @SayCommand(ANTI_SPAM_TIMEOUT, '!leaders')
 def chat_on_leaders(command, index, team_only):
-    player = main_player_manager[index]
+    player = player_manager[index]
 
     if _leader is None:
         tell(player, strings_module['no_current_leader'])

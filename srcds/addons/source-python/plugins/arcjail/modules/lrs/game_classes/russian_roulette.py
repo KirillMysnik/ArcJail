@@ -24,21 +24,16 @@ from controlled_cvars.handlers import int_handler
 
 from ....resource.strings import build_module_strings
 
+from ... import build_module_config
 from ...damage_hook import protected_player_manager
-
 from ...equipment_switcher import (
     register_weapon_drop_filter, register_weapon_pickup_filter,
     saved_player_manager, unregister_weapon_drop_filter,
     unregister_weapon_pickup_filter)
-
 from ...jail_map import get_lrs
-
-from ...players import main_player_manager
-
-from ... import build_module_config
+from ...players import player_manager
 
 from .. import add_available_game, HiddenSetting, stage
-
 from ..base_classes.combat_game import CombatGame
 
 
@@ -142,8 +137,7 @@ class RussianRoulette(CombatGame):
             p_player.set_protected()
 
     def _on_weapon_fire(self, game_event):
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
+        player = player_manager.get_by_userid(game_event['userid'])
 
         if player not in self._players:
             return

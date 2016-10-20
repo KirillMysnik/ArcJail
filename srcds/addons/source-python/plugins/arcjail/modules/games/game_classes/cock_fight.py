@@ -22,19 +22,17 @@ from listeners.tick import on_tick_listener_manager
 
 from controlled_cvars.handlers import bool_handler, int_handler
 
-from ....arcjail import InternalEvent, load_downloadables
-
+from ....arcjail import load_downloadables
+from ....internal_events import InternalEvent
 from ....resource.strings import build_module_strings
 
-from ...players import broadcast, main_player_manager
-
+from ...players import broadcast, player_manager
 from ... import build_module_config
-
-from ..base_classes.prepare_time import PrepareTime
 
 from .. import (
     add_available_game, game_event_handler, helper_set_loser,
     helper_set_winner, stage)
+from ..base_classes.prepare_time import PrepareTime
 
 
 strings_module = build_module_strings('games/cock_fight')
@@ -145,6 +143,7 @@ class CockFight(PrepareTime):
                     else:
                         # TODO: If we specify attacker index,
                         # it won't do any damage - why?
+                        # Probably because friendly fire is off
                         player_.take_damage(player_.health)
 
                     break
@@ -169,9 +168,7 @@ class CockFight(PrepareTime):
         if not config_manager['sounds']:
             return
 
-        player = main_player_manager.get_by_userid(
-            game_event.get_int('userid'))
-
+        player = player_manager.get_by_userid(game_event['userid'])
         if player in self.players:
             sound_name = choice(sounds)
             sound = SoundClass(sound_name, player.index)
